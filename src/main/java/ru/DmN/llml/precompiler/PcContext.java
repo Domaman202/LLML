@@ -1,10 +1,10 @@
-package ru.DmN.llml.parser.ast;
+package ru.DmN.llml.precompiler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SyContext {
-    public List<SyAbstractFunction> functions = new ArrayList<>();
+public class PcContext {
+    public List<PcNIFunction> functions = new ArrayList<>();
 
     @Override
     public String toString() {

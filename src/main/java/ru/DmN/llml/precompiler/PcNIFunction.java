@@ -1,24 +1,18 @@
-package ru.DmN.llml.parser.ast;
+package ru.DmN.llml.precompiler;
 
 import ru.DmN.llml.llvm.Argument;
 import ru.DmN.llml.llvm.Type;
 import ru.DmN.llml.llvm.VariableMap;
 
-import java.util.List;
-
-public abstract class SyAbstractFunction extends SyElement {
+public class PcNIFunction extends PcElement {
     public String name;
     public Type ret;
     public VariableMap<Argument> arguments;
 
-    public SyAbstractFunction(String name, Type ret, List<Argument> arguments) {
+    public PcNIFunction(String name, Type ret, VariableMap<Argument> arguments) {
         this.name = name;
         this.ret = ret;
-        this.arguments = new VariableMap<>(arguments);
-    }
-
-    public String getName() {
-        return '@' + name;
+        this.arguments = arguments;
     }
 
     @Override

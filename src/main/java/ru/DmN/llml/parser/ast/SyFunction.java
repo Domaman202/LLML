@@ -3,7 +3,7 @@ package ru.DmN.llml.parser.ast;
 import ru.DmN.llml.llvm.Argument;
 import ru.DmN.llml.llvm.Type;
 import ru.DmN.llml.llvm.Variable;
-import ru.DmN.llml.llvm.util.VariableMap;
+import ru.DmN.llml.llvm.VariableMap;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,7 @@
 package ru.DmN.llml;
 
 import ru.DmN.llml.parser.Parser;
+import ru.DmN.llml.precompiler.PreCompiler;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,6 +12,14 @@ public class Main {
                 }
                 """);
 
-        System.out.println(parser.parse());
+        var ctxA = parser.parse();
+        System.out.println("Parsed:");
+        System.out.println(ctxA);
+        System.out.println();
+
+        var precompiler = new PreCompiler(ctxA);
+        precompiler.calcA();
+        System.out.println("Precompiled:");
+        System.out.println(precompiler.ctx);
     }
 }

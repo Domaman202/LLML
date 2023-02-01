@@ -1,4 +1,4 @@
-package ru.DmN.llml.llvm.util;
+package ru.DmN.llml.llvm;
 
 import ru.DmN.llml.llvm.Variable;
 

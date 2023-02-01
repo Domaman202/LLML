@@ -1,14 +1,23 @@
 package ru.DmN.llml.parser.action;
 
-public class ActSetVariable extends Action {
-    public String name;
+import ru.DmN.llml.llvm.Type;
+import ru.DmN.llml.llvm.Variable;
+import ru.DmN.llml.parser.ast.SyFunction;
 
-    public ActSetVariable(String name) {
-        this.name = name;
+public class ActSetVariable extends Action {
+    public Variable variable;
+
+    public ActSetVariable(Variable variable) {
+        this.variable = variable;
+    }
+
+    @Override
+    public boolean isNeedCalc(SyFunction fun) {
+        return fun.locals.get(variable.name).type == Type.UNKNOWN;
     }
 
     @Override
     public StringBuilder toString(int offset) {
-        return super.toString(offset).append("(Set Variable): [").append(name).append(']');
+        return super.toString(offset).append("(Set Variable): [").append(variable.name).append("][").append(variable.type.name).append(']');
     }
 }

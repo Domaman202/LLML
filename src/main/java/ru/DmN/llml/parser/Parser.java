@@ -69,10 +69,14 @@ public class Parser {
                     next(Token.Type.PTR);
                     token = next();
                     switch (token.type) {
-                        case PILLAR -> expression.actions.add(new ActReturn());
+                        case PILLAR -> expression.actions.add(new ActReturn(function.ret));
                         case NAMING -> {
-                            function.locals.add(new Variable(token.str, Type.UNKNOWN));
-                            expression.actions.add(new ActSetVariable(token.str));
+                            var var = function.locals.get(token.str);
+                            if (var == null) {
+                                var = new Variable(token.str, Type.UNKNOWN);
+                                function.locals.add(var);
+                            }
+                            expression.actions.add(new ActSetVariable(var));
                         }
                         default -> throw new RuntimeException("(" + token.line + ',' + token.symbol + ") \"" + token.type + "\" != PILLAR|NAMING");
                     }
@@ -98,7 +102,7 @@ public class Parser {
                         case "/" -> oper = ActMathOperation.Operation.DIV;
                         default -> throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Операция \"" + token.str + "\" ещё не реализована!");
                     }
-                    expression.actions.add(new ActMathOperation(oper));
+                    expression.actions.add(new ActMathOperation(oper, Type.UNKNOWN));
                 }
                 default -> throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Неверный токен \"" + token.type + "\"");
             }
