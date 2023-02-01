@@ -1,10 +1,13 @@
-package ru.DmN.llml.lexer;
+package ru.DmN.llml.parser;
 
+import ru.DmN.llml.lexer.Lexer;
+import ru.DmN.llml.lexer.Token;
 import ru.DmN.llml.llvm.Argument;
-import ru.DmN.llml.llvm.Context;
-import ru.DmN.llml.llvm.Function;
 import ru.DmN.llml.llvm.Type;
-import ru.DmN.llml.llvm.expr.Math2Expr;
+import ru.DmN.llml.llvm.Variable;
+import ru.DmN.llml.parser.action.*;
+import ru.DmN.llml.parser.ast.SyContext;
+import ru.DmN.llml.parser.ast.SyFunction;
 
 import java.util.ArrayList;
 
@@ -15,8 +18,8 @@ public class Parser {
         this.lexer = new Lexer(str);
     }
 
-    public Context parse() {
-        var ctx = new Context();
+    public SyContext parse() {
+        var ctx = new SyContext();
         while (!lexer.str.isEmpty()) {
             ctx.functions.add(parseFunction());
             lexer.skipNLSpaces();
@@ -24,7 +27,7 @@ public class Parser {
         return ctx;
     }
 
-    public Function parseFunction() {
+    public SyFunction parseFunction() {
         next(Token.Type.FUN);
         var name = next(Token.Type.NAMING).str;
         next(Token.Type.OPEN_BRACKET);
@@ -44,16 +47,15 @@ public class Parser {
         token = next();
         if (token.type == Token.Type.COLON) {
             ret = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
-            next(Token.Type.COLON);
             token = next();
         } else ret = Type.UNKNOWN;
         check(token, Token.Type.OPEN_FBRACKET);
-        var function = new Function(name, ret, args);
+        var function = new SyFunction(name, ret, args);
         while (parseExpression(function)) ;
         return function;
     }
 
-    public boolean parseExpression(Function function) {
+    public boolean parseExpression(SyFunction function) {
         Token token = next();
         if (token.type == Token.Type.CLOSE_FBRACKET)
             return false;
@@ -67,8 +69,11 @@ public class Parser {
                     next(Token.Type.PTR);
                     token = next();
                     switch (token.type) {
-                        case PILLAR -> expression.ret();
-                        case NAMING -> expression.save(token.str);
+                        case PILLAR -> expression.actions.add(new ActReturn());
+                        case NAMING -> {
+                            function.locals.add(new Variable(token.str, Type.UNKNOWN));
+                            expression.actions.add(new ActSetVariable(token.str));
+                        }
                         default -> throw new RuntimeException("(" + token.line + ',' + token.symbol + ") \"" + token.type + "\" != PILLAR|NAMING");
                     }
 
@@ -78,18 +83,22 @@ public class Parser {
                     return true;
                 }
                 case NAMING -> {
-                    if (!expression.insert(token.str))
+                    var var = function.locals.get(token.str);
+                    if (var == null)
                         throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Неизвестная переменная \"" + token.str + "\"");
+                    expression.actions.add(new ActInsertVariable(var));
                 }
-                case NUMBER -> expression.insert(Integer.parseInt(token.str));
+                case NUMBER -> expression.actions.add(new ActInsertInteger(Integer.parseInt(token.str)));
                 case OPERATION -> {
+                    ActMathOperation.Operation oper;
                     switch (token.str) {
-                        case "+" -> expression.operation(Math2Expr.Type.ADD);
-                        case "-" -> expression.operation(Math2Expr.Type.SUB);
-                        case "*" -> expression.operation(Math2Expr.Type.MUL);
-                        case "/" -> expression.operation(Math2Expr.Type.DIV);
+                        case "+" -> oper = ActMathOperation.Operation.ADD;
+                        case "-" -> oper = ActMathOperation.Operation.SUB;
+                        case "*" -> oper = ActMathOperation.Operation.MUL;
+                        case "/" -> oper = ActMathOperation.Operation.DIV;
                         default -> throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Операция \"" + token.str + "\" ещё не реализована!");
                     }
+                    expression.actions.add(new ActMathOperation(oper));
                 }
                 default -> throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Неверный токен \"" + token.type + "\"");
             }

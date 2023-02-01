@@ -1,7 +1,7 @@
 package ru.DmN.llml.lexer;
 
 public class Lexer {
-    protected String str;
+    public String str;
     protected int line;
     protected int symbol;
 
@@ -117,7 +117,7 @@ public class Lexer {
         return new Token(num.toString(), Token.Type.NUMBER, line, symbol);
     }
 
-    protected void skipNLSpaces() {
+    public void skipNLSpaces() {
         while (true) {
             skipSpaces();
             if (!str.isEmpty() && str.charAt(0) == '\n')
