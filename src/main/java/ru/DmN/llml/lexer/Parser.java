@@ -44,7 +44,6 @@ public class Parser {
         token = next();
         if (token.type == Token.Type.COLON) {
             ret = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
-            next(Token.Type.COLON);
             token = next();
         } else ret = Type.UNKNOWN;
         check(token, Token.Type.OPEN_FBRACKET);
