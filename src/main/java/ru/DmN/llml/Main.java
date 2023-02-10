@@ -17,12 +17,15 @@ public class Main {
         System.out.println(ctx);
         System.out.println();
 
-        for (var it : ctx.functions)
-            if (it instanceof SyFunction fun)
-                ctx.calculate(fun, true);
-        System.out.println("Calculation A:");
-        System.out.println(ctx);
-        System.out.println();
+        for (var it : ctx.functions) {
+            if (it instanceof SyFunction fun) {
+                for (int i = 0; ctx.calculateA(fun); i++) {
+                    System.out.println("Calculation A[" + i + "]:");
+                    System.out.println(ctx);
+                    System.out.println();
+                }
+            }
+        }
 
         var precompiler = new PreCompiler(ctx);
         precompiler.precompile();
