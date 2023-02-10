@@ -16,19 +16,25 @@ public class PreCompiler {
         this.ctx = new PcContext();
     }
 
-    public void calcA() {
+    public void precompile() {
         for (var function : src.functions) {
             if (function instanceof SyFunction fun) {
-                calcA(fun);
+                ctx.functions.add(precompile(src.calculate(fun, true)));
             } else {
-
+                // TODO:
             }
         }
     }
 
-    protected void calcA(SyFunction src) {
+    protected PcFunction precompile(SyFunction src) {
         var fun = new PcFunction(src.name, src.ret, src.arguments);
-        ctx.functions.add(fun);
+        src.expressions.stream().map(it -> it.actions).forEach(fun.actions::addAll);
+        return fun;
+    }
+}
+
+/*
+var fun = new PcFunction(src.name, src.ret, src.arguments);
         var ts = new ArrayDeque<Type>();
         for (var expression : src.expressions) {
             for (var action : expression.actions) {
@@ -60,5 +66,4 @@ public class PreCompiler {
                 }
             }
         }
-    }
-}
+ */

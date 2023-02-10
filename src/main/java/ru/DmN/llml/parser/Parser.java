@@ -38,10 +38,13 @@ public class Parser {
                 token = next();
             check(token, Token.Type.NAMING);
             var argName = token.str;
-            next(Token.Type.COLON);
-            var argType = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
-            args.add(new Argument(argName, argType));
+            Type argType;
             token = next();
+            if (token.type == Token.Type.COLON) {
+                argType = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
+                token = next();
+            } else argType = Type.UNKNOWN;
+            args.add(new Argument(argName, argType));
         }
         Type ret;
         token = next();
