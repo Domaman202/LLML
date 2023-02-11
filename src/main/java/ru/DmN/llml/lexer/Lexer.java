@@ -15,12 +15,8 @@ public class Lexer {
             var c = str.charAt(0);
             if (Character.isDigit(c))
                 return parseNumber();
-            if (Character.isLetter(c)) {
-                if (c == 'f' && str.charAt(1) == 'u' && str.charAt(2) == 'n') {
-                    return new Token("fun", Token.Type.FUN, line, delete(3));
-                }
+            if (Character.isLetter(c))
                 return parseNaming();
-            }
             switch (c) {
                 case '\n' -> {
                     int old = symbol;
@@ -55,6 +51,9 @@ public class Lexer {
                 }
                 case '|' -> {
                     return new Token("|", Token.Type.PILLAR, line, delete(1));
+                }
+                case '=' -> {
+                    return new Token("=", Token.Type.ASSIGN, line, delete(1));
                 }
                 case '-' -> {
                     var $ = str.charAt(1);

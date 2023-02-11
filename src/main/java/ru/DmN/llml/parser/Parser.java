@@ -21,16 +21,19 @@ public class Parser {
     public SyContext parse() {
         var ctx = new SyContext();
         while (!lexer.str.isEmpty()) {
-            ctx.functions.add(parseFunction());
+            var name = next(Token.Type.NAMING).str;
+            var token = next();
+            if (token.type == Token.Type.OPEN_BRACKET) {
+                ctx.functions.add(parseFunction(name));
+            } else {
+                // todo: переменные
+            }
             lexer.skipNLSpaces();
         }
         return ctx;
     }
 
-    public SyFunction parseFunction() {
-        next(Token.Type.FUN);
-        var name = next(Token.Type.NAMING).str;
-        next(Token.Type.OPEN_BRACKET);
+    public SyFunction parseFunction(String name) {
         var args = new ArrayList<Argument>();
         var token = next();
         while (token.type != Token.Type.CLOSE_BRACKET) {
@@ -52,7 +55,8 @@ public class Parser {
             ret = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
             token = next();
         } else ret = Type.UNKNOWN;
-        check(token, Token.Type.OPEN_FBRACKET);
+        check(token, Token.Type.ASSIGN);
+        next(Token.Type.OPEN_FBRACKET);
         var function = new SyFunction(name, ret, args);
         while (parseExpression(function)) ;
         return function;

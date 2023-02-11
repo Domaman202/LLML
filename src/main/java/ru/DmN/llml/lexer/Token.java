@@ -30,8 +30,8 @@ public class Token {
         COLON,
         COMMA,
         PILLAR,
+        ASSIGN,
 
-        FUN,
         PTR,
 
         NAMING,
