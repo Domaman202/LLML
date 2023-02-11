@@ -1,0 +1,81 @@
+Parsed:
+[Context
+|	[fun foo(a: unknown, b: unknown): i32
+|	|	[Expression
+|	|	|	(Insert Variable): [a][unknown]
+|	|	|	(Insert Variable): [b][unknown]
+|	|	|	(Math Operation): [ADD][unknown]
+|	|	|	(Insert Int): [2]
+|	|	|	(Math Operation): [DIV][unknown]
+|	|	|	(Return): [i32]
+|	|	]
+|	]
+]
+
+Calculation A[0]:
+[Context
+|	[fun foo(a: unknown, b: unknown): i32
+|	|	[Expression
+|	|	|	(Insert Variable): [a][unknown]
+|	|	|	(Insert Variable): [b][unknown]
+|	|	|	(Math Operation): [ADD][unknown]
+|	|	|	(Insert Int): [2]
+|	|	|	(Math Operation): [DIV][i32]
+|	|	|	(Return): [i32]
+|	|	]
+|	]
+]
+
+Calculation A[1]:
+[Context
+|	[fun foo(a: unknown, b: unknown): i32
+|	|	[Expression
+|	|	|	(Insert Variable): [a][unknown]
+|	|	|	(Insert Variable): [b][unknown]
+|	|	|	(Math Operation): [ADD][i32]
+|	|	|	(Insert Int): [2]
+|	|	|	(Math Operation): [DIV][i32]
+|	|	|	(Return): [i32]
+|	|	]
+|	]
+]
+
+Calculation A[2]:
+[Context
+|	[fun foo(a: unknown, b: i32): i32
+|	|	[Expression
+|	|	|	(Insert Variable): [a][unknown]
+|	|	|	(Insert Variable): [b][i32]
+|	|	|	(Math Operation): [ADD][i32]
+|	|	|	(Insert Int): [2]
+|	|	|	(Math Operation): [DIV][i32]
+|	|	|	(Return): [i32]
+|	|	]
+|	]
+]
+
+Calculation A[3]:
+[Context
+|	[fun foo(a: i32, b: i32): i32
+|	|	[Expression
+|	|	|	(Insert Variable): [a][i32]
+|	|	|	(Insert Variable): [b][i32]
+|	|	|	(Math Operation): [ADD][i32]
+|	|	|	(Insert Int): [2]
+|	|	|	(Math Operation): [DIV][i32]
+|	|	|	(Return): [i32]
+|	|	]
+|	]
+]
+
+Precompiled:
+[Context
+|	[fun foo(a: i32, b: i32): i32
+|	|	(Insert Variable): [a][i32]
+|	|	(Insert Variable): [b][i32]
+|	|	(Math Operation): [ADD][i32]
+|	|	(Insert Int): [2]
+|	|	(Math Operation): [DIV][i32]
+|	|	(Return): [i32]
+|	]
+]
