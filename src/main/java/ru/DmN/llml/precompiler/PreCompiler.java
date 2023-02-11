@@ -19,7 +19,7 @@ public class PreCompiler {
     public void precompile() {
         for (var function : src.functions) {
             if (function instanceof SyFunction fun) {
-                ctx.functions.add(precompile(src.calculate(fun, true)));
+                ctx.functions.add(precompile(src.calculate(fun, true, Type.UNKNOWN)));
             } else {
                 // TODO:
             }

@@ -7,19 +7,19 @@ import ru.DmN.llml.parser.action.ActMathOperation;
 import ru.DmN.llml.parser.action.ActReturn;
 import ru.DmN.llml.parser.action.Action;
 
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SyContext {
     public List<SyAbstractFunction> functions = new ArrayList<>();
 
-    public SyFunction calculate(SyFunction fun, boolean calcA) {
+    public SyFunction calculate(SyFunction fun, boolean calcA, Type calcB) {
         boolean needCalculation;
         do {
             needCalculation = false;
-            if (calcA) {
-                while (calculateA(fun)) needCalculation = true;
-            }
+            if (calcA) while (calculateA(fun)) needCalculation = true;
+            if (calcB != Type.UNKNOWN) calculateB(fun,calcB);
         } while (needCalculation);
         return fun;
     }
@@ -47,6 +47,26 @@ public class SyContext {
             }
         }
         return false;
+    }
+
+    public void calculateB(SyFunction fun, Type type) {
+        for (var expr : fun.expressions) {
+            for (var act : expr.actions) {
+                if (act instanceof ActInsertVariable insert) {
+                    if (insert.variable.type == Type.UNKNOWN) {
+                        insert.variable.type = type;
+                    }
+                } else if (act instanceof ActMathOperation op) {
+                    if (op.type == Type.UNKNOWN) {
+                        op.type = type;
+                    }
+                } else if (act instanceof ActReturn ret) {
+                    if (ret.type == Type.UNKNOWN) {
+                        fun.ret = ret.type = type;
+                    }
+                }
+            }
+        }
     }
 
     protected Type getTraceType(Tracer<Action> tracer) {

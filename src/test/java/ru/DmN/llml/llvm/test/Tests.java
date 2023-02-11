@@ -1,33 +1,75 @@
 package ru.DmN.llml.llvm.test;
 
-import ru.DmN.llml.llvm.Argument;
 import ru.DmN.llml.llvm.Type;
-import ru.DmN.llml.llvm.expr.Math2Expr;
+import ru.DmN.llml.parser.Parser;
+import ru.DmN.llml.parser.ast.SyFunction;
+import ru.DmN.llml.precompiler.PreCompiler;
 
-import java.util.List;
+import java.io.*;
 
 public class Tests {
-    public static void main(String[] args) {
-        for (int i = 1; i < 257; i++) {
-            System.out.println("I" + i + "(" + i + "),");
+    public static void main(String[] args) throws FileNotFoundException {
+        new File("log").mkdir();
+        test0();
+        test1();
+    }
+
+    private static void test0() throws FileNotFoundException {
+        try (var out = new PrintStream(new FileOutputStream("log/test0.log"))) {
+            var parser = new Parser("""
+                    foo(a, b): i32 = {
+                        [a b + 2 /) -> |
+                    }
+                    """);
+
+            var ctx = parser.parse();
+            out.println("Parsed:");
+            out.println(ctx);
+            out.println();
+
+            for (var it : ctx.functions) {
+                if (it instanceof SyFunction fun) {
+                    for (int i = 0; ctx.calculateA(fun); i++) {
+                        out.println("Calculation A[" + i + "]:");
+                        out.println(ctx);
+                        out.println();
+                    }
+                }
+            }
+
+            var precompiler = new PreCompiler(ctx);
+            precompiler.precompile();
+            out.println("Precompiled:");
+            out.println(precompiler.ctx);
         }
     }
 
-    private static void test0() {
-        var ctx = new Context();
+    private static void test1() throws FileNotFoundException {
+        try (var out = new PrintStream(new FileOutputStream("log/test1.log"))) {
+            var parser = new Parser("""
+                    foo(a, b): i32 = {
+                        [a b + 2 /) -> |
+                    }
+                    """);
 
-        // i32 add(i32 arg$a, i32 arg$b)
-        var func = ctx.defineFunction("add", Type.I32, List.of(new Argument("a", Type.I32), new Argument("b", Type.I32)));
-        var arg$a = func.arguments.get("a");
-        var arg$b = func.arguments.get("b");
+            var ctx = parser.parse();
+            out.println("Parsed:");
+            out.println(ctx);
+            out.println();
 
-        // (a b +) > |
-        var expr = func.expression();
-        expr.insert(arg$a);
-        expr.insert(arg$b);
-        expr.operation(Math2Expr.Type.ADD);
-        expr.ret();
+            for (var it : ctx.functions) {
+                if (it instanceof SyFunction fun) {
+                    ctx.calculateB(fun, Type.I32);
+                    out.println("Calculation B[" + 0 + "]:");
+                    out.println(ctx);
+                    out.println();
+                }
+            }
 
-        System.out.println(ctx.compile());
+            var precompiler = new PreCompiler(ctx);
+            precompiler.precompile();
+            out.println("Precompiled:");
+            out.println(precompiler.ctx);
+        }
     }
 }
