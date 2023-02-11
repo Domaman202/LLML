@@ -7,8 +7,8 @@ import ru.DmN.llml.precompiler.PreCompiler;
 public class Main {
     public static void main(String[] args) {
         var parser = new Parser("""
-                fun foo(a, b): i32 {
-                    [a b +) -> |
+                fun foo(a: i32, b: i32): i32 {
+                    [a b + 2 /) -> |
                 }
                 """);
 
