@@ -2,7 +2,7 @@ package ru.DmN.llml.llvm;
 
 @SuppressWarnings("unused")
 public enum Type {
-    UNKNOWN(null),
+    UNKNOWN("unknown"),
     VOID("void"),
     I1(1),
     I2(2),
