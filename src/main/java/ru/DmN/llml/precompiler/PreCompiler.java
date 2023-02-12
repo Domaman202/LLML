@@ -1,5 +1,6 @@
 package ru.DmN.llml.precompiler;
 
+import ru.DmN.llml.llvm.Constant;
 import ru.DmN.llml.llvm.Type;
 import ru.DmN.llml.llvm.Value;
 import ru.DmN.llml.llvm.Variable;
@@ -40,7 +41,9 @@ public class PreCompiler {
             var expr = src.expressions.get(i);
             for (int j = 0; j < expr.actions.size(); j++) {
                 var act = expr.actions.get(j);
-                if (act instanceof ActInsertVariable insert) {
+                if (act instanceof ActInsertInteger insert) {
+                    vstack.push(new Value(new Constant(insert.value)));
+                } else if (act instanceof ActInsertVariable insert) {
                     vstack.push(new Value(insert.variable));
                 } else if (act instanceof ActMath op) {
                     var a = cast(fun.actions, vstack.pop(), op.type);

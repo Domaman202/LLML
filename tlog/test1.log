@@ -29,11 +29,8 @@ Calculation B[0]:
 Precompiled:
 [Context
 |	[fun foo(a: i32, b: i32): i32
-|	|	(Insert Variable): [a][i32]
-|	|	(Insert Variable): [b][i32]
-|	|	(Math Operation): [ADD][i32]
-|	|	(Insert Int): [2]
-|	|	(Math Operation): [DIV][i32]
-|	|	(Return): [i32]
+|	|	(Math Operation): [ADD][i32] [b(i32)][a(i32)] [__internal_1304836502__(i32)]
+|	|	(Math Operation): [DIV][i32] [2.0(i32)][__internal_1304836502__(i32)] [__internal_225534817__(i32)]
+|	|	(Return): [__internal_225534817__(i32)]
 |	]
 ]
