@@ -1,6 +1,5 @@
 package ru.DmN.llml.llvm.test;
 
-import org.junit.jupiter.api.Assertions;
 import ru.DmN.llml.llvm.Type;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.parser.ast.SyFunction;
