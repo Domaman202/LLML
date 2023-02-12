@@ -17,8 +17,10 @@ public class SyContext {
         boolean needCalculation;
         do {
             needCalculation = false;
-            if (calcA && fun instanceof SyFunction f) while (calculateA(f)) needCalculation = true;
             if (calcB != Type.UNKNOWN) calculateB(fun,calcB);
+            if (fun instanceof SyFunction f) {
+                if (calcA) while (calculateA(f)) needCalculation = true;
+            }
         } while (needCalculation);
         return fun;
     }
