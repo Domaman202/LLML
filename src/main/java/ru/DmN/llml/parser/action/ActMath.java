@@ -3,11 +3,11 @@ package ru.DmN.llml.parser.action;
 import ru.DmN.llml.llvm.Type;
 import ru.DmN.llml.parser.ast.SyFunction;
 
-public class ActMathOperation extends Action {
+public class ActMath extends Action {
     public Operation operation;
     public Type type;
 
-    public ActMathOperation(Operation operation, Type type) {
+    public ActMath(Operation operation, Type type) {
         this.operation = operation;
         this.type = type;
     }

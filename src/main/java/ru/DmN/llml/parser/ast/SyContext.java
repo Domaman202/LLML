@@ -3,7 +3,7 @@ package ru.DmN.llml.parser.ast;
 import ru.DmN.llml.llvm.Type;
 import ru.DmN.llml.parser.Tracer;
 import ru.DmN.llml.parser.action.ActInsertVariable;
-import ru.DmN.llml.parser.action.ActMathOperation;
+import ru.DmN.llml.parser.action.ActMath;
 import ru.DmN.llml.parser.action.ActReturn;
 import ru.DmN.llml.parser.action.Action;
 
@@ -34,7 +34,7 @@ public class SyContext {
                         insert.variable.type = getTraceType(new Tracer.UpStepTracer<>(expr.actions, i));
                         return insert.variable.type != Type.UNKNOWN;
                     }
-                } else if (act instanceof ActMathOperation op) {
+                } else if (act instanceof ActMath op) {
                     if (op.type == Type.UNKNOWN) {
                         op.type = fun.ret;
                         return op.type != Type.UNKNOWN;
@@ -65,7 +65,7 @@ public class SyContext {
                         if (insert.variable.type == Type.UNKNOWN) {
                             insert.variable.type = type;
                         }
-                    } else if (act instanceof ActMathOperation op) {
+                    } else if (act instanceof ActMath op) {
                         if (op.type == Type.UNKNOWN) {
                             op.type = type;
                         }
@@ -86,7 +86,7 @@ public class SyContext {
                 if (insert.variable.type != Type.UNKNOWN) {
                     return insert.variable.type;
                 }
-            } else if (act instanceof ActMathOperation op) {
+            } else if (act instanceof ActMath op) {
                 if (op.type != Type.UNKNOWN) {
                     return op.type;
                 }

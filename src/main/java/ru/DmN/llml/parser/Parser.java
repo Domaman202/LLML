@@ -101,15 +101,15 @@ public class Parser {
                 }
                 case NUMBER -> expression.actions.add(new ActInsertInteger(Integer.parseInt(token.str)));
                 case OPERATION -> {
-                    ActMathOperation.Operation oper;
+                    ActMath.Operation oper;
                     switch (token.str) {
-                        case "+" -> oper = ActMathOperation.Operation.ADD;
-                        case "-" -> oper = ActMathOperation.Operation.SUB;
-                        case "*" -> oper = ActMathOperation.Operation.MUL;
-                        case "/" -> oper = ActMathOperation.Operation.DIV;
+                        case "+" -> oper = ActMath.Operation.ADD;
+                        case "-" -> oper = ActMath.Operation.SUB;
+                        case "*" -> oper = ActMath.Operation.MUL;
+                        case "/" -> oper = ActMath.Operation.DIV;
                         default -> throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Операция \"" + token.str + "\" ещё не реализована!");
                     }
-                    expression.actions.add(new ActMathOperation(oper, Type.UNKNOWN));
+                    expression.actions.add(new ActMath(oper, Type.UNKNOWN));
                 }
                 default -> throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Неверный токен \"" + token.type + "\"");
             }

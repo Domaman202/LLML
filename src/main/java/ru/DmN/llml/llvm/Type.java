@@ -4,6 +4,7 @@ package ru.DmN.llml.llvm;
 public enum Type {
     UNKNOWN("unknown"),
     VOID("void"),
+    FLOAT("float"),
     I1(1),
     I2(2),
     I3(3),

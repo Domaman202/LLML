@@ -5,13 +5,14 @@ import ru.DmN.llml.llvm.Type;
 import ru.DmN.llml.llvm.Variable;
 import ru.DmN.llml.llvm.VariableMap;
 import ru.DmN.llml.parser.action.Action;
+import ru.DmN.llml.precompiler.action.PrecompiledAction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PcFunction extends PcNIFunction {
     public VariableMap<Variable> locals = new VariableMap<>();
-    public List<Action> actions = new ArrayList<>();
+    public List<PrecompiledAction> actions = new ArrayList<>();
 
     public PcFunction(String name, Type ret, VariableMap<Argument> arguments) {
         super(name, ret, arguments);
