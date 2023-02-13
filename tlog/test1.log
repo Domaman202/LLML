@@ -1,32 +1,3 @@
-Parsed:
-[Context
-|	[fun foo(a: unknown, b: unknown): i32
-|	|	[Expression
-|	|	|	(Insert Variable): [a][unknown]
-|	|	|	(Insert Variable): [b][unknown]
-|	|	|	(Math Operation): [ADD][unknown]
-|	|	|	(Insert Int): [2]
-|	|	|	(Math Operation): [DIV][unknown]
-|	|	|	(Return): [i32]
-|	|	]
-|	]
-]
-
-Calculation B[0]:
-[Context
-|	[fun foo(a: i32, b: i32): i32
-|	|	[Expression
-|	|	|	(Insert Variable): [a][i32]
-|	|	|	(Insert Variable): [b][i32]
-|	|	|	(Math Operation): [ADD][i32]
-|	|	|	(Insert Int): [2]
-|	|	|	(Math Operation): [DIV][i32]
-|	|	|	(Return): [i32]
-|	|	]
-|	]
-]
-
-Precompiled:
 [Context
 |	[fun foo(a: i32, b: i32): i32
 |	|	(Math): [ADD][i32] [(%b)(i32)][(%a)(i32)] [(%1)(i32)]

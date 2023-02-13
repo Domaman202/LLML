@@ -10,65 +10,32 @@ import java.io.*;
 public class Tests {
     public static void main(String[] args) throws FileNotFoundException {
         new File("log").mkdir();
-        test0();
-        test1();
+        //
+        test(0, """
+                foo(a, b): i32 = {
+                    [a b + 2 /) -> |
+                }
+                """, true, Type.UNKNOWN);
+        test(1, """
+                foo(a, b): i32 = {
+                    [a b + 2 /) -> |
+                }
+                """, false, Type.I32);
+        test(2, """
+                foo(a, b): i32 = {
+                    [a b +) -> c
+                    [c 2 /) -> |
+                }
+                """, true, Type.UNKNOWN);
     }
 
-    private static void test0() throws FileNotFoundException {
-        try (var out = testStream(0)) {
-            var parser = new Parser("""
-                    foo(a, b): i32 = {
-                        [a b + 2 /) -> |
-                    }
-                    """);
-
+    private static void test(int id, String code, boolean calcA, Type calcB) throws FileNotFoundException {
+        try (var out = testStream(id)) {
+            var parser = new Parser(code);
             var ctx = parser.parse();
-            out.println("Parsed:");
-            out.println(ctx);
-            out.println();
-
-            for (var it : ctx.functions) {
-                if (it instanceof SyFunction fun) {
-                    for (int i = 0; ctx.calculateA(fun); i++) {
-                        out.println("Calculation A[" + i + "]:");
-                        out.println(ctx);
-                        out.println();
-                    }
-                }
-            }
-
+            ctx.functions.forEach(fun -> ctx.calculate(fun, calcA, calcB));
             var precompiler = new PreCompiler(ctx);
             precompiler.precompile();
-            out.println("Precompiled:");
-            out.println(precompiler.ctx);
-        }
-    }
-
-    private static void test1() throws FileNotFoundException {
-        try (var out = testStream(1)) {
-            var parser = new Parser("""
-                    foo(a, b): i32 = {
-                        [a b + 2 /) -> |
-                    }
-                    """);
-
-            var ctx = parser.parse();
-            out.println("Parsed:");
-            out.println(ctx);
-            out.println();
-
-            for (var it : ctx.functions) {
-                if (it instanceof SyFunction fun) {
-                    ctx.calculateB(fun, Type.I32);
-                    out.println("Calculation B[" + 0 + "]:");
-                    out.println(ctx);
-                    out.println();
-                }
-            }
-
-            var precompiler = new PreCompiler(ctx);
-            precompiler.precompile();
-            out.println("Precompiled:");
             out.println(precompiler.ctx);
         }
     }
