@@ -71,8 +71,8 @@ Calculation A[3]:
 Precompiled:
 [Context
 |	[fun foo(a: i32, b: i32): i32
-|	|	(Math Operation): [ADD][i32] [b(i32)][a(i32)] [__internal_1360875712__(i32)]
-|	|	(Math Operation): [DIV][i32] [2.0(i32)][__internal_1360875712__(i32)] [__internal_644117698__(i32)]
-|	|	(Return): [__internal_644117698__(i32)]
+|	|	(Math): [ADD][i32] [(%b)(i32)][(%a)(i32)] [(%1)(i32)]
+|	|	(Math): [DIV][i32] [(2.0)(i32)][(%1)(i32)] [(%2)(i32)]
+|	|	(Return): [(%2)(i32)]
 |	]
 ]
