@@ -11,17 +11,17 @@ public class Tests {
     public static void main(String[] args) throws FileNotFoundException {
         new File("log").mkdir();
         //
-        test(0, """
+        test(0, 0, """
                 foo(a, b): i32 = {
                     [a b + 2 /) -> |
                 }
                 """, true, Type.UNKNOWN);
-        test(1, """
+        test(1, 1, """
                 foo(a, b): i32 = {
                     [a b + 2 /) -> |
                 }
                 """, false, Type.I32);
-        test(2, """
+        test(2, 2, """
                 foo(a, b): i32 = {
                     [a b +) -> c
                     [c 2 /) -> |
@@ -29,8 +29,8 @@ public class Tests {
                 """, true, Type.UNKNOWN);
     }
 
-    private static void test(int id, String code, boolean calcA, Type calcB) throws FileNotFoundException {
-        try (var out = testStream(id)) {
+    private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws FileNotFoundException {
+        try (var out = testStream(tid, cid)) {
             var parser = new Parser(code);
             var ctx = parser.parse();
             ctx.functions.forEach(fun -> ctx.calculate(fun, calcA, calcB));
@@ -40,16 +40,15 @@ public class Tests {
         }
     }
 
-    private static PrintStream testStream(int i) throws FileNotFoundException {
-        final var name = "log/test" + i + ".log";
-        return new PrintStream(new FileOutputStream(name)) {
+    private static PrintStream testStream(int tid, int cid) throws FileNotFoundException {
+        return new PrintStream(new FileOutputStream("log/test" + tid + ".log")) {
             @Override
             public void close() {
                 super.close();
-                if (readChecksum(name) == readChecksum("t" + name)) {
-                    System.out.println("Test №" + i + " success!");
+                if (readChecksum("log/test" + tid + ".log") == readChecksum("tlog/test" + cid + ".log")) {
+                    System.out.println("Test №" + tid + " success!");
                 } else {
-                    System.err.println("Test №" + i + " failed!");
+                    System.err.println("Test №" + tid + " failed!");
                 }
             }
         };
