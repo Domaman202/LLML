@@ -1,8 +1,8 @@
 package ru.DmN.llml.precompiler;
 
-import ru.DmN.llml.llvm.Argument;
-import ru.DmN.llml.llvm.Type;
-import ru.DmN.llml.llvm.VariableMap;
+import ru.DmN.llml.utils.Argument;
+import ru.DmN.llml.utils.Type;
+import ru.DmN.llml.utils.VariableMap;
 
 public class PcNIFunction extends PcElement {
     public String name;

@@ -1,7 +1,6 @@
 package ru.DmN.llml.parser.ast;
 
-public abstract class SyElement {
-    public StringBuilder toString(int offset) {
-        return new StringBuilder("|").append("\t".repeat(offset));
-    }
+import ru.DmN.llml.utils.IASTPrintable;
+
+public abstract class SyElement implements IASTPrintable {
 }

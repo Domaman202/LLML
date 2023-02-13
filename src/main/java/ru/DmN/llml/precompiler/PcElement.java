@@ -1,6 +1,6 @@
 package ru.DmN.llml.precompiler;
 
-import ru.DmN.llml.parser.ast.SyElement;
+import ru.DmN.llml.utils.IASTPrintable;
 
-public abstract class PcElement extends SyElement {
+public abstract class PcElement implements IASTPrintable {
 }

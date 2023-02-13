@@ -1,4 +1,4 @@
-package ru.DmN.llml.parser;
+package ru.DmN.llml.utils;
 
 import java.util.Iterator;
 import java.util.List;

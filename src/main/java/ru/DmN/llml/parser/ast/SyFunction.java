@@ -1,9 +1,9 @@
 package ru.DmN.llml.parser.ast;
 
-import ru.DmN.llml.llvm.Argument;
-import ru.DmN.llml.llvm.Type;
-import ru.DmN.llml.llvm.Variable;
-import ru.DmN.llml.llvm.VariableMap;
+import ru.DmN.llml.utils.Argument;
+import ru.DmN.llml.utils.Type;
+import ru.DmN.llml.utils.Variable;
+import ru.DmN.llml.utils.VariableMap;
 
 import java.util.ArrayList;
 import java.util.List;

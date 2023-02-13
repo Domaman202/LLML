@@ -1,7 +1,7 @@
 package ru.DmN.llml.parser.ast;
 
-import ru.DmN.llml.llvm.Argument;
-import ru.DmN.llml.llvm.Type;
+import ru.DmN.llml.utils.Argument;
+import ru.DmN.llml.utils.Type;
 
 import java.util.List;
 

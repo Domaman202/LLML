@@ -1,7 +1,7 @@
 package ru.DmN.llml.parser.ast;
 
-import ru.DmN.llml.llvm.Type;
-import ru.DmN.llml.parser.Tracer;
+import ru.DmN.llml.utils.Type;
+import ru.DmN.llml.utils.Tracer;
 import ru.DmN.llml.parser.action.ActInsertVariable;
 import ru.DmN.llml.parser.action.ActMath;
 import ru.DmN.llml.parser.action.ActReturn;

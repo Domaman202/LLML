@@ -1,7 +1,7 @@
 package ru.DmN.llml.parser.action;
 
-import ru.DmN.llml.llvm.Type;
-import ru.DmN.llml.llvm.Variable;
+import ru.DmN.llml.utils.Type;
+import ru.DmN.llml.utils.Variable;
 import ru.DmN.llml.parser.ast.SyFunction;
 
 public class ActInsertVariable extends Action {

@@ -1,14 +1,15 @@
 package ru.DmN.llml;
 
-import ru.DmN.llml.llvm.Type;
+import ru.DmN.llml.utils.Type;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.PreCompiler;
 
 public class Main {
     public static void main(String[] args) {
         var parser = new Parser("""
-                f(a: i16, b: i16): i32 = {
-                    [a b +) -> |
+                f(a, b): i32 = {
+                    [a b +) -> c
+                    [c 2 /) -> |
                 }
                 """);
         var ctx = parser.parse();

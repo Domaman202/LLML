@@ -1,4 +1,4 @@
-package ru.DmN.llml.llvm;
+package ru.DmN.llml.utils;
 
 public class Variable {
     public String name;

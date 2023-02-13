@@ -1,4 +1,4 @@
-package ru.DmN.llml.llvm;
+package ru.DmN.llml.utils;
 
 public class Value {
     public Constant constant;
@@ -18,6 +18,6 @@ public class Value {
 
     @Override
     public String toString() {
-        return constant == null ? variable.name : String.valueOf(constant.value);
+        return constant == null ? variable.getName() : String.valueOf(constant.value);
     }
 }

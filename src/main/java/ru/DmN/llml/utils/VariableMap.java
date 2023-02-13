@@ -1,6 +1,4 @@
-package ru.DmN.llml.llvm;
-
-import ru.DmN.llml.llvm.Variable;
+package ru.DmN.llml.utils;
 
 import java.util.*;
 import java.util.stream.Collectors;

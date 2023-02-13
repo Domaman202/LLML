@@ -1,4 +1,4 @@
-package ru.DmN.llml.llvm;
+package ru.DmN.llml.utils;
 
 public class Argument extends Variable {
     public Argument(String name, Type type) {

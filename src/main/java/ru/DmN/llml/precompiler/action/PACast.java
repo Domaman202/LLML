@@ -1,6 +1,6 @@
 package ru.DmN.llml.precompiler.action;
 
-import ru.DmN.llml.llvm.Variable;
+import ru.DmN.llml.utils.Variable;
 
 public class PACast extends PrecompiledAction {
     public Variable of;

@@ -1,6 +1,6 @@
 package ru.DmN.llml.llvm.test;
 
-import ru.DmN.llml.llvm.Type;
+import ru.DmN.llml.utils.Type;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.parser.ast.SyFunction;
 import ru.DmN.llml.precompiler.PreCompiler;

@@ -1,16 +1,10 @@
 package ru.DmN.llml.precompiler;
 
-import ru.DmN.llml.llvm.Constant;
-import ru.DmN.llml.llvm.Type;
-import ru.DmN.llml.llvm.Value;
-import ru.DmN.llml.llvm.Variable;
+import ru.DmN.llml.precompiler.action.*;
+import ru.DmN.llml.utils.*;
 import ru.DmN.llml.parser.action.*;
 import ru.DmN.llml.parser.ast.SyContext;
 import ru.DmN.llml.parser.ast.SyFunction;
-import ru.DmN.llml.precompiler.action.PACast;
-import ru.DmN.llml.precompiler.action.PAMath;
-import ru.DmN.llml.precompiler.action.PAReturn;
-import ru.DmN.llml.precompiler.action.PrecompiledAction;
 
 import java.util.List;
 import java.util.Stack;
@@ -36,6 +30,7 @@ public class PreCompiler {
 
     protected PcFunction precompile(SyFunction src) {
         var fun = new PcFunction(src.name, src.ret, src.arguments);
+        var ivmap = new InternalVarMap();
         var vstack = new Stack<Value>();
         for (int i = 0; i < src.expressions.size(); i++) {
             var expr = src.expressions.get(i);
@@ -46,12 +41,14 @@ public class PreCompiler {
                 } else if (act instanceof ActInsertVariable insert) {
                     vstack.push(new Value(insert.variable));
                 } else if (act instanceof ActMath op) {
-                    var a = cast(fun.actions, vstack.pop(), op.type);
-                    var b = cast(fun.actions, vstack.pop(), op.type);
-                    var out = new Variable("__internal_" + op.hashCode() + "__", op.type);
+                    var a = cast(ivmap, fun.actions, vstack.pop(), op.type);
+                    var b = cast(ivmap, fun.actions, vstack.pop(), op.type);
+                    var out = ivmap.create(op.type);
                     var operation = new PAMath(a, b, out, op.operation);
                     vstack.push(new Value(out));
                     fun.actions.add(operation);
+                } else if (act instanceof ActSetVariable set) {
+                    fun.actions.add(new PASet(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
                 }
             }
         }
@@ -60,11 +57,11 @@ public class PreCompiler {
         return fun;
     }
 
-    protected Value cast(List<PrecompiledAction> actions,  Value of, Type to) {
+    protected Value cast(InternalVarMap vmap, List<PrecompiledAction> actions, Value of, Type to) {
         if (of.constant == null) {
             if (of.variable.type == to)
                 return of;
-            var nw = new Variable("__internal_" + of.hashCode() + "__", to);
+            var nw = vmap.create(to);
             actions.add(new PACast(of.variable, nw));
             return new Value(nw);
         } else if (of.constant.type != to)

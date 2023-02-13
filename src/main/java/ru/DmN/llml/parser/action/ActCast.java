@@ -1,6 +1,6 @@
 package ru.DmN.llml.parser.action;
 
-import ru.DmN.llml.llvm.Variable;
+import ru.DmN.llml.utils.Variable;
 
 public class ActCast extends Action {
     public Variable of;
