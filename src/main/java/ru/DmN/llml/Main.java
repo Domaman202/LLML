@@ -9,7 +9,8 @@ public class Main {
         var parser = new Parser("""
                 f(a, b): i32 = {
                     [a b +) -> c
-                    [c 2 /) -> |
+                    c -> d
+                    [d 2 /) -> |
                 }
                 """);
         var ctx = parser.parse();

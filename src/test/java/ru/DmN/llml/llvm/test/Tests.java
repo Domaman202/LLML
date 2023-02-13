@@ -27,6 +27,20 @@ public class Tests {
                     [c 2 /) -> |
                 }
                 """, true, Type.UNKNOWN);
+        test(3, 3, """
+                f(a, b): i32 = {
+                    [a b +) -> c
+                    [c) -> d
+                    [d) -> |
+                }
+                """, true, Type.UNKNOWN);
+        test(4, 3, """
+                f(a, b): i32 = {
+                    [a b +) -> c
+                    c -> d
+                    d -> |
+                }
+                """, true, Type.UNKNOWN);
     }
 
     private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws FileNotFoundException {

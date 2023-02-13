@@ -1,11 +1,8 @@
 package ru.DmN.llml.parser.ast;
 
+import ru.DmN.llml.parser.action.*;
 import ru.DmN.llml.utils.Type;
 import ru.DmN.llml.utils.Tracer;
-import ru.DmN.llml.parser.action.ActInsertVariable;
-import ru.DmN.llml.parser.action.ActMath;
-import ru.DmN.llml.parser.action.ActReturn;
-import ru.DmN.llml.parser.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,19 +27,20 @@ public class SyContext {
             for (int i = expr.actions.size(); i > 0; ) {
                 var act = expr.actions.get(--i);
                 if (act instanceof ActInsertVariable insert) {
-                    if (insert.variable.type == Type.UNKNOWN) {
-                        insert.variable.type = getTraceType(new Tracer.UpStepTracer<>(expr.actions, i));
-                        return insert.variable.type != Type.UNKNOWN;
+                    if (insert.variable.type == Type.UNKNOWN && (insert.variable.type = getTraceType(new Tracer.IncStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
+                        return true;
                     }
                 } else if (act instanceof ActMath op) {
-                    if (op.type == Type.UNKNOWN) {
-                        op.type = fun.ret;
-                        return op.type != Type.UNKNOWN;
+                    if (op.type == Type.UNKNOWN && (op.type = fun.ret) != Type.UNKNOWN) {
+                        return true;
                     }
                 } else if (act instanceof ActReturn ret) {
-                    if (ret.type == Type.UNKNOWN) {
-                        fun.ret = ret.type = getTraceType(new Tracer.DownStepTracer<>(expr.actions, i));
-                        return ret.type != Type.UNKNOWN;
+                    if (ret.type == Type.UNKNOWN && (fun.ret = ret.type = getTraceType(new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
+                        return true;
+                    }
+                } else if (act instanceof ActSetVariable set) {
+                    if (set.variable.type == Type.UNKNOWN && (set.variable.type = getTraceType(new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
+                        return true;
                     }
                 }
             }

@@ -25,8 +25,8 @@ public abstract class Tracer<T> implements Iterator<T> {
 
     public abstract void step();
 
-    public static class UpStepTracer<T> extends Tracer<T> {
-        public UpStepTracer(List<T> list, int i) {
+    public static class IncStepTracer<T> extends Tracer<T> {
+        public IncStepTracer(List<T> list, int i) {
             super(list, i);
         }
 
@@ -41,8 +41,8 @@ public abstract class Tracer<T> implements Iterator<T> {
         }
     }
 
-    public static class DownStepTracer<T> extends Tracer<T> {
-        public DownStepTracer(List<T> list, int i) {
+    public static class DecStepTracer<T> extends Tracer<T> {
+        public DecStepTracer(List<T> list, int i) {
             super(list, i);
         }
 
