@@ -6,8 +6,10 @@ import ru.DmN.llml.utils.Variable;
 import ru.DmN.llml.parser.action.ActMath;
 import ru.DmN.llml.utils.StringBuilderUtils;
 
+import java.util.Arrays;
+
 public class PAMath extends PrecompiledAction {
-    public ActMath.Operation operation;
+    public Operation oper;
     public Value a, b;
     public Variable out;
 
@@ -15,7 +17,7 @@ public class PAMath extends PrecompiledAction {
         this.a = a;
         this.b = b;
         this.out = out;
-        this.operation = operation;
+        this.oper = Arrays.stream(Operation.values()).filter(it -> it.name().equals(operation.name())).findFirst().get();
     }
 
     public Type getType() {
@@ -24,6 +26,19 @@ public class PAMath extends PrecompiledAction {
 
     @Override
     public StringBuilder toString(int offset) {
-        return StringBuilderUtils.append(StringBuilderUtils.append(StringBuilderUtils.append(super.toString(offset).append("(Math): [").append(operation).append("][").append(getType().name).append("] "), a), b).append(' '), out);
+        return StringBuilderUtils.append(StringBuilderUtils.append(StringBuilderUtils.append(super.toString(offset).append("(Math): [").append(oper).append("][").append(getType().name).append("] "), a), b).append(' '), out);
+    }
+
+    public enum Operation {
+        ADD("add"),
+        SUB("sub"),
+        MUL("mul"),
+        DIV("sdiv");
+
+        public final String ir;
+
+        Operation(String ir) {
+            this.ir = ir;
+        }
     }
 }

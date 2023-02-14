@@ -18,6 +18,6 @@ public class Value {
 
     @Override
     public String toString() {
-        return constant == null ? variable.getName() : String.valueOf(constant.value);
+        return constant == null ? variable.getName() : constant.toString();
     }
 }

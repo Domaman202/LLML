@@ -4,11 +4,11 @@ import ru.DmN.llml.utils.Type;
 import ru.DmN.llml.parser.ast.SyFunction;
 
 public class ActMath extends Action {
-    public Operation operation;
+    public Operation oper;
     public Type type;
 
     public ActMath(Operation operation, Type type) {
-        this.operation = operation;
+        this.oper = operation;
         this.type = type;
     }
 
@@ -19,7 +19,7 @@ public class ActMath extends Action {
 
     @Override
     public StringBuilder toString(int offset) {
-        return super.toString(offset).append("(Math Operation): [").append(operation).append("][").append(type.name).append(']');
+        return super.toString(offset).append("(Math Operation): [").append(oper).append("][").append(type.name).append(']');
     }
 
     public enum Operation {

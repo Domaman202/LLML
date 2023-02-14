@@ -23,4 +23,9 @@ public class Constant {
         this.value = value;
         this.type = Type.FLOAT;
     }
+
+    @Override
+    public String toString() {
+        return type == Type.FLOAT ? String.valueOf(value) : String.valueOf((int) value);
+    }
 }

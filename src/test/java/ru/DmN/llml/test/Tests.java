@@ -1,5 +1,6 @@
-package ru.DmN.llml.llvm.test;
+package ru.DmN.llml.test;
 
+import ru.DmN.llml.compiler.Compiler;
 import ru.DmN.llml.utils.Type;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.parser.ast.SyFunction;
@@ -50,7 +51,9 @@ public class Tests {
             ctx.functions.forEach(fun -> ctx.calculate(fun, calcA, calcB));
             var precompiler = new PreCompiler(ctx);
             precompiler.precompile();
-            out.println(precompiler.ctx);
+            var compiler = new Compiler(precompiler.ctx);
+            compiler.compile();
+            out.println(compiler.out);
         }
     }
 

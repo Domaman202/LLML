@@ -6,11 +6,12 @@ import ru.DmN.llml.parser.action.*;
 import ru.DmN.llml.parser.ast.SyContext;
 import ru.DmN.llml.parser.ast.SyFunction;
 
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Stack;
 
 public class PreCompiler {
-    protected final SyContext src;
+    public final SyContext src;
     public final PcContext ctx;
 
     public PreCompiler(SyContext src) {
@@ -23,7 +24,7 @@ public class PreCompiler {
             if (function instanceof SyFunction fun) {
                 ctx.functions.add(precompile(src.calculate(fun, true, Type.UNKNOWN)));
             } else {
-                // TODO:
+                ctx.functions.add(new PcNIFunction(function.name, function.ret, function.arguments));
             }
         }
     }
@@ -31,21 +32,21 @@ public class PreCompiler {
     protected PcFunction precompile(SyFunction src) {
         var fun = new PcFunction(src.name, src.ret, src.arguments);
         var ivmap = new InternalVarMap();
-        var vstack = new Stack<Value>();
+        var vstack = new ArrayDeque<Value>();
         for (int i = 0; i < src.expressions.size(); i++) {
             var expr = src.expressions.get(i);
             for (int j = 0; j < expr.actions.size(); j++) {
                 var act = expr.actions.get(j);
                 if (act instanceof ActInsertInteger insert) {
-                    vstack.push(new Value(new Constant(insert.value)));
+                    vstack.addLast(new Value(new Constant(insert.value)));
                 } else if (act instanceof ActInsertVariable insert) {
-                    vstack.push(new Value(insert.variable));
+                    vstack.addLast(new Value(insert.variable));
                 } else if (act instanceof ActMath op) {
                     var a = cast(ivmap, fun.actions, vstack.pop(), op.type);
                     var b = cast(ivmap, fun.actions, vstack.pop(), op.type);
                     var out = ivmap.create(op.type);
-                    var operation = new PAMath(a, b, out, op.operation);
-                    vstack.push(new Value(out));
+                    var operation = new PAMath(a, b, out, op.oper);
+                    vstack.addLast(new Value(out));
                     fun.actions.add(operation);
                 } else if (act instanceof ActSetVariable set) {
                     fun.actions.add(new PASet(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));

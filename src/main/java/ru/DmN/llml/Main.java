@@ -1,5 +1,6 @@
 package ru.DmN.llml;
 
+import ru.DmN.llml.compiler.Compiler;
 import ru.DmN.llml.utils.Type;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.PreCompiler;
@@ -8,9 +9,7 @@ public class Main {
     public static void main(String[] args) {
         var parser = new Parser("""
                 f(a, b): i32 = {
-                    [a b +) -> c
-                    c -> d
-                    [d 2 /) -> |
+                    [a b + 2 /) -> |
                 }
                 """);
         var ctx = parser.parse();
@@ -25,6 +24,13 @@ public class Main {
 
         System.out.println("Precompiled:");
         System.out.println(pc.ctx);
+        System.out.println();
+
+        var compiler = new Compiler(pc.ctx);
+        compiler.compile();
+
+        System.out.println("Compiled:");
+        System.out.println(compiler.out);
         System.out.println();
     }
 }

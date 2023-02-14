@@ -1,8 +1,8 @@
-[Context
-|	[fun foo(a: i32, b: i32): i32
-|	|	(Math): [ADD][i32] [(%b)(i32)][(%a)(i32)] [(%1)(i32)]
-|	|	(Set): [(%1)(i32)] [(%c)(i32)]
-|	|	(Math): [DIV][i32] [(2.0)(i32)][(%c)(i32)] [(%2)(i32)]
-|	|	(Return): [(%2)(i32)]
-|	]
-]
+define dso_local i32 @foo(i32 noundef %a, i32 noundef %b) #0 {
+	%1 = add i32 %a, %b
+	%c = %1
+	%2 = sdiv i32 %c, 2
+	ret i32 %2
+}
+
+attributes #0 = { nounwind }
