@@ -3,19 +3,20 @@ package ru.DmN.llml.parser;
 import org.jetbrains.annotations.Contract;
 import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.lexer.Token;
-import ru.DmN.llml.parser.ast.SyExpression;
-import ru.DmN.llml.utils.*;
 import ru.DmN.llml.parser.action.*;
 import ru.DmN.llml.parser.ast.SyContext;
 import ru.DmN.llml.parser.ast.SyFunction;
+import ru.DmN.llml.utils.*;
 
 import java.util.ArrayList;
 
 public class Parser {
+    protected final String src;
     protected final Lexer lexer;
 
-    public Parser(String str) {
-        this.lexer = new Lexer(str);
+    public Parser(String src) {
+        this.src = src;
+        this.lexer = new Lexer(src);
     }
 
     public SyContext parse() {
@@ -68,7 +69,7 @@ public class Parser {
         return function;
     }
 
-    public boolean parseExpression(SyFunction function) {
+    protected boolean parseExpression(SyFunction function) {
         Token token = next();
         if (token.type == Token.Type.CLOSE_FBRACKET)
             return false;
@@ -98,8 +99,7 @@ public class Parser {
                                     }
                                 }
                             }
-                            default ->
-                                    throw new RuntimeException("(" + token.line + ',' + token.symbol + ") \"" + token.type + "\" != PILLAR|NAMING");
+                            default -> throwBadToken(token);
                         }
 
                         return true;
@@ -142,7 +142,7 @@ public class Parser {
             else throwBadToken(token);
             next(Token.Type.PTR);
             token = next();
-            var expr = new SyExpression();
+            var expr = function.expression();
             expr.actions.add(value.constant == null ? (value.variable instanceof GlobalVariable ? new ActInsertGlobalVariable(value.variable) : new ActInsertVariable(value.variable)) : new ActInsertInteger((int) value.constant.value));
             if (token.type == Token.Type.NAMING) {
                 var var = function.locals.getOrAdd(token.str, value.type());
@@ -150,7 +150,6 @@ public class Parser {
             } else if (token.type == Token.Type.PILLAR) {
                 expr.actions.add(new ActReturn(function.ret));
             } else throwBadToken(token);
-            function.expressions.add(expr);
             return true;
         }
     }
@@ -186,12 +185,12 @@ public class Parser {
 
     protected void check(Token token, Token.Type needed) {
         if (token.type != needed) {
-            throw new RuntimeException("(" + token.line + ',' + token.symbol + ") \"" + token.type + "\" != \"" + needed + "\"");
+            throwBadToken(token);
         }
     }
 
     @Contract("_ -> fail")
-    protected void throwBadToken(Token token) throws RuntimeException {
-        throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Неверный токен \"" + token.type + "\"");
+    protected void throwBadToken(Token token) throws InvalidTokenException {
+        throw InvalidTokenException.create(src, token);
     }
 }

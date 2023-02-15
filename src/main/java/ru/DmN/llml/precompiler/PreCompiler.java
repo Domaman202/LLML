@@ -75,7 +75,7 @@ public class PreCompiler {
                 }
             }
         }
-        if (!(fun.actions.get(fun.actions.size() - 1) instanceof PAReturn))
+        if (!fun.actions.isEmpty() && !(fun.actions.get(fun.actions.size() - 1) instanceof PAReturn))
             fun.actions.add(new PAReturn(fun.ret == Type.VOID ? null : new Value(new Constant(0))));
         return fun;
     }

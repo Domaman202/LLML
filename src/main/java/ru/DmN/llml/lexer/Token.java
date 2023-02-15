@@ -20,7 +20,6 @@ public class Token {
 
     public enum Type {
         NL,
-
         OPEN_BRACKET,
         OPEN_CBRACKET,
         OPEN_FBRACKET,
@@ -32,13 +31,11 @@ public class Token {
         PILLAR,
         ASSIGN,
         DOG,
-
         PTR,
-
         NAMING,
         TYPE,
         NUMBER,
-
-        OPERATION
+        OPERATION,
+        ERROR
     }
 }

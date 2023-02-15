@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 public class Tests {
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws IOException {
         new File("log").mkdir();
         //
         test(0, 0, """

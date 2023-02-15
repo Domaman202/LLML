@@ -1,12 +1,15 @@
 package ru.DmN.llml.lexer;
 
+import ru.DmN.llml.parser.InvalidTokenException;
+
 public class Lexer {
+    public final String src;
     public String str;
     protected int line;
     protected int symbol;
 
     public Lexer(String str) {
-        this.str = str;
+        this.src = this.str = str;
     }
 
     public Token next() {
@@ -73,10 +76,13 @@ public class Lexer {
                     }
                 }
                 case '+', '/', '*' -> {
-                    str = str.substring(1);
+                    delete(1);
                     return new Token(String.valueOf(c), Token.Type.OPERATION, line, symbol);
                 }
-                default -> throw new RuntimeException("Error Token: " + c);
+                default -> {
+                    delete(1);
+                    throw InvalidTokenException.create(src, new Token(String.valueOf(c), Token.Type.ERROR, line, symbol));
+                }
             }
         }
         return null;
