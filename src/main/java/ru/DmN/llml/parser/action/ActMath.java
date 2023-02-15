@@ -19,7 +19,7 @@ public class ActMath extends Action {
 
     @Override
     public StringBuilder toString(int offset) {
-        return super.toString(offset).append("(Math Operation): [").append(oper).append("][").append(type.name).append(']');
+        return super.toString(offset).append("(Math Operation): [").append(oper).append("][").append(type).append(']');
     }
 
     public enum Operation {

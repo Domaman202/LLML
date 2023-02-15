@@ -1,3 +1,4 @@
+
 define dso_local i32 @foo(i32 noundef %a, i32 noundef %b) #0 {
 	%1 = add i32 %a, %b
 	%c = %1

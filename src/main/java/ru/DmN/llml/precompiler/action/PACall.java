@@ -20,6 +20,6 @@ public class PACall extends PrecompiledAction {
 
     @Override
     public StringBuilder toString(int offset) {
-        return StringBuilderUtils.append(StringBuilderUtils.append(super.toString(offset).append("(Call): [").append(fun.name).append("][").append(fun.ret.name).append("] "), args).append(' '), res);
+        return StringBuilderUtils.append(StringBuilderUtils.append(super.toString(offset).append("(Call): [").append(fun.name).append("][").append(fun.ret).append("] "), args).append(' '), res);
     }
 }

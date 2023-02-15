@@ -24,16 +24,22 @@ public class Parser {
             var name = next(Token.Type.NAMING).str;
             var token = next();
             if (token.type == Token.Type.OPEN_BRACKET) {
-                ctx.functions.add(parseFunction(name));
+                ctx.functions.add(parseFunction(ctx, name));
             } else {
-                // todo: переменные
+                Variable var = null;
+                if (token.type == Token.Type.COLON)
+                    var = new Variable(name, Type.valueOf(next(Token.Type.TYPE).str.toUpperCase()));
+                else if (token.type == Token.Type.ASSIGN)
+                    var = new InitializedGlobalVariable(name, new Constant(next(Token.Type.NUMBER).str));
+                else throwBadToken(token);
+                ctx.variables.add(var);
             }
             lexer.skipNLSpaces();
         }
         return ctx;
     }
 
-    public SyFunction parseFunction(String name) {
+    public SyFunction parseFunction(SyContext ctx, String name) {
         var args = new ArrayList<Argument>();
         var token = next();
         while (token.type != Token.Type.CLOSE_BRACKET) {
@@ -57,7 +63,7 @@ public class Parser {
         } else ret = Type.UNKNOWN;
         check(token, Token.Type.ASSIGN);
         next(Token.Type.OPEN_FBRACKET);
-        var function = new SyFunction(name, ret, args);
+        var function = new SyFunction(ctx.variables, name, ret, args);
         while (parseExpression(function)) ;
         return function;
     }
@@ -89,10 +95,10 @@ public class Parser {
                         return true;
                     }
                     case NAMING -> {
-                        var var = function.locals.get(token.str);
-                        if (var == null)
-                            throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Неизвестная переменная \"" + token.str + "\"");
-                        expression.actions.add(new ActInsertVariable(var));
+                        var var = function.locals.getOrAdd(token.str, Type.UNKNOWN);
+//                        if (var == null)
+//                            throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Неизвестная переменная \"" + token.str + "\"");
+                        expression.actions.add(var instanceof GlobalVariable ? new ActInsertGlobalVariable(var) : new ActInsertVariable(var));
                     }
                     case NUMBER -> expression.actions.add(new ActInsertInteger(Integer.parseInt(token.str)));
                     case OPERATION -> {
@@ -119,15 +125,14 @@ public class Parser {
         } else {
             Value value = null;
             if (token.type == Token.Type.NAMING)
-                value = new Value(function.locals.get(token.str));
+                value = new Value(function.locals.getOrAdd(token.str, Type.UNKNOWN));
             else if (token.type == Token.Type.NUMBER)
                 value = new Value(new Constant(token.str));
             else throwBadToken(token);
-            check(token, Token.Type.NAMING);
             next(Token.Type.PTR);
             token = next();
             var expr = new SyExpression();
-            expr.actions.add(value.constant == null ? new ActInsertVariable(value.variable) : new ActInsertInteger((int) value.constant.value));
+            expr.actions.add(value.constant == null ? (value.variable instanceof GlobalVariable ? new ActInsertGlobalVariable(value.variable) : new ActInsertVariable(value.variable)) : new ActInsertInteger((int) value.constant.value));
             if (token.type == Token.Type.NAMING)
                 expr.actions.add(new ActSetVariable(function.locals.getOrAdd(token.str, value.type())));
             else if (token.type == Token.Type.PILLAR)

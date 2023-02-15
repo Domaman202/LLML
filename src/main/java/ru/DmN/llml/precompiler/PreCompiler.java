@@ -21,6 +21,7 @@ public class PreCompiler {
     }
 
     public void precompile() {
+        ctx.variables.addAll(src.variables.list);
         for (var function : src.functions) {
             if (function instanceof SyFunction fun) {
                 ctx.functions.add(precompile(src.calculate(fun, true, Type.UNKNOWN)));
@@ -32,7 +33,7 @@ public class PreCompiler {
 
     protected PcFunction precompile(SyFunction src) {
         var fun = new PcFunction(src.name, src.ret, src.arguments);
-        var ivmap = new InternalVarMap();
+        var ivmap = new InternalVarMap(ctx.variables, src.arguments.list);
         var vstack = new ArrayDeque<Value>();
         for (int i = 0; i < src.expressions.size(); i++) {
             var expr = src.expressions.get(i);
@@ -50,6 +51,10 @@ public class PreCompiler {
                         vstack.addLast(new Value(res));
                     }
                     fun.actions.add(new PACall(function, args, res));
+                } else if (act instanceof ActInsertGlobalVariable insert) {
+                    var to = ivmap.create(insert.variable.type);
+                    vstack.addLast(new Value(to));
+                    fun.actions.add(new PALoad(insert.variable, to));
                 } else if (act instanceof ActInsertInteger insert) {
                     vstack.addLast(new Value(new Constant(insert.value)));
                 } else if (act instanceof ActInsertVariable insert) {

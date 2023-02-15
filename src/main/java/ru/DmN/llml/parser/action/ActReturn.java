@@ -17,6 +17,6 @@ public class ActReturn extends Action {
 
     @Override
     public StringBuilder toString(int offset) {
-        return super.toString(offset).append("(Return): [").append(type.name).append(']');
+        return super.toString(offset).append("(Return): [").append(type).append(']');
     }
 }

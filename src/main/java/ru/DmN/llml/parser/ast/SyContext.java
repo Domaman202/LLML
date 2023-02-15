@@ -1,14 +1,14 @@
 package ru.DmN.llml.parser.ast;
 
 import ru.DmN.llml.parser.action.*;
-import ru.DmN.llml.utils.Type;
-import ru.DmN.llml.utils.Tracer;
+import ru.DmN.llml.utils.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SyContext {
     public List<SyAbstractFunction> functions = new ArrayList<>();
+    public VariableMap<Variable> variables = new VariableMap<>();
 
     public <T extends SyAbstractFunction> T calculate(T fun, boolean calcA, Type calcB) {
         boolean needCalculation;
@@ -119,6 +119,12 @@ public class SyContext {
     @Override
     public String toString() {
         var out = new StringBuilder("[Context");
+        for (var variable : variables.list) {
+            out.append('\n').append("|\t[var ").append(variable.name).append(": ").append(variable.type);
+            if (variable instanceof InitializedGlobalVariable var) out.append(" = ").append(var.constant);
+            out.append(']');
+        }
+        out.append("\n|");
         for (var function : functions)
             out.append("\n").append(function.toString(1));
         return out.append("\n]").toString();

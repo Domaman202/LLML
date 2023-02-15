@@ -26,11 +26,11 @@ public abstract class SyAbstractFunction extends SyElement {
         var out = super.toString(offset).append("[fun ").append(name).append('(');
         for (int i = 0; i < arguments.size(); i++) {
             var arg = arguments.list.get(i);
-            out.append(arg.name).append(": ").append(arg.type.name);
+            out.append(arg.name).append(": ").append(arg.type);
             if (i + 1 < arguments.size()) {
                 out.append(", ");
             }
         }
-        return out.append(')').append(": ").append(ret.name);
+        return out.append(')').append(": ").append(ret);
     }
 }

@@ -18,18 +18,20 @@ public class VariableMap<T extends Variable> implements Map<String, T> {
         if (this.containsKey(name))
             return this.get(name);
         var var = (T) new Variable(name, type);
-        this.add(var);
+        this.list.add(var);
         return var;
     }
 
     public void add(T v) {
         if (!this.containsKey(v.name))
-            list.add(v);
+            this.list.add(v);
     }
 
     public void addAll(List<? extends T> c) {
-        for (var e : c) {
-            this.add(e);
+        for (var var : c) {
+            if (!this.containsKey(var.name)) {
+                this.list.add(var);
+            }
         }
     }
 

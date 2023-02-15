@@ -26,7 +26,7 @@ public class PAMath extends PrecompiledAction {
 
     @Override
     public StringBuilder toString(int offset) {
-        return StringBuilderUtils.append(StringBuilderUtils.append(StringBuilderUtils.append(super.toString(offset).append("(Math): [").append(oper).append("][").append(getType().name).append("] "), a), b).append(' '), out);
+        return StringBuilderUtils.append(StringBuilderUtils.append(StringBuilderUtils.append(super.toString(offset).append("(Math): [").append(oper).append("][").append(getType()).append("] "), a), b).append(' '), out);
     }
 
     public enum Operation {

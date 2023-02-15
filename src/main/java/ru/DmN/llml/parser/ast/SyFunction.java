@@ -1,20 +1,17 @@
 package ru.DmN.llml.parser.ast;
 
-import ru.DmN.llml.utils.Argument;
-import ru.DmN.llml.utils.Type;
-import ru.DmN.llml.utils.Variable;
-import ru.DmN.llml.utils.VariableMap;
+import ru.DmN.llml.utils.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SyFunction extends SyAbstractFunction {
-    public VariableMap<Variable> locals = new VariableMap<>();
+    public VariableMap<Variable> locals;
     public List<SyExpression> expressions = new ArrayList<>();
 
-    public SyFunction(String name, Type ret, List<Argument> arguments) {
+    public SyFunction(VariableMap<Variable> variables, String name, Type ret, List<Argument> arguments) {
         super(name, ret, arguments);
-        this.locals.addAll(arguments);
+        this.locals = new InternalVarMap(variables, arguments);
     }
 
     public SyExpression expression() {

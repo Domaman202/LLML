@@ -4,6 +4,7 @@ import ru.DmN.llml.precompiler.PcContext;
 import ru.DmN.llml.precompiler.PcFunction;
 import ru.DmN.llml.precompiler.PcNIFunction;
 import ru.DmN.llml.precompiler.action.*;
+import ru.DmN.llml.utils.InitializedGlobalVariable;
 
 public class Compiler {
     public final PcContext src;
@@ -15,6 +16,14 @@ public class Compiler {
     }
 
     public void compile() {
+        for (var variable : this.src.variables.list) {
+            out.append(variable.getName()).append(" = dso_local global ").append(variable.type).append(' ');
+            if (variable instanceof InitializedGlobalVariable var)
+                out.append(var.constant);
+            else out.append('0');
+            out.append('\n');
+        }
+        out.append('\n');
         for (var function : this.src.functions) {
             if (function instanceof PcFunction fun) {
                 writeFunction(true, fun);
@@ -37,6 +46,9 @@ public class Compiler {
                         var of = cast.of.type;
                         var to = cast.to.type;
                         out.append(cast.to.getName()).append(" = ").append(of.bits < to.bits ? "sext" : "trunc").append(' ').append(of).append(' ').append(cast.of.getName()).append(" to ").append(to);
+                    } else if (act instanceof PALoad load) {
+                        var of = load.of;
+                        out.append(load.to.getName()).append(" = load ").append(of.type).append(", ptr ").append(of.getName());
                     } else if (act instanceof PAMath math) {
                         out.append(math.out.getName()).append(" = ").append(math.oper.ir).append(' ').append(math.getType()).append(' ').append(math.a).append(", ").append(math.b);
                     } else if (act instanceof PAReturn ret) {
@@ -55,10 +67,10 @@ public class Compiler {
     }
 
     protected void writeFunction(boolean define, PcNIFunction fun) {
-        out.append(define? "define" : "declare").append(" dso_local ").append(fun.ret.name).append(" @").append(fun.name).append('(');
+        out.append(define? "define" : "declare").append(" dso_local ").append(fun.ret).append(" @").append(fun.name).append('(');
         for (int i = 0; i < fun.args.size(); i++) {
             var arg = fun.args.list.get(i);
-            out.append(arg.type.name).append(" noundef ").append(arg.getName());
+            out.append(arg.type).append(" noundef ").append(arg.getName());
             if (i + 1 < fun.args.size()) {
                 out.append(", ");
             }

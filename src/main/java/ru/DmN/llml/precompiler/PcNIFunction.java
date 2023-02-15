@@ -24,11 +24,11 @@ public class PcNIFunction extends PcElement {
         var out = super.toString(offset).append("[fun ").append(name).append('(');
         for (int i = 0; i < args.size(); i++) {
             var arg = args.list.get(i);
-            out.append(arg.name).append(": ").append(arg.type.name);
+            out.append(arg.name).append(": ").append(arg.type);
             if (i + 1 < args.size()) {
                 out.append(", ");
             }
         }
-        return out.append(')').append(": ").append(ret.name);
+        return out.append(')').append(": ").append(ret);
     }
 }

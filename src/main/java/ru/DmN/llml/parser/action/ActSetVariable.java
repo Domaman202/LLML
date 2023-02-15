@@ -18,6 +18,6 @@ public class ActSetVariable extends Action {
 
     @Override
     public StringBuilder toString(int offset) {
-        return super.toString(offset).append("(Set Variable): [").append(variable.name).append("][").append(variable.type.name).append(']');
+        return super.toString(offset).append("(Set Variable): [").append(variable.name).append("][").append(variable.type).append(']');
     }
 }
