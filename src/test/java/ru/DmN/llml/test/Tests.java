@@ -63,6 +63,17 @@ public class Tests {
                     [a b +) -> |
                 }
                 """, true, Type.UNKNOWN);
+        test(7, 7, """
+                f(a, b): i32 = {
+                    [a, b) -> (c, d]
+                }
+                """, true, Type.UNKNOWN);
+        test(8, 7, """
+                f(a, b): i32 = {
+                    [a) -> (c]
+                    b -> d
+                }
+                """, true, Type.UNKNOWN);
     }
 
     private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws IOException {

@@ -1,0 +1,8 @@
+
+define dso_local i32 @f(unknown noundef %a, unknown noundef %b) #0 {
+	%c = %a
+	%d = %b
+	ret i32 0
+}
+
+attributes #0 = { nounwind }

@@ -84,7 +84,20 @@ public class Parser {
                         token = next();
                         switch (token.type) {
                             case PILLAR -> expression.actions.add(new ActReturn(function.ret));
-                            case NAMING -> expression.actions.add(new ActSetVariable(function.locals.getOrAdd(token.str, Type.UNKNOWN)));
+                            case NAMING -> {
+                                var var = function.locals.getOrAdd(token.str, Type.UNKNOWN);
+                                expression.actions.add(var instanceof GlobalVariable ? new ActSetGlobalVariable(var) : new ActSetVariable(var));
+                            }
+                            case OPEN_BRACKET -> {
+                                while (token.type != Token.Type.CLOSE_CBRACKET) {
+                                    var var = function.locals.getOrAdd(next(Token.Type.NAMING).str, Type.UNKNOWN);
+                                    expression.actions.add(var instanceof GlobalVariable ? new ActSetGlobalVariable(var) : new ActSetVariable(var));
+                                    token = next();
+                                    if (token.type != Token.Type.COMMA) {
+                                        check(token, Token.Type.CLOSE_CBRACKET);
+                                    }
+                                }
+                            }
                             default ->
                                     throw new RuntimeException("(" + token.line + ',' + token.symbol + ") \"" + token.type + "\" != PILLAR|NAMING");
                         }
