@@ -7,21 +7,25 @@ import ru.DmN.llml.utils.VariableMap;
 public class PcNIFunction extends PcElement {
     public String name;
     public Type ret;
-    public VariableMap<Argument> arguments;
+    public VariableMap<Argument> args;
 
     public PcNIFunction(String name, Type ret, VariableMap<Argument> arguments) {
         this.name = name;
         this.ret = ret;
-        this.arguments = arguments;
+        this.args = arguments;
+    }
+
+    public String getName() {
+        return "@" + name;
     }
 
     @Override
     public StringBuilder toString(int offset) {
         var out = super.toString(offset).append("[fun ").append(name).append('(');
-        for (int i = 0; i < arguments.size(); i++) {
-            var arg = arguments.list.get(i);
+        for (int i = 0; i < args.size(); i++) {
+            var arg = args.list.get(i);
             out.append(arg.name).append(": ").append(arg.type.name);
-            if (i + 1 < arguments.size()) {
+            if (i + 1 < args.size()) {
                 out.append(", ");
             }
         }

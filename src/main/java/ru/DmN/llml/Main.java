@@ -8,8 +8,10 @@ import ru.DmN.llml.precompiler.PreCompiler;
 public class Main {
     public static void main(String[] args) {
         var parser = new Parser("""
-                f(a, b): i32 = {
-                    [a b + 2 /) -> |
+                add(a, b): i32 = { [a b +) -> | }
+                
+                f(c: i16, d: i16): i16 = {
+                    [c d @call(add)) -> |
                 }
                 """);
         var ctx = parser.parse();

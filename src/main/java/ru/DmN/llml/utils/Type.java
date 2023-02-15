@@ -275,4 +275,9 @@ public enum Type {
         this.name = "i" + bits;
         this.bits = bits;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

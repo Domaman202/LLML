@@ -1,5 +1,6 @@
 package ru.DmN.llml.precompiler.action;
 
+import ru.DmN.llml.utils.StringBuilderUtils;
 import ru.DmN.llml.utils.Variable;
 
 public class PACast extends PrecompiledAction {
@@ -13,6 +14,6 @@ public class PACast extends PrecompiledAction {
 
     @Override
     public StringBuilder toString(int offset) {
-        return super.toString(offset).append("(Cast): [").append(of.name).append('(').append(of.type.name).append(")][").append(to.name).append('(').append(to.type.name).append(")]");
+        return StringBuilderUtils.append(StringBuilderUtils.append(super.toString(offset).append("(Cast): "), of).append(' '), to);
     }
 }

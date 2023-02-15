@@ -35,8 +35,12 @@ public class SyContext {
                         return true;
                     }
                 } else if (act instanceof ActReturn ret) {
-                    if (ret.type == Type.UNKNOWN && (fun.ret = ret.type = getTraceType(new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
-                        return true;
+                    if (ret.type == Type.UNKNOWN) {
+                        if ((fun.ret = ret.type = getTraceType(new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
+                            return true;
+                        }
+                    } else if (ret.type != fun.ret) {
+                        ret.type = fun.ret;
                     }
                 } else if (act instanceof ActSetVariable set) {
                     if (set.variable.type == Type.UNKNOWN && (set.variable.type = getTraceType(new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
@@ -71,6 +75,10 @@ public class SyContext {
                         if (ret.type == Type.UNKNOWN) {
                             fun.ret = ret.type = type;
                         }
+                    } else if (act instanceof ActSetVariable set) {
+                        if (set.variable.type == Type.UNKNOWN) {
+                            set.variable.type = type;
+                        }
                     }
                 }
             }
@@ -80,17 +88,28 @@ public class SyContext {
     protected Type getTraceType(Tracer<Action> tracer) {
         while (tracer.hasNext()) {
             var act = tracer.next();
-            if (act instanceof ActInsertVariable insert) {
+            if (act instanceof ActCall call) {
+                var fun = this.functions.stream().filter(it -> it.name.equals(call.fun)).findFirst().orElseThrow(() -> new RuntimeException("Функция \"" + call.fun + "\" не определена!"));
+                if (fun.ret != Type.UNKNOWN) {
+                    return fun.ret;
+                }
+            } else if (act instanceof ActInsertInteger) {
+                return Type.I32;
+            } else if (act instanceof ActInsertVariable insert) {
                 if (insert.variable.type != Type.UNKNOWN) {
                     return insert.variable.type;
                 }
-            } else if (act instanceof ActMath op) {
-                if (op.type != Type.UNKNOWN) {
-                    return op.type;
+            } else if (act instanceof ActMath math) {
+                if (math.type != Type.UNKNOWN) {
+                    return math.type;
                 }
             } else if (act instanceof ActReturn ret) {
                 if (ret.type != Type.UNKNOWN) {
                     return ret.type;
+                }
+            } else if (act instanceof ActSetVariable set) {
+                if (set.variable.type != Type.UNKNOWN) {
+                    return set.variable.type;
                 }
             }
         }

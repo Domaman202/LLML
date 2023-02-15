@@ -55,6 +55,9 @@ public class Lexer {
                 case '=' -> {
                     return new Token("=", Token.Type.ASSIGN, line, delete(1));
                 }
+                case '@' -> {
+                    return new Token("@", Token.Type.DOG, line, delete(1));
+                }
                 case '-' -> {
                     var $ = str.charAt(1);
                     switch ($) {

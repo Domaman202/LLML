@@ -31,6 +31,7 @@ public class Token {
         COMMA,
         PILLAR,
         ASSIGN,
+        DOG,
 
         PTR,
 

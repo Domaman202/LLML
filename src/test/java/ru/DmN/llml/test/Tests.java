@@ -42,6 +42,13 @@ public class Tests {
                     d -> |
                 }
                 """, true, Type.UNKNOWN);
+        test(5, 5, """
+                add(a, b): i32 = { [a b +) -> | }
+                
+                f(c: i16, d: i16): i16 = {
+                    [c d @call(add)) -> |
+                }
+                """, true, Type.UNKNOWN);
     }
 
     private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws FileNotFoundException {

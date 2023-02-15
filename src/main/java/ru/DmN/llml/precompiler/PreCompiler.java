@@ -7,6 +7,7 @@ import ru.DmN.llml.parser.ast.SyContext;
 import ru.DmN.llml.parser.ast.SyFunction;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -37,7 +38,19 @@ public class PreCompiler {
             var expr = src.expressions.get(i);
             for (int j = 0; j < expr.actions.size(); j++) {
                 var act = expr.actions.get(j);
-                if (act instanceof ActInsertInteger insert) {
+                if (act instanceof ActCall call) {
+                    var function = ctx.functions.stream().filter(it -> it.name.equals(call.fun)).findFirst().orElseThrow(() -> new RuntimeException("Функция \"" + call.fun + "\" не определена!"));
+                    var args = new ArrayList<Value>();
+                    function.args.list.forEach(it -> args.add(cast(ivmap, fun.actions, vstack.pop(), it.type)));
+                    Variable res;
+                    if (fun.ret == Type.VOID) {
+                        res = null;
+                    } else {
+                        res = ivmap.create(function.ret);
+                        vstack.addLast(new Value(res));
+                    }
+                    fun.actions.add(new PACall(function, args, res));
+                } else if (act instanceof ActInsertInteger insert) {
                     vstack.addLast(new Value(new Constant(insert.value)));
                 } else if (act instanceof ActInsertVariable insert) {
                     vstack.addLast(new Value(insert.variable));
@@ -48,21 +61,21 @@ public class PreCompiler {
                     var operation = new PAMath(a, b, out, op.oper);
                     vstack.addLast(new Value(out));
                     fun.actions.add(operation);
+                } else if (act instanceof ActReturn) {
+                    fun.actions.add(new PAReturn(cast(ivmap, fun.actions, vstack.pop(), fun.ret)));
                 } else if (act instanceof ActSetVariable set) {
                     fun.actions.add(new PASet(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
                 }
             }
         }
-        if (fun.ret != Type.UNKNOWN && fun.ret != Type.VOID)
-            fun.actions.add(new PAReturn(vstack.pop()));
         return fun;
     }
 
-    protected Value cast(InternalVarMap vmap, List<PrecompiledAction> actions, Value of, Type to) {
+    protected Value cast(InternalVarMap ivmap, List<PrecompiledAction> actions, Value of, Type to) {
         if (of.constant == null) {
             if (of.variable.type == to)
                 return of;
-            var nw = vmap.create(to);
+            var nw = ivmap.create(to);
             actions.add(new PACast(of.variable, nw));
             return new Value(nw);
         } else if (of.constant.type != to)

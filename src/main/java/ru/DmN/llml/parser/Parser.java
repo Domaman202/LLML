@@ -107,6 +107,12 @@ public class Parser {
                         }
                         expression.actions.add(new ActMath(oper, Type.UNKNOWN));
                     }
+                    case DOG -> {
+                        var annotation = parseAnnotation();
+                        switch (annotation.name) {
+                            case "call" -> expression.actions.add(new ActCall(annotation.args.get(0)));
+                        }
+                    }
                     default -> throwBadToken(token);
                 }
             }
@@ -130,6 +136,21 @@ public class Parser {
             function.expressions.add(expr);
             return true;
         }
+    }
+
+    protected Annotation parseAnnotation() {
+        var name = next(Token.Type.NAMING).str;
+        var args = new ArrayList<String>();
+        next(Token.Type.OPEN_BRACKET);
+        var token = next();
+        if (token.type != Token.Type.CLOSE_BRACKET) {
+            do {
+                args.add(token.str);
+                token = next();
+            } while (token.type == Token.Type.COMMA);
+            check(token, Token.Type.CLOSE_BRACKET);
+        }
+        return new Annotation(name, args);
     }
 
     protected Token next(Token.Type needed) {

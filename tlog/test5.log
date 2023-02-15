@@ -1,0 +1,14 @@
+define dso_local i32 @add(i32 noundef %a, i32 noundef %b) #0 {
+	%1 = add i32 %a, %b
+	ret i32 %1
+}
+
+define dso_local i16 @f(i16 noundef %c, i16 noundef %d) #0 {
+	%1 = sext i16 %c to i32
+	%2 = sext i16 %d to i32
+	%3 = call i32 @add(i32 %1, i32 %2)
+	%4 = trunc i32 %3 to i16
+	ret i16 %4
+}
+
+attributes #0 = { nounwind }
