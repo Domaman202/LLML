@@ -5,6 +5,7 @@ import ru.DmN.llml.precompiler.PcFunction;
 import ru.DmN.llml.precompiler.PcNIFunction;
 import ru.DmN.llml.precompiler.action.*;
 import ru.DmN.llml.utils.InitializedGlobalVariable;
+import ru.DmN.llml.utils.Type;
 
 public class Compiler {
     public final PcContext src;
@@ -52,9 +53,15 @@ public class Compiler {
                     } else if (act instanceof PAMath math) {
                         out.append(math.out.getName()).append(" = ").append(math.oper.ir).append(' ').append(math.getType()).append(' ').append(math.a).append(", ").append(math.b);
                     } else if (act instanceof PAReturn ret) {
-                        out.append("ret ").append(ret.value.type()).append(' ').append(ret.value);
+                        out.append("ret ").append(fun.ret);
+                        if (fun.ret != Type.VOID) {
+                            out.append(' ').append(ret.value);
+                        }
                     } else if (act instanceof PASet set) {
                         out.append(set.var.getName()).append(" = ").append(set.value);
+                    } else if (act instanceof PAStore store) {
+                        var to = store.to;
+                        out.append("store ").append(to.type).append(' ').append(store.value).append(", ptr ").append(to.getName());
                     }
                     out.append('\n');
                 }

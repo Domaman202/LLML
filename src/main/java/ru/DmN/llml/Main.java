@@ -6,9 +6,13 @@ import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.PreCompiler;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) { // TODO: SET GLOBAL VARIABLE
         var parser = new Parser("""
                 a = 21
+                
+                set(i: i32): void = {
+                    i -> a
+                }
                 
                 f(b): i32 = {
                     [a b +) -> |

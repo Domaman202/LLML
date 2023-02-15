@@ -96,8 +96,6 @@ public class Parser {
                     }
                     case NAMING -> {
                         var var = function.locals.getOrAdd(token.str, Type.UNKNOWN);
-//                        if (var == null)
-//                            throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Неизвестная переменная \"" + token.str + "\"");
                         expression.actions.add(var instanceof GlobalVariable ? new ActInsertGlobalVariable(var) : new ActInsertVariable(var));
                     }
                     case NUMBER -> expression.actions.add(new ActInsertInteger(Integer.parseInt(token.str)));
@@ -133,11 +131,12 @@ public class Parser {
             token = next();
             var expr = new SyExpression();
             expr.actions.add(value.constant == null ? (value.variable instanceof GlobalVariable ? new ActInsertGlobalVariable(value.variable) : new ActInsertVariable(value.variable)) : new ActInsertInteger((int) value.constant.value));
-            if (token.type == Token.Type.NAMING)
-                expr.actions.add(new ActSetVariable(function.locals.getOrAdd(token.str, value.type())));
-            else if (token.type == Token.Type.PILLAR)
+            if (token.type == Token.Type.NAMING) {
+                var var = function.locals.getOrAdd(token.str, value.type());
+                expr.actions.add(var instanceof GlobalVariable ? new ActSetGlobalVariable(var) : new ActSetVariable(var));
+            } else if (token.type == Token.Type.PILLAR) {
                 expr.actions.add(new ActReturn(function.ret));
-            else throwBadToken(token);
+            } else throwBadToken(token);
             function.expressions.add(expr);
             return true;
         }

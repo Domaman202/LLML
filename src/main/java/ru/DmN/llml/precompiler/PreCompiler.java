@@ -68,11 +68,15 @@ public class PreCompiler {
                     fun.actions.add(operation);
                 } else if (act instanceof ActReturn) {
                     fun.actions.add(new PAReturn(cast(ivmap, fun.actions, vstack.pop(), fun.ret)));
+                } else if (act instanceof ActSetGlobalVariable set) {
+                    fun.actions.add(new PAStore(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
                 } else if (act instanceof ActSetVariable set) {
                     fun.actions.add(new PASet(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
                 }
             }
         }
+        if (!(fun.actions.get(fun.actions.size() - 1) instanceof PAReturn))
+            fun.actions.add(new PAReturn(fun.ret == Type.VOID ? null : new Value(new Constant(0))));
         return fun;
     }
 

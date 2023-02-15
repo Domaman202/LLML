@@ -98,7 +98,7 @@ public class Lexer {
             } while (Character.isDigit(c));
             return new Token(naming.toString(), Token.Type.TYPE, line, symbol);
         }
-        return new Token(naming.toString(), Token.Type.NAMING, line, symbol);
+        return new Token(naming.toString(), naming.toString().equals("void") ? Token.Type.TYPE : Token.Type.NAMING, line, symbol);
     }
 
     protected Token parseNumber() {
