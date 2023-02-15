@@ -1,14 +1,18 @@
 package ru.DmN.llml.test;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import ru.DmN.llml.compiler.Compiler;
 import ru.DmN.llml.utils.Type;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.PreCompiler;
 
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 public class Tests {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         new File("log").mkdir();
         //
         test(0, 0, """
@@ -61,7 +65,7 @@ public class Tests {
                 """, true, Type.UNKNOWN);
     }
 
-    private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws FileNotFoundException {
+    private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws IOException {
         try (var out = new TestStream(tid, cid)) {
             var parser = new Parser(code);
             var ctx = parser.parse();
@@ -72,23 +76,30 @@ public class Tests {
             compiler.compile();
             out.println(compiler.out);
         } finally {
-            if (readChecksum("log/test" + tid + ".log") == readChecksum("tlog/test" + cid + ".log")) {
-                System.out.println("Test №" + tid + " success!");
-            } else {
-                System.err.println("Test №" + tid + " failed!");
+            try {
+                if (Objects.equals(readChecksum("log/test" + tid), readChecksum("tlog/test" + cid))) {
+                    System.out.println("Test №" + tid + " success!");
+                } else {
+                    System.err.println("Test №" + tid + " failed!");
+                }
+            } catch (IOException exception) {
+                System.err.println("Test №" + tid + " check ended with error: " + exception.getMessage());
             }
         }
     }
 
-    private static int readChecksum(String name) {
-        var checksum = 0;
-        try (var stream = new FileInputStream(name)) {
-            while (stream.available() > 0) {
-                checksum += stream.read();
+    private static String readChecksum(String name) throws IOException {
+        var file = new File(name + ".check");
+        if (file.exists()) {
+            try (var stream = new FileInputStream(file)) {
+                return new String(stream.readAllBytes());
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } else {
+            var sum = DigestUtils.md5Hex(new FileInputStream(name + ".log"));
+            try (var stream = new FileOutputStream(file)) {
+                stream.write(sum.getBytes());
+            }
+            return sum;
         }
-        return checksum;
     }
 }
