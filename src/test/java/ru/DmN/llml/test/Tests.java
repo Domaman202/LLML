@@ -3,7 +3,6 @@ package ru.DmN.llml.test;
 import ru.DmN.llml.compiler.Compiler;
 import ru.DmN.llml.utils.Type;
 import ru.DmN.llml.parser.Parser;
-import ru.DmN.llml.parser.ast.SyFunction;
 import ru.DmN.llml.precompiler.PreCompiler;
 
 import java.io.*;
@@ -49,10 +48,21 @@ public class Tests {
                     [c d @call(add)) -> |
                 }
                 """, true, Type.UNKNOWN);
+        test(6, 6, """
+                a = 21
+                
+                set(i: i32): void = {
+                    i -> a
+                }
+                
+                f(b): i32 = {
+                    [a b +) -> |
+                }
+                """, true, Type.UNKNOWN);
     }
 
     private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws FileNotFoundException {
-        try (var out = testStream(tid, cid)) {
+        try (var out = new TestStream(tid, cid)) {
             var parser = new Parser(code);
             var ctx = parser.parse();
             ctx.functions.forEach(fun -> ctx.calculate(fun, calcA, calcB));
@@ -61,21 +71,13 @@ public class Tests {
             var compiler = new Compiler(precompiler.ctx);
             compiler.compile();
             out.println(compiler.out);
-        }
-    }
-
-    private static PrintStream testStream(int tid, int cid) throws FileNotFoundException {
-        return new PrintStream(new FileOutputStream("log/test" + tid + ".log")) {
-            @Override
-            public void close() {
-                super.close();
-                if (readChecksum("log/test" + tid + ".log") == readChecksum("tlog/test" + cid + ".log")) {
-                    System.out.println("Test №" + tid + " success!");
-                } else {
-                    System.err.println("Test №" + tid + " failed!");
-                }
+        } finally {
+            if (readChecksum("log/test" + tid + ".log") == readChecksum("tlog/test" + cid + ".log")) {
+                System.out.println("Test №" + tid + " success!");
+            } else {
+                System.err.println("Test №" + tid + " failed!");
             }
-        };
+        }
     }
 
     private static int readChecksum(String name) {
