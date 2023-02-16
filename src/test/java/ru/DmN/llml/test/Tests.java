@@ -74,6 +74,11 @@ public class Tests {
                     b -> d
                 }
                 """, true, Type.UNKNOWN);
+        test(9, 9, """
+                f(a: i32, b: i32): f32 = {
+                    [a b +) -> |
+                }
+                """, true, Type.UNKNOWN);
     }
 
     private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws IOException {

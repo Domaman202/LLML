@@ -10,7 +10,7 @@ public class Constant {
             this.type = Type.I32;
         } else {
             this.value = Double.parseDouble(value);
-            this.type = Type.FLOAT;
+            this.type = Type.F32;
         }
     }
 
@@ -21,11 +21,11 @@ public class Constant {
 
     public Constant(double value) {
         this.value = value;
-        this.type = Type.FLOAT;
+        this.type = Type.F32;
     }
 
     @Override
     public String toString() {
-        return type == Type.FLOAT ? String.valueOf(value) : String.valueOf((int) value);
+        return type.name.startsWith("F") ? String.valueOf(value) : String.valueOf((int) value);
     }
 }

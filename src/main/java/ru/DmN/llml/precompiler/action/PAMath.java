@@ -30,15 +30,21 @@ public class PAMath extends PrecompiledAction {
     }
 
     public enum Operation {
-        ADD("add"),
-        SUB("sub"),
-        MUL("mul"),
-        DIV("sdiv");
+        ADD("add", "fadd"),
+        SUB("sub", "fsub"),
+        MUL("mul", "fmul"),
+        DIV("sdiv", "fdiv");
 
         public final String ir;
+        public final String fir;
 
-        Operation(String ir) {
+        Operation(String ir, String fir) {
             this.ir = ir;
+            this.fir = fir;
+        }
+
+        public String getIr(boolean isFloat) {
+            return isFloat ? fir : ir;
         }
     }
 }

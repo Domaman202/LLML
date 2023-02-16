@@ -4,7 +4,10 @@ package ru.DmN.llml.utils;
 public enum Type {
     UNKNOWN("unknown"),
     VOID("void"),
-    FLOAT("float"),
+    F16("half"),
+    F32("float"),
+    F64("double"),
+    F128("fp128"),
     I1(1),
     I2(2),
     I3(3),
@@ -274,6 +277,10 @@ public enum Type {
     Type(int bits) {
         this.name = "i" + bits;
         this.bits = bits;
+    }
+
+    public String fieldName() {
+        return super.toString();
     }
 
     @Override

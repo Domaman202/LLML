@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             var parser = new Parser("""
-                    f(a, b): i32 = {
+                    f(a: i32, b: i32): f32 = {
                         [a b +) -> |
                     }
                     """);

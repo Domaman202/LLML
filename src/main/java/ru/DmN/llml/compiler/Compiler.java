@@ -45,13 +45,15 @@ public class Compiler {
                         out.append(')');
                     } else if (act instanceof PACast cast) {
                         var of = cast.of.type;
+                        var of$int = of.fieldName().startsWith("I");
                         var to = cast.to.type;
-                        out.append(cast.to.getName()).append(" = ").append(of.bits < to.bits ? "sext" : "trunc").append(' ').append(of).append(' ').append(cast.of.getName()).append(" to ").append(to);
+                        var to$int = to.fieldName().startsWith("I");
+                        out.append(cast.to.getName()).append(" = ").append(of$int?(to$int?(of.bits<to.bits?"sext":"trunc"):"sitofp"):(to$int?"fptosi":(of.bits<to.bits?"fpext":"fptrunc"))).append(' ').append(of).append(' ').append(cast.of.getName()).append(" to ").append(to);
                     } else if (act instanceof PALoad load) {
                         var of = load.of;
                         out.append(load.to.getName()).append(" = load ").append(of.type).append(", ptr ").append(of.getName());
                     } else if (act instanceof PAMath math) {
-                        out.append(math.out.getName()).append(" = ").append(math.oper.ir).append(' ').append(math.getType()).append(' ').append(math.a).append(", ").append(math.b);
+                        out.append(math.out.getName()).append(" = ").append(math.oper.getIr(math.out.type.fieldName().startsWith("F"))).append(' ').append(math.getType()).append(' ').append(math.a).append(", ").append(math.b);
                     } else if (act instanceof PAReturn ret) {
                         out.append("ret ").append(fun.ret);
                         if (fun.ret != Type.VOID) {

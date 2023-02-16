@@ -1,0 +1,9 @@
+
+define dso_local float @f(i32 noundef %a, i32 noundef %b) #0 {
+	%1 = sitofp i32 %a to float
+	%2 = sitofp i32 %b to float
+	%3 = fadd float %1, %2
+	ret float %3
+}
+
+attributes #0 = { nounwind }
