@@ -5,6 +5,7 @@ import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.lexer.Token;
 import ru.DmN.llml.parser.action.*;
 import ru.DmN.llml.parser.ast.SyContext;
+import ru.DmN.llml.parser.ast.SyExpression;
 import ru.DmN.llml.parser.ast.SyFunction;
 import ru.DmN.llml.utils.*;
 
@@ -65,16 +66,15 @@ public class Parser {
         check(token, Token.Type.ASSIGN);
         next(Token.Type.OPEN_FBRACKET);
         var function = new SyFunction(ctx.variables, name, ret, args);
-        while (parseExpression(function)) ;
+        while (parseExpression(function, function.expression())) ;
         return function;
     }
 
-    protected boolean parseExpression(SyFunction function) {
+    protected boolean parseExpression(SyFunction function, SyExpression expression) {
         Token token = next();
         if (token.type == Token.Type.CLOSE_FBRACKET)
             return false;
         if (token.type == Token.Type.OPEN_CBRACKET) {
-            var expression = function.expression();
             while (true) {
                 token = next();
                 switch (token.type) {
@@ -124,15 +124,13 @@ public class Parser {
                         }
                         expression.actions.add(new ActMath(oper, Type.UNKNOWN));
                     }
-                    case DOG -> {
-                        var annotation = parseAnnotation();
-                        switch (annotation.name) {
-                            case "call" -> expression.actions.add(new ActCall(annotation.args.get(0)));
-                        }
-                    }
+                    case DOG -> parseAnnotation(function, expression, parseAnnotation());
                     default -> throwBadToken(token);
                 }
             }
+        } else if (token.type == Token.Type.DOG) {
+            parseAnnotation(function, function.expression(), parseAnnotation());
+            return true;
         } else {
             Value value = null;
             if (token.type == Token.Type.NAMING)
@@ -142,15 +140,26 @@ public class Parser {
             else throwBadToken(token);
             next(Token.Type.PTR);
             token = next();
-            var expr = function.expression();
-            expr.actions.add(value.constant == null ? (value.variable instanceof GlobalVariable ? new ActInsertGlobalVariable(value.variable) : new ActInsertVariable(value.variable)) : new ActInsertInteger((int) value.constant.value));
+            expression.actions.add(value.constant == null ? (value.variable instanceof GlobalVariable ? new ActInsertGlobalVariable(value.variable) : new ActInsertVariable(value.variable)) : new ActInsertInteger((int) value.constant.value));
             if (token.type == Token.Type.NAMING) {
                 var var = function.locals.getOrAdd(token.str, value.type());
-                expr.actions.add(var instanceof GlobalVariable ? new ActSetGlobalVariable(var) : new ActSetVariable(var));
+                expression.actions.add(var instanceof GlobalVariable ? new ActSetGlobalVariable(var) : new ActSetVariable(var));
             } else if (token.type == Token.Type.PILLAR) {
-                expr.actions.add(new ActReturn(function.ret));
+                expression.actions.add(new ActReturn(function.ret));
             } else throwBadToken(token);
             return true;
+        }
+    }
+
+    protected void parseAnnotation(SyFunction function, SyExpression expression, Annotation annotation) {
+        switch (annotation.name) {
+            case "call" -> expression.actions.add(new ActCall(annotation.args.get(0)));
+            case "if" -> {
+                next(Token.Type.PTR);
+                next(Token.Type.OPEN_FBRACKET);
+                var expr = function.ifExpression(function.locals.get(annotation.args.get(0)));
+                while (this.parseExpression(function, expr)) ;
+            }
         }
     }
 

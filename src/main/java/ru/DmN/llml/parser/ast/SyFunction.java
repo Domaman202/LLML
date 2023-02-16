@@ -20,6 +20,12 @@ public class SyFunction extends SyAbstractFunction {
         return expr;
     }
 
+    public SyIfExpression ifExpression(Variable condition) {
+        var expr = new SyIfExpression(condition);
+        expressions.add(expr);
+        return expr;
+    }
+
     @Override
     public StringBuilder toString(int offset) {
         var out = super.toString(offset);

@@ -49,6 +49,16 @@ public class Compiler {
                         var to = cast.to.type;
                         var to$int = to.fieldName().startsWith("I");
                         out.append(cast.to.getName()).append(" = ").append(of$int?(to$int?(of.bits<to.bits?"sext":"trunc"):"sitofp"):(to$int?"fptosi":(of.bits<to.bits?"fpext":"fptrunc"))).append(' ').append(of).append(' ').append(cast.of.getName()).append(" to ").append(to);
+                    } else if (act instanceof PAJmp jump) {
+                        out.append("br ");
+                        var condition = jump.condition;
+                        if (condition != null)
+                            out.append(condition.type()).append(' ').append(condition).append(", ");
+                        out.append("label ").append(jump.labelA.label.getName());
+                        var labelB = jump.labelB;
+                        if (labelB != null) {
+                            out.append(", label ").append(labelB.label.getName());
+                        }
                     } else if (act instanceof PALoad load) {
                         var of = load.of;
                         out.append(load.to.getName()).append(" = load ").append(of.type).append(", ptr ").append(of.getName());
@@ -64,6 +74,8 @@ public class Compiler {
                     } else if (act instanceof PAStore store) {
                         var to = store.to;
                         out.append("store ").append(to.type).append(' ').append(store.value).append(", ptr ").append(to.getName());
+                    } else if (act instanceof PLabel label) {
+                        out.replace(out.lastIndexOf("\t"), out.length(), label.label.name).append(':');
                     }
                     out.append('\n');
                 }

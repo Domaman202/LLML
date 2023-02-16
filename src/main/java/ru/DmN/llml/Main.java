@@ -9,9 +9,10 @@ import ru.DmN.llml.precompiler.PreCompiler;
 public class Main {
     public static void main(String[] args) {
         try {
-            var parser = new Parser("""
-                    f(a: i32, b: i32): f32 = {
-                        [a b +) -> |
+            var parser = new Parser("""  
+                    f(i: i32): i32 = {
+                        @if(i) -> { 5 -> | }
+                        4 -> |
                     }
                     """);
             var ctx = parser.parse();

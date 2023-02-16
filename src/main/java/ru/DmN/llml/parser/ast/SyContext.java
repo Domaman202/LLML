@@ -10,16 +10,27 @@ public class SyContext {
     public List<SyAbstractFunction> functions = new ArrayList<>();
     public VariableMap<Variable> variables = new VariableMap<>();
 
-    public <T extends SyAbstractFunction> T calculate(T fun, boolean calcA, Type calcB) {
+    public <T extends SyAbstractFunction> T calculate(T function, boolean calcA, Type calcB) {
         boolean needCalculation;
         do {
             needCalculation = false;
-            if (calcB != Type.UNKNOWN) calculateB(fun,calcB);
-            if (fun instanceof SyFunction f) {
-                if (calcA) while (calculateA(f)) needCalculation = true;
+            if (calcB != Type.UNKNOWN) calculateB(function,calcB);
+            if (function instanceof SyFunction fun) {
+                for (int i = 0; i < fun.expressions.size(); i++) {
+                    var expr = fun.expressions.get(i);
+                    if (expr.actions.isEmpty()) {
+                        fun.expressions.remove(expr);
+                        i--;
+                    }
+                }
+                if (calcA) {
+                    while (calculateA(fun)) {
+                        needCalculation = true;
+                    }
+                }
             }
         } while (needCalculation);
-        return fun;
+        return function;
     }
 
     public boolean calculateA(SyFunction fun) {

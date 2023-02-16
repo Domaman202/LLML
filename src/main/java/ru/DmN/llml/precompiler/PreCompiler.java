@@ -1,5 +1,6 @@
 package ru.DmN.llml.precompiler;
 
+import ru.DmN.llml.parser.ast.SyIfExpression;
 import ru.DmN.llml.precompiler.action.*;
 import ru.DmN.llml.utils.*;
 import ru.DmN.llml.parser.action.*;
@@ -35,10 +36,19 @@ public class PreCompiler {
         var fun = new PcFunction(src.name, src.ret, src.arguments);
         var ivmap = new InternalVarMap(ctx.variables, src.arguments.list);
         var vstack = new ArrayDeque<Value>();
+        var lstack = new ArrayDeque<PLabel>();
         for (int i = 0; i < src.expressions.size(); i++) {
-            var expr = src.expressions.get(i);
-            for (int j = 0; j < expr.actions.size(); j++) {
-                var act = expr.actions.get(j);
+            var expression = src.expressions.get(i);
+            if (expression instanceof SyIfExpression expr) {
+                var condition = cast(ivmap, fun.actions, new Value(expr.condition), Type.I1);
+                var labelA = new PLabel(ivmap.create(Type.VOID));
+                var labelB = new PLabel(null);
+                lstack.addLast(labelB);
+                fun.actions.add(new PAJmp(condition, labelA, labelB));
+                fun.actions.add(labelA);
+            }
+            for (int j = 0; j < expression.actions.size(); j++) {
+                var act = expression.actions.get(j);
                 if (act instanceof ActCall call) {
                     var function = ctx.functions.stream().filter(it -> it.name.equals(call.fun)).findFirst().orElseThrow(() -> new RuntimeException("Функция \"" + call.fun + "\" не определена!"));
                     var args = new ArrayList<Value>();
@@ -74,6 +84,11 @@ public class PreCompiler {
                     fun.actions.add(new PASet(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
                 }
             }
+            if (expression instanceof SyIfExpression) {
+                var label = lstack.pop();
+                label.label = ivmap.create(Type.VOID);
+                fun.actions.add(label);
+            }
         }
         if (!fun.actions.isEmpty() && !(fun.actions.get(fun.actions.size() - 1) instanceof PAReturn))
             fun.actions.add(new PAReturn(fun.ret == Type.VOID ? null : new Value(new Constant(0))));
@@ -81,14 +96,17 @@ public class PreCompiler {
     }
 
     protected Value cast(InternalVarMap ivmap, List<PrecompiledAction> actions, Value of, Type to) {
-        if (of.constant == null) {
-            if (of.variable.type == to)
-                return of;
-            var nw = ivmap.create(to);
-            actions.add(new PACast(of.variable, nw));
-            return new Value(nw);
-        } else if (of.constant.type != to)
-            of.constant.type = to;
+        if (of.type() != to) {
+            if (of.constant == null) {
+                if (of.variable.type != to) {
+                    var nw = ivmap.create(to);
+                    actions.add(new PACast(of.variable, nw));
+                    return new Value(nw);
+                }
+            } else if (of.constant.type != to) {
+                of.constant.type = to;
+            }
+        }
         return of;
     }
 }
