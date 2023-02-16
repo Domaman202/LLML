@@ -13,7 +13,10 @@ import java.util.Objects;
 
 public class Tests {
     public static void main(String[] args) throws IOException {
-        new File("log").mkdir();
+        var logdir = new File("log");
+        if (logdir.exists()) {
+            for (File file : logdir.listFiles()) file.delete();
+        } else logdir.mkdir();
         //
         test(0, 0, """
                 foo(a, b): i32 = {
@@ -77,6 +80,13 @@ public class Tests {
         test(9, 9, """
                 f(a: i32, b: i32): f32 = {
                     [a b +) -> |
+                }
+                """, true, Type.UNKNOWN);
+        test(10, 10, """
+                f(i: i32): i32 = {
+                    [i 5 > !) -> x
+                    @if(x) -> { 5 -> | }
+                    i -> |
                 }
                 """, true, Type.UNKNOWN);
     }

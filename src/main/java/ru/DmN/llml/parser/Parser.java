@@ -119,10 +119,19 @@ public class Parser {
                             case "-" -> oper = ActMath.Operation.SUB;
                             case "*" -> oper = ActMath.Operation.MUL;
                             case "/" -> oper = ActMath.Operation.DIV;
+                            case ">" -> oper = ActMath.Operation.GREAT;
+                            case "<" -> oper = ActMath.Operation.LESS;
+                            case "=" -> oper = ActMath.Operation.EQ;
+                            case "&" -> oper = ActMath.Operation.AND;
+                            case "|" -> oper = ActMath.Operation.OR;
+                            case "!" -> {
+                                expression.actions.add(new ActInsertInteger(1, Type.I1));
+                                oper = ActMath.Operation.NOT;
+                            }
                             default ->
                                     throw new RuntimeException("(" + token.line + ',' + token.symbol + ") Операция \"" + token.str + "\" ещё не реализована!");
                         }
-                        expression.actions.add(new ActMath(oper, Type.UNKNOWN));
+                        expression.actions.add(new ActMath(oper));
                     }
                     case DOG -> parseAnnotation(function, expression, parseAnnotation());
                     default -> throwBadToken(token);

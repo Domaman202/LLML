@@ -63,7 +63,7 @@ public class Compiler {
                         var of = load.of;
                         out.append(load.to.getName()).append(" = load ").append(of.type).append(", ptr ").append(of.getName());
                     } else if (act instanceof PAMath math) {
-                        out.append(math.out.getName()).append(" = ").append(math.oper.getIr(math.out.type.fieldName().startsWith("F"))).append(' ').append(math.getType()).append(' ').append(math.a).append(", ").append(math.b);
+                        out.append(math.out.getName()).append(" = ").append(math.oper.getIr(math.out.type.fieldName().startsWith("F"))).append(' ').append(math.getCalcType()).append(' ').append(math.a).append(", ").append(math.b);
                     } else if (act instanceof PAReturn ret) {
                         out.append("ret ").append(fun.ret);
                         if (fun.ret != Type.VOID) {

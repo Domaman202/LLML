@@ -70,9 +70,9 @@ public class PreCompiler {
                 } else if (act instanceof ActInsertVariable insert) {
                     vstack.addLast(new Value(insert.variable));
                 } else if (act instanceof ActMath op) {
-                    var a = cast(ivmap, fun.actions, vstack.pop(), op.type);
-                    var b = cast(ivmap, fun.actions, vstack.pop(), op.type);
-                    var out = ivmap.create(op.type);
+                    var a = cast(ivmap, fun.actions, vstack.pop(), op.inputType);
+                    var b = cast(ivmap, fun.actions, vstack.pop(), op.inputType);
+                    var out = ivmap.create(op.outputType);
                     var operation = new PAMath(a, b, out, op.oper);
                     vstack.addLast(new Value(out));
                     fun.actions.add(operation);
@@ -81,7 +81,12 @@ public class PreCompiler {
                 } else if (act instanceof ActSetGlobalVariable set) {
                     fun.actions.add(new PAStore(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
                 } else if (act instanceof ActSetVariable set) {
-                    fun.actions.add(new PASet(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
+                    var val = cast(ivmap, fun.actions, vstack.pop(), set.variable.type);
+                    if (val.variable == null) {
+                        fun.actions.add(new PASet(val, set.variable));
+                    } else {
+                        set.variable.name = val.variable.name;
+                    }
                 }
             }
             if (expression instanceof SyIfExpression) {

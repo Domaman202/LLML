@@ -38,23 +38,27 @@ public class SyContext {
             for (int i = expr.actions.size(); i > 0; ) {
                 var act = expr.actions.get(--i);
                 if (act instanceof ActInsertVariable insert) {
-                    if (insert.variable.type == Type.UNKNOWN && (insert.variable.type = getTraceType(new Tracer.IncStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
+                    if (insert.variable.type == Type.UNKNOWN && (insert.variable.type = getTraceType(fun, new Tracer.IncStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
                         return true;
                     }
                 } else if (act instanceof ActMath op) {
-                    if (op.type == Type.UNKNOWN && (op.type = fun.ret) != Type.UNKNOWN) {
+                    if (op.isNeedCalc(fun)) {
+                        if (op.inputType == Type.UNKNOWN)
+                            return (op.inputType = getTraceType(fun, new Tracer.IncStepTracer<>(expr.actions, i))) != Type.UNKNOWN;
+                        if (op.outputType == Type.UNKNOWN)
+                            return (op.outputType = getTraceType(fun, new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN;
                         return true;
                     }
                 } else if (act instanceof ActReturn ret) {
                     if (ret.type == Type.UNKNOWN) {
-                        if ((fun.ret = ret.type = getTraceType(new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
+                        if ((fun.ret = ret.type = getTraceType(fun, new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
                             return true;
                         }
                     } else if (ret.type != fun.ret) {
                         ret.type = fun.ret;
                     }
                 } else if (act instanceof ActSetVariable set) {
-                    if (set.variable.type == Type.UNKNOWN && (set.variable.type = getTraceType(new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
+                    if (set.variable.type == Type.UNKNOWN && (set.variable.type = getTraceType(fun, new Tracer.DecStepTracer<>(expr.actions, i))) != Type.UNKNOWN) {
                         return true;
                     }
                 }
@@ -79,9 +83,10 @@ public class SyContext {
                             insert.variable.type = type;
                         }
                     } else if (act instanceof ActMath op) {
-                        if (op.type == Type.UNKNOWN) {
-                            op.type = type;
-                        }
+                        if (op.inputType == Type.UNKNOWN)
+                            op.inputType = type;
+                        if (op.outputType == Type.UNKNOWN)
+                            op.outputType = type;
                     } else if (act instanceof ActReturn ret) {
                         if (ret.type == Type.UNKNOWN) {
                             fun.ret = ret.type = type;
@@ -96,7 +101,7 @@ public class SyContext {
         }
     }
 
-    protected Type getTraceType(Tracer<Action> tracer) {
+    protected Type getTraceType(SyFunction function, Tracer<Action> tracer) {
         while (tracer.hasNext()) {
             var act = tracer.next();
             if (act instanceof ActCall call) {
@@ -111,8 +116,12 @@ public class SyContext {
                     return insert.variable.type;
                 }
             } else if (act instanceof ActMath math) {
-                if (math.type != Type.UNKNOWN) {
-                    return math.type;
+                if (tracer instanceof Tracer.DecStepTracer) {
+                    if (math.outputType != Type.UNKNOWN) {
+                        return math.outputType;
+                    } else if (math.inputType != Type.UNKNOWN) {
+                        return math.inputType;
+                    }
                 }
             } else if (act instanceof ActReturn ret) {
                 if (ret.type != Type.UNKNOWN) {
@@ -124,7 +133,7 @@ public class SyContext {
                 }
             }
         }
-        return Type.UNKNOWN;
+        return tracer instanceof Tracer.IncStepTracer ? function.ret : Type.UNKNOWN;
     }
 
     @Override

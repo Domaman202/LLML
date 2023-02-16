@@ -1,9 +1,7 @@
 
 define dso_local i32 @f(i32 noundef %a, i32 noundef %b) #0 {
 	%1 = add i32 %a, %b
-	%c = %1
-	%d = %c
-	ret i32 %d
+	ret i32 %1
 }
 
 attributes #0 = { nounwind }

@@ -11,8 +11,9 @@ public class Main {
         try {
             var parser = new Parser("""  
                     f(i: i32): i32 = {
-                        @if(i) -> { 5 -> | }
-                        4 -> |
+                        [i 5 > !) -> x
+                        @if(x) -> { 5 -> | }
+                        i -> |
                     }
                     """);
             var ctx = parser.parse();
