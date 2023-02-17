@@ -81,12 +81,7 @@ public class PreCompiler {
                 } else if (act instanceof ActSetGlobalVariable set) {
                     fun.actions.add(new PAStore(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
                 } else if (act instanceof ActSetVariable set) {
-                    var val = cast(ivmap, fun.actions, vstack.pop(), set.variable.type);
-                    if (val.variable == null) {
-                        fun.actions.add(new PASet(val, set.variable));
-                    } else {
-                        set.variable.name = val.variable.name;
-                    }
+                    fun.actions.add(new PASet(cast(ivmap, fun.actions, vstack.pop(), set.variable.type), set.variable));
                 }
             }
             if (expression instanceof SyIfExpression) {

@@ -1,0 +1,13 @@
+
+define dso_local i32 @f(i32 noundef %i) #0 {
+	%1 = icmp ugt i32 %i, 5
+	%2 = xor i1 %1, 1
+	%x = bitcast i1 %2 to i1
+	br i1 %x, label %3, label %4
+3:
+	ret i32 5
+4:
+	ret i32 %i
+}
+
+attributes #0 = { nounwind }

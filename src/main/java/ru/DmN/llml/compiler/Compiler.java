@@ -70,7 +70,11 @@ public class Compiler {
                             out.append(' ').append(ret.value);
                         }
                     } else if (act instanceof PASet set) {
-                        out.append(set.var.getName()).append(" = ").append(set.value);
+                        out.append(set.var.getName()).append(" = ");
+                        if (set.value.constant == null) {
+                            var type = set.value.type();
+                            out.append("bitcast").append(' ').append(type).append(' ').append(set.value).append(" to ").append(type);
+                        } else out.append(set.value);
                     } else if (act instanceof PAStore store) {
                         var to = store.to;
                         out.append("store ").append(to.type).append(' ').append(store.value).append(", ptr ").append(to.getName());

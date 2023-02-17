@@ -1,5 +1,0 @@
-
-define dso_local i32 @f(i32 noundef %a, i32 noundef %b) #0 {
-}
-
-attributes #0 = { nounwind }

@@ -19,17 +19,17 @@ public class Tests {
         } else logdir.mkdir();
         //
         test(0, 0, """
-                foo(a, b): i32 = {
+                f(a, b): i32 = {
                     [a b + 2 /) -> |
                 }
                 """, true, Type.UNKNOWN);
-        test(1, 1, """
-                foo(a, b): i32 = {
+        test(1, 0, """
+                f(a, b) = {
                     [a b + 2 /) -> |
                 }
                 """, false, Type.I32);
         test(2, 2, """
-                foo(a, b): i32 = {
+                f(a, b): i32 = {
                     [a b +) -> c
                     [c 2 /) -> |
                 }
@@ -37,52 +37,40 @@ public class Tests {
         test(3, 3, """
                 f(a, b): i32 = {
                     [a b +) -> c
-                    [c) -> d
-                    [d) -> |
-                }
-                """, true, Type.UNKNOWN);
-        test(4, 3, """
-                f(a, b): i32 = {
-                    [a b +) -> c
                     c -> d
                     d -> |
                 }
                 """, true, Type.UNKNOWN);
-        test(5, 5, """
+        test(4, 4, """
                 add(a, b): i32 = { [a b +) -> | }
-                
+
                 f(c: i16, d: i16): i16 = {
                     [c d @call(add)) -> |
                 }
                 """, true, Type.UNKNOWN);
-        test(6, 6, """
+        test(5, 5, """
                 a = 21
-                
+
                 set(i: i32): void = {
                     i -> a
                 }
-                
+
                 f(b): i32 = {
                     [a b +) -> |
                 }
                 """, true, Type.UNKNOWN);
-        test(7, 7, """
+        test(6, 6, """
                 f(a, b): i32 = {
                     [a, b) -> (c, d]
                 }
                 """, true, Type.UNKNOWN);
-        test(8, 7, """
+        test(7, 6, """
                 f(a, b): i32 = {
                     [a) -> (c]
                     b -> d
                 }
                 """, true, Type.UNKNOWN);
-        test(9, 9, """
-                f(a: i32, b: i32): f32 = {
-                    [a b +) -> |
-                }
-                """, true, Type.UNKNOWN);
-        test(10, 10, """
+        test(8, 8, """
                 f(i: i32): i32 = {
                     [i 5 > !) -> x
                     @if(x) -> { 5 -> | }

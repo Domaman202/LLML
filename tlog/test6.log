@@ -1,14 +1,8 @@
-@a = dso_local global i32 21
 
-define dso_local void @set(i32 noundef %i) #0 {
-	store i32 %i, ptr @a
-	ret void
-}
-
-define dso_local i32 @f(i32 noundef %b) #0 {
-	%1 = load i32, ptr @a
-	%2 = add i32 %1, %b
-	ret i32 %2
+define dso_local i32 @f(i32 noundef %a, i32 noundef %b) #0 {
+	%c = bitcast i32 %a to i32
+	%d = bitcast i32 %b to i32
+	ret i32 0
 }
 
 attributes #0 = { nounwind }
