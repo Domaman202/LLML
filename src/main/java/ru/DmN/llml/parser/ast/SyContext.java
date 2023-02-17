@@ -14,8 +14,10 @@ public class SyContext {
         boolean needCalculation;
         do {
             needCalculation = false;
+            // Замена неопределённых типов на `calcB`
             if (calcB != Type.UNKNOWN) calculateB(function,calcB);
             if (function instanceof SyFunction fun) {
+                // Удаление пустых выражений
                 for (int i = 0; i < fun.expressions.size(); i++) {
                     var expr = fun.expressions.get(i);
                     if (expr.actions.isEmpty()) {
@@ -23,6 +25,7 @@ public class SyContext {
                         i--;
                     }
                 }
+                // Просчёт типов
                 if (calcA) {
                     while (calculateA(fun)) {
                         needCalculation = true;
@@ -146,7 +149,7 @@ public class SyContext {
         }
         out.append("\n|");
         for (var function : functions)
-            out.append("\n").append(function.toString(1));
+            out.append('\n').append(function.toString(1));
         return out.append("\n]").toString();
     }
 }
