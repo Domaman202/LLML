@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Parser {
     public final Lexer lexer;
@@ -247,11 +248,14 @@ public class Parser {
     }
 
     protected Token next(Token.Type...type) {
-        return this.check(this.lexer.next(), type);
+        var types = Arrays.stream(type).collect(Collectors.toList());
+        if (types.contains(Token.Type.NAMING))
+            types.add(Token.Type.TYPE);
+        return this.check(this.lexer.next(), types);
     }
 
-    protected Token check(Token token, Token.Type...type) {
-        if (Arrays.stream(type).anyMatch(t -> t == token.type)) {
+    protected Token check(Token token, List<Token.Type> types) {
+        if (types.stream().anyMatch(t -> t == token.type)) {
             return token;
         } else {
             throw InvalidTokenException.create(this.lexer.src, token);

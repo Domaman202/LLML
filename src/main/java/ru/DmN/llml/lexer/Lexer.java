@@ -139,7 +139,7 @@ public class Lexer {
                     delete(1);
                     c = str.charAt(0);
                 } while (Character.isDigit(c));
-                return new Token(naming.toString(), Token.Type.TYPE, line, symbol);
+                return new Token(naming.toString(), Token.Type.TYPE, line, symbol); // todo: regex "(i|f)(\d)+"
             }
             var name = naming.toString();
             return new Token(name, name.equals("void") ? Token.Type.TYPE : Token.Type.NAMING, line, symbol);

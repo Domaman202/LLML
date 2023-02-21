@@ -71,17 +71,19 @@ public class Precompiler {
         if (expression instanceof AstReturn ret) {
             if (function.ret == Type.UNKNOWN)
                 return function.ret = dsgt(function, ret.value);
-            return gnut(this.ts(function, ret.value, function.ret), this.ustc(function, ret.value));
+            return gnut(ts(function, ret.value, function.ret), ustc(function, ret.value));
         }
 
+        if (expression instanceof AstIf if_)
+            return ustc(function, if_.value);
         if (expression instanceof AstMath1Arg math)
-            return gnut(this.ts(function, math.a, math.rettype), this.ustc(function, math.a));
+            return gnut(this.ts(function, math.a, math.rettype), ustc(function, math.a));
         if (expression instanceof AstMath2Arg math)
-            return gnut(gnut(this.ts(function, math.a, math.rettype), this.ts(function, math.b, math.rettype)), gnut(this.ustc(function, math.a), this.ustc(function, math.b)));
+            return gnut(gnut(this.ts(function, math.a, math.rettype), ts(function, math.b, math.rettype)), gnut(ustc(function, math.a), ustc(function, math.b)));
         if (expression instanceof AstNamedActions actions)
-            return this.ustc(function, actions.actions);
+            return ustc(function, actions.actions);
         if (expression instanceof AstVariableSet set)
-            return this.ts(function, set.value, function.variable(set.name).type);
+            return ts(function, set.value, function.variable(set.name).type);
         return Type.UNKNOWN;
     }
 
@@ -97,22 +99,24 @@ public class Precompiler {
         }
 
         if (expression instanceof AstReturn ret) {
-            var type = this.dstc(function, ret.value);
+            var type = dstc(function, ret.value);
             if (function.ret == Type.UNKNOWN)
                 function.ret = type;
             return type;
         }
 
+        if (expression instanceof AstIf if_)
+            return dstc(function, if_.value);
         if (expression instanceof AstMath1Arg math)
-            return this.ts(function, math, dsgt(function, math.a));
+            return ts(function, math, dsgt(function, math.a));
         if (expression instanceof AstMath2Arg math)
-            return this.ts(function, math, grmt(dsgt(function, math.a), dsgt(function, math.b)));
+            return ts(function, math, grmt(dsgt(function, math.a), dsgt(function, math.b)));
         if (expression instanceof AstNamedActions actions)
-            return this.dstc(function, actions.actions);
+            return dstc(function, actions.actions);
 
         if (expression instanceof AstVariableSet set) {
             var vtype = function.variable(set.name).type;
-            return vtype == Type.UNKNOWN ? this.vts(function, set.name, dsgt(function, set.value)) : this.ts(function, set.value, vtype);
+            return vtype == Type.UNKNOWN ? this.vts(function, set.name, dsgt(function, set.value)) : ts(function, set.value, vtype);
         }
 
         return Type.UNKNOWN;
@@ -141,7 +145,7 @@ public class Precompiler {
         if (expression instanceof AstMath2Arg math)
             return math.operation.logicOutput ? Type.I1 : math.rettype;
         if (expression instanceof AstReturn ret)
-            return this.dsgt(function, ret.value);
+            return dsgt(function, ret.value);
         if (expression instanceof AstVariableGet get)
             return function.variable(get.name).type;
         if (expression instanceof AstVariableSet set)
@@ -162,9 +166,9 @@ public class Precompiler {
         }
 
         if (expression instanceof AstVariableGet get)
-            return this.vts(function, get.name, type);
+            return vts(function, get.name, type);
         if (expression instanceof AstVariableSet set)
-            return this.vts(function, set.name, type);
+            return vts(function, set.name, type);
         return Type.UNKNOWN;
     }
 

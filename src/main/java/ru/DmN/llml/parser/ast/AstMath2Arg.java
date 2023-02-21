@@ -24,11 +24,11 @@ public class AstMath2Arg extends AstExpression {
         AND("&", "and", "and", false),
         OR("|", "or", "or", false),
         EQ("=", "eq", "oeq", true),
-        NOT_EQ("!=", "ne", "une", true),
-        GREAT(">", "gt", "ogt", true),
-        GREAT_EQ(">=", "ge", "oge", true),
-        LESS("<", "lt", "olt", true),
-        LESS_EQ("<=", "le", "ole", true);
+        NOT_EQ("!=", "ne", "one", true),
+        GREAT(">", "sgt", "ogt", true),
+        GREAT_EQ(">=", "sge", "oge", true),
+        LESS("<", "slt", "olt", true),
+        LESS_EQ("<=", "sle", "ole", true);
 
         public final String symbol;
         public final String iir, fir;

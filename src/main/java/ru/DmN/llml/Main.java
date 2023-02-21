@@ -11,17 +11,11 @@ public class Main {
     public static void main(String[] args) {
         try {
             var lexer = new Lexer("""
-                    f(a: i32, b: i32, act: i1): i32 -> {
-                          @if(act add sub)
-                      
-                          @label(add) -> {
-                              [+ a b]
-                          }
-                      
-                          @label(sub) -> {
-                              [- a b]
-                          }
-                      }
+                    f(i: i32): i32 -> {
+                        @if(< i 5 ret5 retI)
+                        @label(ret5) -> { [5] }
+                        @label(retI) -> { [i] }
+                    }
                     """);
             var parser = new Parser(lexer);
             var ctx = parser.parse();
