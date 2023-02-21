@@ -14,7 +14,7 @@ public class Compiler {
 
     public String compile() {
         for (var function : this.context.functions) {
-            out.append("define ");
+            out.append("\ndefine ");
             if (function.ret != Type.VOID)
                 out.append("noundef ");
             out.append(function.ret.name).append(" @").append(function.name).append('(');
@@ -27,7 +27,7 @@ public class Compiler {
             }
             out.append(") #0 {");
             this.write(function, new AstActions(function.expressions));
-            out.append("\n}");
+            out.append("\n}\n");
         }
 
         return this.out.append("\n\nattributes #0 = { nounwind }").toString();
@@ -37,30 +37,43 @@ public class Compiler {
         if (expression instanceof AstActions actions) {
             actions.actions.forEach(it -> this.write(function, it));
         } else if (expression instanceof AstAnnotation annotation) {
-            switch (annotation.name) {
-                case "if" -> {
-                    var var$a = this.write(function, annotation.arguments.get(0));
-                    out.append("\n\tbr i1 ");
-                    this.write(var$a).append(", label %").append(((AstNamedActionsReference) annotation.arguments.get(1)).name).append(", label %").append(((AstNamedActionsReference) annotation.arguments.get(2)).name);
-                }
-                default -> throw new RuntimeException("TODO:");
-            }
+            throw new RuntimeException("TODO:");
         } else if (expression instanceof AstArgument argument) {
             return new AstValue(argument);
+        } else if (expression instanceof AstCall call) {
+            var arguments = call.arguments.stream().map(it -> this.write(function, it)).toList();
+            var tmp = function.createTmpVariable(call.function.ret);
+            out.append("\n\t");
+            this.write(tmp).append(" = call ").append(tmp.type).append(' ').append(call.function.name).append('(');
+            for (int i = 0; i < arguments.size();) {
+                var argument = arguments.get(i);
+                out.append(argument.type()).append(' ');
+                this.write(argument);
+                if (++i < arguments.size())
+                    out.append(", ");
+            }
+            out.append(')');
+            return new AstValue(tmp);
         } else if (expression instanceof AstCast cast) {
             var val = this.write(function, cast.value);
-            var tmp = function.createTmpVariable();
             //
             var of = val.type();
             var of$int = of.fieldName().startsWith("I");
             var to = cast.type;
             var to$int = of.fieldName().startsWith("I");
             //
-            this.write(tmp).append(" = ").append(of$int ? (to$int ? (of.bits > to.bits ? "trunc" : "sext") : "sitofp") : (to$int ? "fptosi" : (of.bits > to.bits ? "fptrunc" : "fpext"))).append(val.type().name).append(' ');
+            var tmp = function.createTmpVariable(to);
+            out.append("\n\t");
+            this.write(tmp).append(" = ").append(of$int ? (to$int ? (of.bits > to.bits ? "trunc" : "sext") : "sitofp") : (to$int ? "fptosi" : (of.bits > to.bits ? "fptrunc" : "fpext"))).append(' ').append(val.type().name).append(' ');
             this.write(val).append(" to ").append(to);
             return new AstValue(tmp);
         } else if (expression instanceof AstConstant constant) {
             return new AstValue(constant);
+        } else if (expression instanceof AstIf if_) {
+            var var$a = this.write(function, if_.value);
+            out.append("\n\tbr i1 ");
+            this.write(var$a).append(", label %").append(if_.a.name).append(", label %").append(if_.b.name);
+
         } else if (expression instanceof AstMath1Arg math) {
             out.append("\n\t");
             var val$a = this.write(function, math.a);
@@ -79,7 +92,7 @@ public class Compiler {
             //
             var var$a = this.write(function, math.a);
             var var$b = this.write(function, math.b);
-            var tmp = function.createTmpVariable();
+            var tmp = function.createTmpVariable(math.operation.logicOutput ? Type.I1 : math.rettype);
             var result$int = math.rettype.fieldName().startsWith("I");
             //
             this.write(tmp).append(" = ");

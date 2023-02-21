@@ -21,12 +21,19 @@ public class PrintUtils {
         return offset(offset).append("[Argument ([").append(ast.name).append("][").append(ast.type.name).append("])").toString();
     }
 
+    public static String print(AstCall ast, int offset) {
+        var out = offset(offset(offset).append("[Call\n"), offset + 1).append('[').append(ast.function.name).append(']');
+        for (var argument : ast.arguments)
+            out.append('\n').append(print(argument, offset + 1));
+        return offset(out.append('\n'), offset).append(']').toString();
+    }
+
     public static String print(AstCast ast, int offset) {
         return offset(offset(offset).append("[Cast [").append(ast.type.name).append("]\n").append(print(ast.value, offset + 1)).append('\n'), offset).append(']').toString();
     }
 
     public static String print(AstConstant ast, int offset) {
-        return offset(offset).append("[Constant (").append(ast.value).append(")]").toString();
+        return offset(offset).append("[Constant [").append(ast.value).append("]]").toString();
     }
 
     public static String print(AstContext ast, int offset) {
@@ -44,9 +51,13 @@ public class PrintUtils {
             return print(ast, offset);
         if (expression instanceof AstArgument ast)
             return print(ast, offset);
+        if (expression instanceof AstCall ast)
+            return print(ast, offset);
         if (expression instanceof AstCast ast)
             return print(ast, offset);
         if (expression instanceof AstConstant ast)
+            return print(ast, offset);
+        if (expression instanceof AstIf ast)
             return print(ast, offset);
         if (expression instanceof AstMath1Arg ast)
             return print(ast, offset);
@@ -84,6 +95,10 @@ public class PrintUtils {
         return offset(out.append('\n'), offset).append(']').toString();
     }
 
+    public static String print(AstIf ast, int offset) {
+        return offset(offset(offset(offset(offset).append("[If").append('\n').append(print(ast.value, offset + 1)).append('\n'), offset + 1).append('[').append(ast.a.name).append("]\n"), offset + 1).append('[').append(ast.b.name).append(']').append('\n'), offset).append(']').toString();
+    }
+
     public static String print(AstMath1Arg ast, int offset) {
         return offset(offset(offset).append("[Math [").append(ast.operation).append("][").append(ast.rettype.name).append("]\n").append(print(ast.a, offset + 1)).append('\n').append('\n'), offset).append(']').toString();
     }
@@ -112,15 +127,15 @@ public class PrintUtils {
     }
 
     public static String print(AstVariable ast, int offset) {
-        return offset(offset).append("[Variable (").append(ast.name).append(')').toString();
+        return offset(offset).append("[Variable [").append(ast.name).append(']').toString();
     }
 
     public static String print(AstVariableGet ast, int offset) {
-        return offset(offset).append("[Get Variable: (").append(ast.name).append(")]").toString();
+        return offset(offset).append("[Get Variable [").append(ast.name).append("]]").toString();
     }
 
     public static String print(AstVariableSet ast, int offset) {
-        return offset(offset(offset).append("[Set Variable: (").append(ast.name).append(")\n").append(print(ast.value,offset + 1)).append('\n'), offset).append(']').toString();
+        return offset(offset(offset).append("[Set Variable [").append(ast.name).append("]\n").append(print(ast.value,offset + 1)).append('\n'), offset).append(']').toString();
     }
 
     public static StringBuilder offset(int offset) {

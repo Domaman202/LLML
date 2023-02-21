@@ -24,7 +24,12 @@ public class AstFunction {
     }
 
     public AstVariable createTmpVariable() {
-        var var = new AstVariable(String.valueOf(++this.tmpVarCount ));
+        return this.createTmpVariable(Type.UNKNOWN);
+    }
+
+    public AstVariable createTmpVariable(Type type) {
+        var var = new AstVariable(String.valueOf(++this.tmpVarCount));
+        var.type = type;
         this.variables.add(var);
         return var;
     }

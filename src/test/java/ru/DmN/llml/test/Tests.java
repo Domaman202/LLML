@@ -20,9 +20,18 @@ public class Tests {
         }
         file.mkdir();
         //
-        test("add0");
-        test("add1");
-        test("if");
+        Arrays.stream(new File("test").listFiles()).forEach(it -> {
+            if (it.isFile()) {
+                try {
+                    var name = it.getName();
+                    if (name.endsWith(".src")) {
+                        test(name.substring(0, name.length() - 4));
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     private static void test(String name) throws IOException {
