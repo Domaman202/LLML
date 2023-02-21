@@ -1,18 +1,18 @@
 package ru.DmN.llml.test;
 
+import com.google.gson.Gson;
 import ru.DmN.llml.compiler.Compiler;
 import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.Precompiler;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 
 public class Tests {
-    public static void main(String[] args) throws IOException {
+    public static final Config config;
+
+    public static void main(String[] args) {
         var file = new File("test/log");
         if (file.exists()) {
             Arrays.stream(file.listFiles()).forEach(it -> it.delete());
@@ -20,23 +20,20 @@ public class Tests {
         }
         file.mkdir();
         //
-        Arrays.stream(new File("test").listFiles()).forEach(it -> {
-            if (it.isFile()) {
-                try {
-                    var name = it.getName();
-                    if (name.endsWith(".src")) {
-                        test(name.substring(0, name.length() - 4));
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+        Arrays.stream(new File("test/src").listFiles()).forEach(it -> {
+            var name = it.getName();
+            name = name.substring(0, name.length() - 4);
+            try {
+                test(name);
+            } catch (IOException | RuntimeException e) {
+                new RuntimeException("Ошибка при выполнении теста \"" + name + "\":\n" + e.getMessage()).printStackTrace();
             }
         });
     }
 
     private static void test(String name) throws IOException {
         String src;
-        try (var stream = new FileInputStream("test/" + name + ".src")) {
+        try (var stream = new FileInputStream("test/src/" + name + ".src")) {
             src = new String(stream.readAllBytes());
         } catch (IOException e) {
             throw new RuntimeException("Ошибка при выполнении теста \"" + name + "\"! (Исходники не найдены)");
@@ -55,6 +52,13 @@ public class Tests {
         if (calccheck(out) != loadcheck(name)) {
             throw new RuntimeException("Ошибка при проверке теста \"" + name + "\"!");
         }
+
+        if (config.optimization.enable) {
+            var process = Runtime.getRuntime().exec("opt -S -O" + config.optimization.level + " -o test/log/" + name + ".optimized.ll test/log/" + name + ".ll");
+            while (process.isAlive()) Thread.onSpinWait();
+            var stream = process.getErrorStream();
+            if (stream.available() > 0) throw new RuntimeException(new String(stream.readAllBytes()));
+        }
     }
 
     private static int calccheck(String str) {
@@ -71,5 +75,14 @@ public class Tests {
             throw new RuntimeException("Ошибка при выполении теста \"" + name + "\"! (Лог проверки не найден)");
         }
         return sum;
+    }
+
+    static {
+        var gson = new Gson();
+        try (var stream = new FileInputStream("test/config.json")) {
+            config = gson.fromJson(new String(stream.readAllBytes()), Config.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
