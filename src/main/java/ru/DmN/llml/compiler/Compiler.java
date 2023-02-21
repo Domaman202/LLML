@@ -97,9 +97,7 @@ public class Compiler {
             //
             this.write(tmp).append(" = ");
             switch (math.operation) {
-                case EQ, NOT_EQ, GREAT, GREAT_EQ, LESS, LESS_EQ  -> { // todo:
-                    out.append(result$int ? 'i' : 'f').append("cmp ");
-                }
+                case EQ, NOT_EQ, GREAT, GREAT_EQ, LESS, LESS_EQ  -> out.append(result$int ? 'i' : 'f').append("cmp ");
             }
             out.append(result$int ? math.operation.iir : math.operation.fir).append(' ').append(math.rettype.name).append(' ');
             this.write(var$a);
