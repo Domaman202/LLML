@@ -30,12 +30,13 @@ public class Token {
         COMMA,
         PILLAR,
         ASSIGN,
-        DOG,
+        ANNOTATION,
         PTR,
         NAMING,
         TYPE,
         NUMBER,
         OPERATION,
+        EOF,
         ERROR
     }
 }

@@ -1,119 +1,66 @@
 package ru.DmN.llml.test;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import ru.DmN.llml.compiler.Compiler;
-import ru.DmN.llml.utils.Type;
+import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.parser.Parser;
-import ru.DmN.llml.precompiler.PreCompiler;
+import ru.DmN.llml.precompiler.Precompiler;
 
-import java.io.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class Tests {
     public static void main(String[] args) throws IOException {
-        var logdir = new File("log");
-        if (logdir.exists()) {
-            for (File file : logdir.listFiles()) file.delete();
-        } else logdir.mkdir();
-        //
-        test(0, 0, """
-                f(a, b): i32 = {
-                    [a b + 2 /) -> |
-                }
-                """, true, Type.UNKNOWN);
-        test(1, 0, """
-                f(a, b) = {
-                    [a b + 2 /) -> |
-                }
-                """, false, Type.I32);
-        test(2, 2, """
-                f(a, b): i32 = {
-                    [a b +) -> c
-                    [c 2 /) -> |
-                }
-                """, true, Type.UNKNOWN);
-        test(3, 3, """
-                f(a, b): i32 = {
-                    [a b +) -> c
-                    c -> d
-                    d -> |
-                }
-                """, true, Type.UNKNOWN);
-        test(4, 4, """
-                add(a, b): i32 = { [a b +) -> | }
-
-                f(c: i16, d: i16): i16 = {
-                    [c d @call(add)) -> |
-                }
-                """, true, Type.UNKNOWN);
-        test(5, 5, """
-                a = 21
-
-                set(i: i32): void = {
-                    i -> a
-                }
-
-                f(b): i32 = {
-                    [a b +) -> |
-                }
-                """, true, Type.UNKNOWN);
-        test(6, 6, """
-                f(a, b): i32 = {
-                    [a, b) -> (c, d]
-                }
-                """, true, Type.UNKNOWN);
-        test(7, 6, """
-                f(a, b): i32 = {
-                    [a) -> (c]
-                    b -> d
-                }
-                """, true, Type.UNKNOWN);
-        test(8, 8, """
-                f(i: i32): i32 = {
-                    [i 5 > !) -> x
-                    @if(x) -> { 5 -> | }
-                    i -> |
-                }
-                """, true, Type.UNKNOWN);
-    }
-
-    private static void test(int tid, int cid, String code, boolean calcA, Type calcB) throws IOException {
-        try (var out = new TestStream(tid, cid)) {
-            var parser = new Parser(code);
-            var ctx = parser.parse();
-            ctx.functions.forEach(fun -> ctx.calculate(fun, calcA, calcB));
-            var precompiler = new PreCompiler(ctx);
-            precompiler.precompile();
-            var compiler = new Compiler(precompiler.ctx);
-            compiler.compile();
-            out.println(compiler.out);
-        } finally {
-            try {
-                if (Objects.equals(readChecksum("log/test" + tid), readChecksum("tlog/test" + cid))) {
-                    System.out.println("Test №" + tid + " success!");
-                } else {
-                    System.err.println("Test №" + tid + " failed!");
-                }
-            } catch (IOException exception) {
-                System.err.println("Test №" + tid + " check ended with error: " + exception.getMessage());
-            }
-        }
-    }
-
-    private static String readChecksum(String name) throws IOException {
-        var file = new File(name + ".check");
+        var file = new File("test/log");
         if (file.exists()) {
-            try (var stream = new FileInputStream(file)) {
-                return new String(stream.readAllBytes());
-            }
-        } else {
-            var sum = DigestUtils.md5Hex(new FileInputStream(name + ".log"));
-            try (var stream = new FileOutputStream(file)) {
-                stream.write(sum.getBytes());
-            }
-            return sum;
+            Arrays.stream(file.listFiles()).forEach(it -> it.delete());
+            file.delete();
         }
+        file.mkdir();
+        //
+        test("add0");
+        test("add1");
+        test("if");
+    }
+
+    private static void test(String name) throws IOException {
+        String src;
+        try (var stream = new FileInputStream("test/" + name + ".src")) {
+            src = new String(stream.readAllBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при выполнении теста \"" + name + "\"! (Исходники не найдены)");
+        }
+
+        var lexer = new Lexer(src);
+        var parser = new Parser(lexer);
+        var precompiler = new Precompiler(parser.parse());
+        var compiler = new Compiler(precompiler.precompile());
+        var out = compiler.compile();
+
+        try (var stream = new FileOutputStream("test/log/" + name + ".ll")) {
+            stream.write(out.getBytes());
+        }
+
+        if (calccheck(out) != loadcheck(name)) {
+            throw new RuntimeException("Ошибка при проверке теста \"" + name + "\"!");
+        }
+    }
+
+    private static int calccheck(String str) {
+        return str.chars().sum();
+    }
+
+    private static int loadcheck(String name) {
+        var sum = 0;
+        try (var stream = new FileInputStream("test/checklog/" + name + ".ll")) {
+            while (stream.available() > 0) {
+                sum += stream.read();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при выполении теста \"" + name + "\"! (Лог проверки не найден)");
+        }
+        return sum;
     }
 }

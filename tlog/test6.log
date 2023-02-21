@@ -1,8 +1,0 @@
-
-define dso_local i32 @f(i32 noundef %a, i32 noundef %b) #0 {
-	%c = bitcast i32 %a to i32
-	%d = bitcast i32 %b to i32
-	ret i32 0
-}
-
-attributes #0 = { nounwind }

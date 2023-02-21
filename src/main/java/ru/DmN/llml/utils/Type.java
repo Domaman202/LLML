@@ -2,12 +2,12 @@ package ru.DmN.llml.utils;
 
 @SuppressWarnings("unused")
 public enum Type {
-    UNKNOWN("unknown"),
-    VOID("void"),
-    F16("half"),
-    F32("float"),
-    F64("double"),
-    F128("fp128"),
+    UNKNOWN("unknown", 0),
+    VOID("void", -1),
+    F16("half", 16),
+    F32("float", 32),
+    F64("double", 64),
+    F128("fp128", 128),
     I1(1),
     I2(2),
     I3(3),
@@ -269,9 +269,9 @@ public enum Type {
     public final String name;
     public final int bits;
 
-    Type(String name) {
+    Type(String name, int bits) {
         this.name = name;
-        this.bits = -1;
+        this.bits = bits;
     }
 
     Type(int bits) {
