@@ -25,8 +25,12 @@ public class Tests {
             name = name.substring(0, name.length() - 4);
             try {
                 test(name);
-            } catch (IOException | RuntimeException e) {
+            } catch (IOException e) {
                 new RuntimeException("Ошибка при выполнении теста \"" + name + "\":\n" + e.getMessage()).printStackTrace();
+//                e.printStackTrace();
+            } catch (RuntimeException e) {
+                System.err.println(e.getMessage());
+//                e.printStackTrace();
             }
         });
     }

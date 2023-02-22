@@ -1,11 +1,11 @@
 
-define noundef i32 @f(i32 noundef %i) #0 {
-	%1 = icmp slt i32 %i, 5
-	br i1 %1, label %ret5, label %retI
+define noundef i32 @f(i32 noundef %0) #0 {
+	%2 = icmp slt i32 %0, 5
+	br i1 %2, label %ret5, label %retI
 ret5:
 	ret i32 5
 retI:
-	ret i32 %i
+	ret i32 %0
 }
 
 

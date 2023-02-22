@@ -10,7 +10,7 @@ public class AstFunction {
     public final List<AstArgument> arguments;
     public Type ret;
     public final List<AstExpression> expressions = new ArrayList<>();
-    public final List<AstVariable> variables = new ArrayList<>();
+    public final List<AstAbstractVariable> variables = new ArrayList<>();
     public int tmpVarCount = 0;
 
     public AstFunction(String name, List<AstArgument> arguments, Type ret) {
@@ -19,16 +19,16 @@ public class AstFunction {
         this.ret = ret;
     }
 
-    public AstVariable variable(String name) {
-        return ((List<AstVariable>) (List<?>) this.arguments).stream().filter(it -> it.name.equals(name)).findFirst().orElseGet(() -> variables.stream().filter(it -> it.name.equals(name)).findFirst().orElse(null));
+    public AstAbstractVariable variable(String name) {
+        return ((List<AstAbstractVariable>) (List<?>) this.arguments).stream().filter(it -> it.getName().equals(name)).findFirst().orElseGet(() -> variables.stream().filter(it -> it.getName().equals(name)).findFirst().orElse(null));
     }
 
-    public AstVariable createTmpVariable() {
+    public AstTmpVariable createTmpVariable() {
         return this.createTmpVariable(Type.UNKNOWN);
     }
 
-    public AstVariable createTmpVariable(Type type) {
-        var var = new AstVariable(String.valueOf(++this.tmpVarCount));
+    public AstTmpVariable createTmpVariable(Type type) {
+        var var = new AstTmpVariable(++this.tmpVarCount);
         var.type = type;
         this.variables.add(var);
         return var;

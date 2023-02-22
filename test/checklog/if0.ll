@@ -1,12 +1,12 @@
 
-define noundef i32 @f(i32 noundef %a, i32 noundef %b, i1 noundef %act) #0 {
-	br i1 %act, label %add, label %sub
+define noundef i32 @f(i32 noundef %0, i32 noundef %1, i1 noundef %2) #0 {
+	br i1 %2, label %add, label %sub
 add:
-	%1 = add i32 %a, %b
-	ret i32 %1
+	%4 = add i32 %0, %1
+	ret i32 %4
 sub:
-	%2 = sub i32 %a, %b
-	ret i32 %2
+	%5 = sub i32 %0, %1
+	ret i32 %5
 }
 
 

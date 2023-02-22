@@ -4,13 +4,13 @@ import ru.DmN.llml.utils.Type;
 
 public class AstValue extends AstExpression {
     public AstConstant constant;
-    public AstVariable variable;
+    public AstAbstractVariable variable;
 
     public AstValue(AstConstant constant) {
         this.constant = constant;
     }
 
-    public AstValue(AstVariable variable) {
+    public AstValue(AstAbstractVariable variable) {
         this.variable = variable;
     }
 
@@ -19,7 +19,7 @@ public class AstValue extends AstExpression {
         this.variable = null;
     }
 
-    public void set(AstVariable variable) {
+    public void set(AstAbstractVariable variable) {
         this.constant = null;
         this.variable = variable;
     }

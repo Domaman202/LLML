@@ -58,9 +58,19 @@ public class Precompiler {
     }
 
     /**
+     * Universal Calculation
+     */
+    protected void uc(AstFunction function, AstExpression expression) {
+        if (expression instanceof AstVariableGet get && get.variable == null)
+            get.variable = function.variable(get.name);
+    }
+
+    /**
      * Up-Step Type Calculation
      */
     protected Type ustc(AstFunction function, AstExpression expression) {
+        uc(function, expression);
+        //
         if (expression instanceof AstActions actions) {
             Type type = Type.UNKNOWN;
             for (var action : actions.actions)
@@ -74,6 +84,8 @@ public class Precompiler {
             return gnut(ts(function, ret.value, function.ret), ustc(function, ret.value));
         }
 
+        if (expression instanceof AstCall call)
+            return ustc(function, new AstActions(call.arguments));
         if (expression instanceof AstIf if_)
             return ustc(function, if_.value);
         if (expression instanceof AstMath1Arg math)
@@ -83,7 +95,7 @@ public class Precompiler {
         if (expression instanceof AstNamedActions actions)
             return ustc(function, actions.actions);
         if (expression instanceof AstVariableSet set)
-            return ts(function, set.value, function.variable(set.name).type);
+            return ts(function, set.value, (set.variable = function.variable(set.name)).type);
         return Type.UNKNOWN;
     }
 
@@ -91,6 +103,8 @@ public class Precompiler {
      * Down-Step Type Calculation
      */
     protected Type dstc(AstFunction function, AstExpression expression) {
+        uc(function, expression);
+        //
         if (expression instanceof AstActions actions) {
             Type type = Type.UNKNOWN;
             for (var action : actions.actions)
@@ -98,13 +112,8 @@ public class Precompiler {
             return type;
         }
 
-        if (expression instanceof AstReturn ret) {
-            var type = dstc(function, ret.value);
-            if (function.ret == Type.UNKNOWN)
-                function.ret = type;
-            return type;
-        }
-
+        if (expression instanceof AstCall call)
+            return dstc(function, new AstActions(call.arguments));
         if (expression instanceof AstIf if_)
             return dstc(function, if_.value);
         if (expression instanceof AstMath1Arg math)
@@ -114,8 +123,15 @@ public class Precompiler {
         if (expression instanceof AstNamedActions actions)
             return dstc(function, actions.actions);
 
+        if (expression instanceof AstReturn ret) {
+            var type = dstc(function, ret.value);
+            if (function.ret == Type.UNKNOWN)
+                function.ret = type;
+            return type;
+        }
+
         if (expression instanceof AstVariableSet set) {
-            var vtype = function.variable(set.name).type;
+            var vtype = (set.variable = function.variable(set.name)).type;
             return vtype == Type.UNKNOWN ? this.vts(function, set.name, dsgt(function, set.value)) : ts(function, set.value, vtype);
         }
 
@@ -126,6 +142,8 @@ public class Precompiler {
      * Down-Step Get Type
      */
     protected Type dsgt(AstFunction function, AstExpression expression) {
+        uc(function, expression);
+        //
         var type = dsgt0(function, expression);
         if (type == Type.UNKNOWN)
             return dstc(function, expression);
@@ -136,6 +154,8 @@ public class Precompiler {
      * Down-Step Get Type
      */
     protected Type dsgt0(AstFunction function, AstExpression expression) {
+        if (expression instanceof AstCall call)
+            return call.function.ret;
         if (expression instanceof AstCast cast)
             return cast.type;
         if (expression instanceof AstConstant constant)

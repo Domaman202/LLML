@@ -11,10 +11,12 @@ public class Main {
     public static void main(String[] args) {
         try {
             var lexer = new Lexer("""
-                    f(i: i32): i32 -> {
-                        @if(< i 5 ret5 retI)
-                        @label(ret5) -> { [5] }
-                        @label(retI) -> { [i] }
+                    add(a, b): i32 -> {
+                        [+ a b]
+                    }
+                                        
+                    f(a: i32, b: i32): i32 -> {
+                        [@call(add a b)]
                     }
                     """);
             var parser = new Parser(lexer);

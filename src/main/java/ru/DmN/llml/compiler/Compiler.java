@@ -18,19 +18,40 @@ public class Compiler {
             if (function.ret != Type.VOID)
                 out.append("noundef ");
             out.append(function.ret.name).append(" @").append(function.name).append('(');
+            // вычисляем новые имена аргументам
+            this.compileArgsNames(function);
+            //
             for (int i = 0; i < function.arguments.size();) {
                 var argument = function.arguments.get(i);
-                out.append(argument.type.name).append(" noundef %").append(argument.name);
+                out.append(argument.type.name).append(" noundef %").append(argument.getName());
                 if (++i < function.arguments.size()) {
                     out.append(", ");
                 }
             }
             out.append(") #0 {");
+            // пишем тело функции
             this.write(function, new AstActions(function.expressions));
+            //
             out.append("\n}\n");
         }
 
         return this.out.append("\n\nattributes #0 = { nounwind }").toString();
+    }
+
+    protected void compileArgsNames(AstFunction function) {
+        var ac = function.arguments.size();
+
+        for (int i = 0; i < ac; i++) {
+            var argument = function.arguments.get(i);
+            argument.name = null;
+            argument.i = i;
+        }
+
+        for (int i = function.tmpVarCount; i > 0; i--) {
+            ((AstTmpVariable) function.variable(String.valueOf(i))).i += ac;
+        }
+
+        function.tmpVarCount += ac;
     }
 
     protected AstValue write(AstFunction function, AstExpression expression) {
@@ -116,10 +137,10 @@ public class Compiler {
                 out.append("\n\t").append("ret void");
             }
         } else if (expression instanceof AstVariableGet get) {
-            return new AstValue(function.variable(get.name));
+            return new AstValue(get.variable);
         } else if (expression instanceof AstVariableSet set) {
             var val = this.write(function, set.value);
-            var var = function.variable(set.name);
+            var var = set.variable;
             out.append("\n\t");
             this.write(var).append(" = bitcast ").append(var.type.name).append(' ');
             this.write(val).append(" to ").append(var.type.name);
@@ -129,11 +150,20 @@ public class Compiler {
         return null;
     }
 
+    protected AstTmpVariable copy(AstFunction function, AstAbstractVariable var) {
+        var tmp = function.createTmpVariable(var.type);
+        out.append("\n\t");
+        this.write(tmp).append(" = bitcast ").append(var.type.name).append(' ');
+        this.write(var).append(" to ").append(var.type.name);
+        return tmp;
+    }
+
+
     protected StringBuilder write(AstValue value) {
         return value.isConst() ? out.append(value.constant.value) : this.write(value.variable);
     }
 
-    protected StringBuilder write(AstVariable var) {
-        return out.append('%').append(var.name);
+    protected StringBuilder write(AstAbstractVariable var) {
+        return out.append('%').append(var.getName());
     }
 }

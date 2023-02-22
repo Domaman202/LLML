@@ -71,7 +71,7 @@ public class PrintUtils {
             return print(ast, offset);
         if (expression instanceof AstValue ast)
             return print(ast, offset);
-        if (expression instanceof AstVariable ast)
+        if (expression instanceof AstAbstractVariable ast)
             return print(ast, offset);
         if (expression instanceof AstVariableGet ast)
             return print(ast, offset);
@@ -126,16 +126,16 @@ public class PrintUtils {
         return ast.isConst() ? print(ast.constant, offset) : print(ast.variable, offset);
     }
 
-    public static String print(AstVariable ast, int offset) {
-        return offset(offset).append("[Variable [").append(ast.name).append(']').toString();
+    public static String print(AstAbstractVariable ast, int offset) {
+        return offset(offset).append("[Variable [").append(ast.getName()).append(']').toString();
     }
 
     public static String print(AstVariableGet ast, int offset) {
-        return offset(offset).append("[Get Variable [").append(ast.name).append("]]").toString();
+        return offset(offset).append("[Get Variable [").append(ast.name).append("][").append(ast.variable == null ? "null" : ast.name).append("]]").toString();
     }
 
     public static String print(AstVariableSet ast, int offset) {
-        return offset(offset(offset).append("[Set Variable [").append(ast.name).append("]\n").append(print(ast.value,offset + 1)).append('\n'), offset).append(']').toString();
+        return offset(offset(offset).append("[Set Variable [").append(ast.name).append("][").append(ast.variable == null ? "null" : ast.name).append("]\n").append(print(ast.value,offset + 1)).append('\n'), offset).append(']').toString();
     }
 
     public static StringBuilder offset(int offset) {

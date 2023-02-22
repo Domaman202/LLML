@@ -1,7 +1,7 @@
 
-define noundef i32 @f(i32 noundef %a, i32 noundef %b) #0 {
-	%1 = add i32 %a, %b
-	%c = bitcast i32 %1 to i32
+define noundef i32 @f(i32 noundef %0, i32 noundef %1) #0 {
+	%3 = add i32 %0, %1
+	%c = bitcast i32 %3 to i32
 	ret i32 %c
 }
 
