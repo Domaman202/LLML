@@ -1,0 +1,9 @@
+{
+  "name": "call #2",
+  "src": "call2",
+  "out": "call2",
+  "test": ["call2"],
+  "optimization": {
+    "ano": true
+  }
+}

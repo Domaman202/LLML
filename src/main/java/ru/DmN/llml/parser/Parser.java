@@ -61,8 +61,12 @@ public class Parser {
                         }
                     } while (token.type == Token.Type.COLON);
                     // добавляем функцию в список функций
-                    var function = new AstFunction(name, arguments, ret);
-                    this.context.functions.add(function);
+                    var ret$ = ret;
+                    var function = this.context.functions.stream().filter(it -> it.name.equals(name)).findFirst().orElseGet(() -> {
+                        var fun = new AstFunction(name, arguments, ret$);
+                        this.context.functions.add(fun);
+                        return fun;
+                    });
                     // парсим тело функции
                     if (token.type== Token.Type.PTR) {
                         function.expressions = new ArrayList<>();

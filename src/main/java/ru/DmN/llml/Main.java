@@ -17,6 +17,10 @@ public class Main {
                     f(a: i32, b: i32): i32 -> {
                         [@call(add a b)]
                     }
+                    
+                    add(a, b): i32 -> {
+                        [+ a b]
+                    }
                     """);
             var parser = new Parser(lexer);
             var ctx = parser.parse();
