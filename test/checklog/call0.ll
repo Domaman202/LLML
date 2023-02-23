@@ -5,7 +5,7 @@ define noundef i32 @add(i32 noundef %0, i32 noundef %1) #0 {
 }
 
 define noundef i32 @f(i32 noundef %0, i32 noundef %1) #0 {
-	%3 = call noundef i32 @add(i32 noundef %0, i32 noundef %1)
+	%3 = tail call noundef i32 @add(i32 noundef %0, i32 noundef %1)
 	ret i32 %3
 }
 
