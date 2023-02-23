@@ -1,7 +1,8 @@
 {
   "name": "if #0",
-  "src": "if0.src",
-  "out": "if0.ll",
+  "src": "if0",
+  "out": "if0",
+  "test": ["if0"],
   "optimization": {
     "ano": true
   }

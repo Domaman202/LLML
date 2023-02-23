@@ -1,3 +1,4 @@
+target triple = "x86_64-pc-linux-gnu"
 
 define noundef i32 @f(i32 noundef %0) #0 {
 	%2 = icmp slt i32 %0, 5

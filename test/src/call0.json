@@ -1,7 +1,8 @@
 {
   "name": "call #0",
-  "src": "call0.src",
-  "out": "call0.ll",
+  "src": "call0",
+  "out": "call0",
+  "test": ["call0"],
   "optimization": {
     "ano": true
   }

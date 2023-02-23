@@ -1,7 +1,8 @@
 {
   "name": "add #1",
-  "src": "add1.src",
-  "out": "add1.ll",
+  "src": "add1",
+  "out": "add1",
+  "test": ["add1"],
   "optimization": {
     "ano": true
   }

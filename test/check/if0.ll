@@ -1,3 +1,4 @@
+target triple = "x86_64-pc-linux-gnu"
 
 define noundef i32 @f(i32 noundef %0, i32 noundef %1, i1 noundef %2) #0 {
 	br i1 %2, label %add, label %sub

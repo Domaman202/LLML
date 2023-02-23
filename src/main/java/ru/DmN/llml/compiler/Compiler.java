@@ -14,6 +14,7 @@ public class Compiler {
     }
 
     public String compile(OptimizationConfig config) {
+        out.append("target triple = \"x86_64-pc-linux-gnu\"\n");
         for (var function : this.context.functions) {
             out.append("\ndefine ");
             if (function.ret != Type.VOID)
