@@ -1,0 +1,6 @@
+{
+  "name": "call #0",
+  "src": "call0.src",
+  "out": "call0.ll",
+  "optimization": {}
+}

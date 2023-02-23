@@ -1,6 +1,3 @@
 {
-  "optimization": {
-    "enable": true,
-    "level": 3
-  }
+  "optimization": 3
 }

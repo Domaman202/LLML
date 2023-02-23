@@ -1,0 +1,6 @@
+{
+  "name": "add #1",
+  "src": "add1.src",
+  "out": "add1.ll",
+  "optimization": {}
+}

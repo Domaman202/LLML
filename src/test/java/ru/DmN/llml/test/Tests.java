@@ -10,7 +10,7 @@ import java.io.*;
 import java.util.Arrays;
 
 public class Tests {
-    public static final Config config;
+    public static final GlobalConfig config;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void main(String[] args) {
@@ -23,25 +23,34 @@ public class Tests {
         //
         Arrays.stream(new File("test/src").listFiles()).forEach(it -> {
             var name = it.getName();
-            name = name.substring(0, name.length() - 4);
-            try {
-                test(name);
-            } catch (IOException e) {
-                new RuntimeException("Ошибка при выполнении теста \"" + name + "\":\n" + e.getMessage()).printStackTrace();
+            if (name.endsWith(".json")) {
+                name = name.substring(0, name.length() - 5);
+                TestConfig config;
+                try (var stream = new FileInputStream("test/src/" + name + ".json")) {
+                    var gson = new Gson();
+                    config = gson.fromJson(new String(stream.readAllBytes()), TestConfig.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    test(config);
+                } catch (IOException e) {
+                    new RuntimeException("Ошибка при выполнении теста \"" + config.name + "\":\n" + e.getMessage()).printStackTrace();
 //                e.printStackTrace();
-            } catch (RuntimeException e) {
-                System.err.println(e.getMessage());
+                } catch (RuntimeException e) {
+                    System.err.println(e.getMessage());
 //                e.printStackTrace();
+                }
             }
         });
     }
 
-    private static void test(String name) throws IOException {
+    private static void test(TestConfig config) throws IOException {
         String src;
-        try (var stream = new FileInputStream("test/src/" + name + ".src")) {
+        try (var stream = new FileInputStream("test/src/" + config.src)) {
             src = new String(stream.readAllBytes());
         } catch (IOException e) {
-            throw new RuntimeException("Ошибка при выполнении теста \"" + name + "\"! (Исходники не найдены)");
+            throw new RuntimeException("Ошибка при выполнении теста \"" + config.name + "\"! (Исходники не найдены)");
         }
 
         var lexer = new Lexer(src);
@@ -50,34 +59,32 @@ public class Tests {
         var compiler = new Compiler(precompiler.precompile());
         var out = compiler.compile();
 
-        try (var stream = new FileOutputStream("test/log/" + name + ".ll")) {
+        try (var stream = new FileOutputStream("test/log/" + config.out)) {
             stream.write(out.getBytes());
         }
 
-        if (calccheck(out) != loadcheck(name)) {
-            throw new RuntimeException("Ошибка при проверке теста \"" + name + "\"!");
+        if (calccheck(out) != loadcheck(config)) {
+            throw new RuntimeException("Ошибка при проверке теста \"" + config.name + "\"!");
         }
 
-        if (config.optimization.enable) {
-            var process = Runtime.getRuntime().exec("opt -S -O" + config.optimization.level + " -o test/log/" + name + ".optimized.ll test/log/" + name + ".ll");
-            while (process.isAlive()) Thread.onSpinWait();
-            var stream = process.getErrorStream();
-            if (stream.available() > 0) throw new RuntimeException(new String(stream.readAllBytes()));
-        }
+        var process = Runtime.getRuntime().exec("opt -S -O" + Tests.config.optimization + " -o test/log/" + config.out + ".optimized test/log/" + config.out);
+        while (process.isAlive()) Thread.onSpinWait();
+        var stream = process.getErrorStream();
+        if (stream.available() > 0) throw new RuntimeException(new String(stream.readAllBytes()));
     }
 
     private static int calccheck(String str) {
         return str.chars().sum();
     }
 
-    private static int loadcheck(String name) {
+    private static int loadcheck(TestConfig config) {
         var sum = 0;
-        try (var stream = new FileInputStream("test/checklog/" + name + ".ll")) {
+        try (var stream = new FileInputStream("test/checklog/" + config.out)) {
             while (stream.available() > 0) {
                 sum += stream.read();
             }
         } catch (IOException e) {
-            throw new RuntimeException("Ошибка при выполении теста \"" + name + "\"! (Лог проверки не найден)");
+            throw new RuntimeException("Ошибка при выполении теста \"" + config.name + "\"! (Лог проверки не найден)");
         }
         return sum;
     }
@@ -85,7 +92,7 @@ public class Tests {
     static {
         var gson = new Gson();
         try (var stream = new FileInputStream("test/config.json")) {
-            config = gson.fromJson(new String(stream.readAllBytes()), Config.class);
+            config = gson.fromJson(new String(stream.readAllBytes()), GlobalConfig.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
