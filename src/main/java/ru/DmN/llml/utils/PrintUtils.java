@@ -90,8 +90,9 @@ public class PrintUtils {
             }
         }
         out.append(") [").append(ast.ret).append(']');
-        for (var expression : ast.expressions)
-            out.append('\n').append(print(expression, offset + 1));
+        if (ast.expressions != null)
+            for (var expression : ast.expressions)
+                out.append('\n').append(print(expression, offset + 1));
         return offset(out.append('\n'), offset).append(']').toString();
     }
 

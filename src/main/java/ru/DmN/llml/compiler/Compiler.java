@@ -16,7 +16,7 @@ public class Compiler {
     public String compile(OptimizationConfig config) {
         out.append("target triple = \"x86_64-pc-linux-gnu\"\n");
         for (var function : this.context.functions) {
-            out.append("\ndefine ");
+            out.append(function.expressions == null ? "\ndeclare " : "\ndefine ");
             if (function.ret != Type.VOID)
                 out.append("noundef ");
             out.append(function.ret.name).append(" @").append(function.name).append('(');
@@ -30,11 +30,15 @@ public class Compiler {
                     out.append(", ");
                 }
             }
-            out.append(") #0 {");
+            out.append(") #0 ");
             // пишем тело функции
-            this.write(function, new AstActions(function.expressions));
+            if (function.expressions != null) {
+                out.append('{');
+                this.write(function, new AstActions(function.expressions));
+                out.append("\n}");
+            }
             //
-            out.append("\n}\n");
+            out.append('\n');
         }
 
         return this.out.append("\n\nattributes #0 = { nounwind }").toString();

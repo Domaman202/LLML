@@ -12,7 +12,7 @@ public class Precompiler {
 
     public AstContext precompile() {
         for (var function : context.functions) {
-            if (!function.expressions.isEmpty()) {
+            if (function.expressions != null && !function.expressions.isEmpty()) {
                 this.precompileTypes(function);
                 this.precompileCasts(function);
             }

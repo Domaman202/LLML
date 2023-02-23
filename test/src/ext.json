@@ -1,0 +1,9 @@
+{
+  "name": "external",
+  "src": "ext",
+  "out": "ext",
+  "test": ["ext"],
+  "optimization": {
+    "ano": true
+  }
+}

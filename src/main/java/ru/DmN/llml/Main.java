@@ -12,9 +12,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             var lexer = new Lexer("""
-                    add(a, b): i32 -> {
-                        [+ a b]
-                    }
+                    add(a: i32, b: i32): i32
                                         
                     f(a: i32, b: i32): i32 -> {
                         [@call(add a b)]

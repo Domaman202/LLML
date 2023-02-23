@@ -21,7 +21,7 @@ public class Parser {
     }
 
     public AstContext parse() {
-        var token = this.lexer.next();
+        var token = this.next();
         while (token.type != Token.Type.EOF) {
             switch (token.type) {
                 case NAMING -> {
@@ -55,18 +55,23 @@ public class Parser {
                     }
                     // обработка возвращаемого значения
                     do {
-                        token = next(Token.Type.COLON, Token.Type.PTR);
-                        if (Objects.requireNonNull(token.type) == Token.Type.COLON) ret = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
-                    } while(token.type != Token.Type.PTR);
+                        token = this.next(Token.Type.COLON, Token.Type.PTR, Token.Type.NL);
+                        if (token.type == Token.Type.COLON) {
+                            ret = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
+                        }
+                    } while (token.type == Token.Type.COLON);
                     // добавляем функцию в список функций
                     var function = new AstFunction(name, arguments, ret);
                     this.context.functions.add(function);
                     // парсим тело функции
-                    function.expressions.addAll(this.parseBody(function).actions);
+                    if (token.type== Token.Type.PTR) {
+                        function.expressions = new ArrayList<>();
+                        function.expressions.addAll(this.parseBody(function).actions);
+                    }
                 }
                 default -> throw InvalidTokenException.create(this.lexer.src, token);
             }
-            token = this.lexer.next();
+            token = this.next();
         }
         return this.context;
     }
@@ -75,7 +80,7 @@ public class Parser {
         var expressions = new ArrayList<AstExpression>();
         Token token;
         //
-        next(Token.Type.OPEN_FBRACKET);
+        this.next(Token.Type.OPEN_FBRACKET);
         token = this.next(Token.Type.ANNOTATION, Token.Type.OPEN_CBRACKET, Token.Type.CLOSE_FBRACKET);
         // указатель старта выражения
         var start = -1;
@@ -206,7 +211,7 @@ public class Parser {
     protected AstActions parseActions(AstFunction function, int endptr) {
         var actions = new ArrayList<AstExpression>();
         while (true) {
-            this.lexer.next();
+            this.next();
             if (this.lexer.ptr <= endptr) {
                 this.lexer.ptr--;
                 actions.add(this.parseExpression(function, endptr));
@@ -218,7 +223,7 @@ public class Parser {
     }
 
     protected AstExpression parseExpression(AstFunction function, int endptr) {
-        var token = this.lexer.next();
+        var token = this.next();
         while (this.lexer.ptr <= endptr) {
             switch (token.type) {
                 case NUMBER -> {
@@ -247,11 +252,26 @@ public class Parser {
         throw new RuntimeException("Jepa");
     }
 
+    protected Token next() {
+        var token = this.lexer.next();
+        while (token.type == Token.Type.NL)
+            token = this.lexer.next();
+        return token;
+    }
+
     protected Token next(Token.Type...type) {
         var types = Arrays.stream(type).collect(Collectors.toList());
         if (types.contains(Token.Type.NAMING))
             types.add(Token.Type.TYPE);
-        return this.check(this.lexer.next(), types);
+        var token = this.lexer.next();
+        if (token.type == Token.Type.NL) {
+            if (types.contains(Token.Type.NL)) {
+                return token;
+            } else {
+                token = this.next();
+            }
+        }
+        return this.check(token, types);
     }
 
     protected Token check(Token token, List<Token.Type> types) {

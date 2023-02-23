@@ -9,7 +9,7 @@ public class AstFunction {
     public final String name;
     public final List<AstArgument> arguments;
     public Type ret;
-    public final List<AstExpression> expressions = new ArrayList<>();
+    public List<AstExpression> expressions;
     public final List<AstAbstractVariable> variables = new ArrayList<>();
     public int tmpVarCount = 0;
 

@@ -43,7 +43,7 @@ public class Lexer {
         }
 
         protected Token parseToken() {
-            skipNLSpaces();
+            skipSpaces();
             if (str.length() > 0) {
                 var c = str.charAt(0);
                 if (Character.isDigit(c))
