@@ -1,0 +1,8 @@
+{
+  "name": "add #2",
+  "src": "add2.src",
+  "out": "add2.ll",
+  "optimization": {
+    "ano": true
+  }
+}

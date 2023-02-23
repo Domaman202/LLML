@@ -2,5 +2,7 @@
   "name": "if #0",
   "src": "if0.src",
   "out": "if0.ll",
-  "optimization": {}
+  "optimization": {
+    "ano": true
+  }
 }

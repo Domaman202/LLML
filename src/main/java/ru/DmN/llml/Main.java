@@ -5,6 +5,7 @@ import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.parser.InvalidTokenException;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.Precompiler;
+import ru.DmN.llml.utils.OptimizationConfig;
 import ru.DmN.llml.utils.PrintUtils;
 
 public class Main {
@@ -33,7 +34,7 @@ public class Main {
             System.out.println();
 
             var compiler = new Compiler(ctx);
-            compiler.compile();
+            compiler.compile(new OptimizationConfig(false));
             System.out.println("Compiled:");
             System.out.println(compiler.out);
             System.out.println();

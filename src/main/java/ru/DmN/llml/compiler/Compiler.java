@@ -1,6 +1,7 @@
 package ru.DmN.llml.compiler;
 
 import ru.DmN.llml.parser.ast.*;
+import ru.DmN.llml.utils.OptimizationConfig;
 import ru.DmN.llml.utils.Type;
 
 public class Compiler {
@@ -12,14 +13,14 @@ public class Compiler {
         this.out = new StringBuilder();
     }
 
-    public String compile() {
+    public String compile(OptimizationConfig config) {
         for (var function : this.context.functions) {
             out.append("\ndefine ");
             if (function.ret != Type.VOID)
                 out.append("noundef ");
             out.append(function.ret.name).append(" @").append(function.name).append('(');
-            // вычисляем новые имена аргументам
-            this.compileArgsNames(function);
+            // (опция "ano") вычисляем новые имена аргументам
+            if (config.ano) this.compileArgsNames(function);
             //
             for (int i = 0; i < function.arguments.size();) {
                 var argument = function.arguments.get(i);

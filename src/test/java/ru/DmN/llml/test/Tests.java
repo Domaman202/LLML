@@ -57,7 +57,7 @@ public class Tests {
         var parser = new Parser(lexer);
         var precompiler = new Precompiler(parser.parse());
         var compiler = new Compiler(precompiler.precompile());
-        var out = compiler.compile();
+        var out = compiler.compile(config.optimization);
 
         try (var stream = new FileOutputStream("test/log/" + config.out)) {
             stream.write(out.getBytes());

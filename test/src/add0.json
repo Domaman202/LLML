@@ -2,5 +2,7 @@
   "name": "add #0",
   "src": "add0.src",
   "out": "add0.ll",
-  "optimization": {}
+  "optimization": {
+    "ano": false
+  }
 }
