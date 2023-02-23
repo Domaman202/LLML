@@ -65,10 +65,10 @@ public class Compiler {
             var arguments = call.arguments.stream().map(it -> this.write(function, it)).toList();
             var tmp = function.createTmpVariable(call.function.ret);
             out.append("\n\t");
-            this.write(tmp).append(" = call ").append(tmp.type).append(' ').append(call.function.name).append('(');
+            this.write(tmp).append(" = call noundef ").append(tmp.type).append(" @").append(call.function.name).append('(');
             for (int i = 0; i < arguments.size();) {
                 var argument = arguments.get(i);
-                out.append(argument.type()).append(' ');
+                out.append(argument.type()).append(" noundef ");
                 this.write(argument);
                 if (++i < arguments.size())
                     out.append(", ");

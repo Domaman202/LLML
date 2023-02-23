@@ -5,9 +5,9 @@ define noundef i32 @add(i32 noundef %0, i32 noundef %1) #0 {
 }
 
 define noundef i32 @f(i32 noundef %0, i32 noundef %1, i32 noundef %2, i32 noundef %3) #0 {
-	%5 = call i32 add(i32 %0, i32 %1)
-	%6 = call i32 add(i32 %2, i32 %3)
-	%7 = call i32 add(i32 %5, i32 %6)
+	%5 = call noundef i32 @add(i32 noundef %0, i32 noundef %1)
+	%6 = call noundef i32 @add(i32 noundef %2, i32 noundef %3)
+	%7 = call noundef i32 @add(i32 noundef %5, i32 noundef %6)
 	ret i32 %7
 }
 

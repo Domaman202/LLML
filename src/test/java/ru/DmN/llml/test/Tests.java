@@ -12,10 +12,11 @@ import java.util.Arrays;
 public class Tests {
     public static final Config config;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void main(String[] args) {
         var file = new File("test/log");
         if (file.exists()) {
-            Arrays.stream(file.listFiles()).forEach(it -> it.delete());
+            Arrays.stream(file.listFiles()).forEach(File::delete);
             file.delete();
         }
         file.mkdir();
