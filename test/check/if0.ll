@@ -10,5 +10,4 @@ sub:
 	ret i32 %5
 }
 
-
 attributes #0 = { nounwind }

@@ -1,0 +1,9 @@
+value: i32 = ext
+
+set(i) = {
+    [i) -> (value]
+}
+
+get() = {
+    [value]
+}

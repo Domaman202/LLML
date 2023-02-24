@@ -5,5 +5,4 @@ define noundef i32 @f(i32 noundef %a, i32 noundef %b) #0 {
 	ret i32 %1
 }
 
-
 attributes #0 = { nounwind }

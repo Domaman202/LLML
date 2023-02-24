@@ -1,11 +1,11 @@
-f(a: i32, b: i32, act: i1): i32 -> {
+f(a: i32, b: i32, act: i1): i32 = {
     @if(act add sub)
 
-    @label(add) -> {
+    @label(add) = {
         [+ a b]
     }
 
-    @label(sub) -> {
+    @label(sub) = {
         [- a b]
     }
 }

@@ -1,7 +1,7 @@
-add(i, j): i32 -> {
+add(i, j): i32 = {
     [+ i j]
 }
 
-f(a: i32, b: i32, c: i32, d: i32): i32 -> {
+f(a: i32, b: i32, c: i32, d: i32): i32 = {
     [@call(add @call(add a b) @call(add c d))]
 }

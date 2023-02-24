@@ -1,6 +1,7 @@
 package ru.DmN.llml.parser.ast;
 
 import ru.DmN.llml.utils.Type;
+import ru.DmN.llml.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +20,9 @@ public class AstFunction {
         this.ret = ret;
     }
 
+    @SuppressWarnings("unchecked")
     public AstAbstractVariable variable(String name) {
-        return ((List<AstAbstractVariable>) (List<?>) this.arguments).stream().filter(it -> it.getName().equals(name)).findFirst().orElseGet(() -> variables.stream().filter(it -> it.getName().equals(name)).findFirst().orElse(null));
+        return Utils.findVariable((List<AstAbstractVariable>) (List<?>) this.arguments, name).orElseGet(() -> Utils.findVariable(this.variables, name).orElse(null));
     }
 
     public AstTmpVariable createTmpVariable() {

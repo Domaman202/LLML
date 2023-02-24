@@ -12,15 +12,9 @@ public class Main {
     public static void main(String[] args) {
         try {
             var lexer = new Lexer("""
-                    add(a: i32, b: i32): i32
-                                        
-                    f(a: i32, b: i32): i32 -> {
-                        [@call(add a b)]
-                    }
-                    
-                    add(a, b): i32 -> {
-                        [+ a b]
-                    }
+                    f(a: i32, b: i32): i32 = {
+                         [+ a b]
+                     }
                     """);
             var parser = new Parser(lexer);
             var ctx = parser.parse();

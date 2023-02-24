@@ -15,6 +15,17 @@ public class Compiler {
 
     public String compile(OptimizationConfig config) {
         out.append("target triple = \"x86_64-pc-linux-gnu\"\n");
+
+        for (var variable : this.context.variables) {
+            out.append('\n').append('@').append(variable.name).append(" = ");
+            if (variable.external)
+                out.append("external ");
+            out.append("global ").append(variable.type.name);
+            if (!variable.external)
+                out.append(" 0");
+            out.append('\n');
+        }
+
         for (var function : this.context.functions) {
             out.append(function.expressions == null ? "\ndeclare " : "\ndefine ");
             if (function.ret != Type.VOID)
@@ -41,7 +52,7 @@ public class Compiler {
             out.append('\n');
         }
 
-        return this.out.append("\n\nattributes #0 = { nounwind }").toString();
+        return this.out.append("\nattributes #0 = { nounwind }").toString();
     }
 
     protected void compileArgsNames(AstFunction function) {
@@ -143,33 +154,45 @@ public class Compiler {
                 out.append("\n\t").append("ret void");
             }
         } else if (expression instanceof AstVariableGet get) {
-            return new AstValue(get.variable);
+            return this.get(function, new AstValue(get.variable));
         } else if (expression instanceof AstVariableSet set) {
-            var val = this.write(function, set.value);
             var var = set.variable;
-            out.append("\n\t");
-            this.write(var).append(" = bitcast ").append(var.type.name).append(' ');
-            this.write(val).append(" to ").append(var.type.name);
+            this.set(function, this.write(function, set.value), var);
             return new AstValue(var);
         }
 
         return null;
     }
 
-    protected AstTmpVariable copy(AstFunction function, AstAbstractVariable var) {
-        var tmp = function.createTmpVariable(var.type);
-        out.append("\n\t");
-        this.write(tmp).append(" = bitcast ").append(var.type.name).append(' ');
-        this.write(var).append(" to ").append(var.type.name);
-        return tmp;
+    protected AstValue get(AstFunction function, AstValue value) {
+        if (value.isConst())
+            return value;
+        if (value.variable instanceof AstVariable var && var.global) {
+            var tmp = function.createTmpVariable(var.type);
+            out.append("\n\t");
+            this.write(tmp).append(" = load ").append(var.type.name).append(", ptr @").append(var.name);
+            return new AstValue(tmp);
+        } else return value;
     }
 
+    protected void set(AstFunction function, AstValue of, AstAbstractVariable to) {
+        var tname = to.type.name;
+        out.append("\n\t");
+        of = this.get(function, of);
+        if (to instanceof AstVariable var && var.global) {
+            out.append("store ").append(tname).append(' ');
+            this.write(of).append(", ptr @").append(var.name);
+        } else {
+            this.write(to).append(" = bitcast ").append(tname).append(' ');
+            this.write(of).append(" to ").append(tname);
+        }
+    }
 
     protected StringBuilder write(AstValue value) {
         return value.isConst() ? out.append(value.constant.value) : this.write(value.variable);
     }
 
-    protected StringBuilder write(AstAbstractVariable var) {
-        return out.append('%').append(var.getName());
+    protected StringBuilder write(AstAbstractVariable avar) {
+        return out.append(avar instanceof AstVariable var ? var.global ? '@' : '%' : '%').append(avar.getName());
     }
 }

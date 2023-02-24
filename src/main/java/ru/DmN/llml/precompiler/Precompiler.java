@@ -15,6 +15,11 @@ public class Precompiler {
             if (function.expressions != null && !function.expressions.isEmpty()) {
                 this.precompileTypes(function);
                 this.precompileCasts(function);
+
+                if (function.ret == Type.UNKNOWN) {
+                    function.ret = Type.VOID;
+                    function.expressions.add(new AstReturn(null));
+                }
             }
         }
         return this.context;
@@ -62,7 +67,7 @@ public class Precompiler {
      */
     protected void uc(AstFunction function, AstExpression expression) {
         if (expression instanceof AstVariableGet get && get.variable == null)
-            get.variable = function.variable(get.name);
+            get.variable = context.variable(function, get.name);
     }
 
     /**
@@ -95,7 +100,7 @@ public class Precompiler {
         if (expression instanceof AstNamedActions actions)
             return ustc(function, actions.actions);
         if (expression instanceof AstVariableSet set)
-            return ts(function, set.value, (set.variable = function.variable(set.name)).type);
+            return ts(function, set.value, (set.variable = context.variable(function, set.name)).type);
         return Type.UNKNOWN;
     }
 
@@ -131,8 +136,13 @@ public class Precompiler {
         }
 
         if (expression instanceof AstVariableSet set) {
-            var vtype = (set.variable = function.variable(set.name)).type;
-            return vtype == Type.UNKNOWN ? this.vts(function, set.name, dsgt(function, set.value)) : ts(function, set.value, vtype);
+            var vtype = (set.variable = context.variable(function, set.name)).type;
+            if (vtype == Type.UNKNOWN) {
+                return this.vts(function, set.name, dsgt(function, set.value));
+            } else {
+                uc(function, set.value);
+                return ts(function, set.value, vtype);
+            }
         }
 
         return Type.UNKNOWN;
@@ -167,9 +177,9 @@ public class Precompiler {
         if (expression instanceof AstReturn ret)
             return dsgt(function, ret.value);
         if (expression instanceof AstVariableGet get)
-            return function.variable(get.name).type;
+            return context.variable(function, get.name).type;
         if (expression instanceof AstVariableSet set)
-            return function.variable(set.name).type;
+            return context.variable(function, set.name).type;
         return Type.UNKNOWN;
     }
 
@@ -196,7 +206,7 @@ public class Precompiler {
      * Variable Type Set
      */
     protected Type vts(AstFunction function, String name, Type type) {
-        var var = function.variable(name);
+        var var = context.variable(function, name);
         if (var.type == Type.UNKNOWN)
             return var.type = type;
         return Type.UNKNOWN;

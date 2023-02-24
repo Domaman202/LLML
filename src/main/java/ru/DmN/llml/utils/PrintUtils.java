@@ -38,9 +38,10 @@ public class PrintUtils {
 
     public static String print(AstContext ast, int offset) {
         var out = new StringBuilder("[Context");
-        for (var function : ast.functions) {
+        for (var variable : ast.variables)
+            out.append('\n').append(print(variable, offset + 1)).append('[').append(variable.type).append("]]");
+        for (var function : ast.functions)
             out.append('\n').append(print(function, offset + 1));
-        }
         return out.append("\n]").toString();
     }
 
@@ -71,6 +72,8 @@ public class PrintUtils {
             return print(ast, offset);
         if (expression instanceof AstValue ast)
             return print(ast, offset);
+        if (expression instanceof AstVariable ast)
+            return print(ast, offset);
         if (expression instanceof AstAbstractVariable ast)
             return print(ast, offset);
         if (expression instanceof AstVariableGet ast)
@@ -81,7 +84,7 @@ public class PrintUtils {
     }
 
     public static String print(AstFunction ast, int offset) {
-        var out = offset(offset).append("[Function (");
+        var out = offset(offset).append('[').append(ast.expressions == null ? "External " : "").append("Function (");
         for (int i = 0; i < ast.arguments.size(); i++) {
             var argument = ast.arguments.get(i);
             out.append('[').append(argument.name).append("][").append(argument.type).append(']');
@@ -120,7 +123,10 @@ public class PrintUtils {
     }
 
     public static String print(AstReturn ast, int offset) {
-        return offset(offset(offset).append("[Return\n").append(print(ast.value,offset + 1)).append('\n'), offset).append(']').toString();
+        var out = offset(offset).append("[Return");
+        if (ast.value != null)
+            offset(out.append('\n').append(print(ast.value,offset + 1)).append('\n'), offset);
+        return out.append(']').toString();
     }
 
     public static String print(AstValue ast, int offset) {
@@ -131,12 +137,16 @@ public class PrintUtils {
         return offset(offset).append("[Variable [").append(ast.getName()).append(']').toString();
     }
 
+    public static String print(AstVariable ast, int offset) {
+        return offset(offset).append("[").append(ast.global ? "Global " : "").append("Variable [").append(ast.name).append(']').toString();
+    }
+
     public static String print(AstVariableGet ast, int offset) {
-        return offset(offset).append("[Get Variable [").append(ast.name).append("][").append(ast.variable == null ? "null" : ast.name).append("]]").toString();
+        return offset(offset).append("[Get Variable [").append(ast.name).append("][").append(ast.variable == null ? "null" : "X").append("]]").toString();
     }
 
     public static String print(AstVariableSet ast, int offset) {
-        return offset(offset(offset).append("[Set Variable [").append(ast.name).append("][").append(ast.variable == null ? "null" : ast.name).append("]\n").append(print(ast.value,offset + 1)).append('\n'), offset).append(']').toString();
+        return offset(offset(offset).append("[Set Variable [").append(ast.name).append("][").append(ast.variable == null ? "null" : "X").append("]\n").append(print(ast.value,offset + 1)).append('\n'), offset).append(']').toString();
     }
 
     public static StringBuilder offset(int offset) {

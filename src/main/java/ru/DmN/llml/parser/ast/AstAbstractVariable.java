@@ -9,5 +9,9 @@ public abstract class AstAbstractVariable extends AstExpression {
         this.type = Type.UNKNOWN;
     }
 
+    public AstAbstractVariable(Type type) {
+        this.type = type;
+    }
+
     public abstract String getName();
 }

@@ -29,48 +29,73 @@ public class Parser {
                     var arguments = new ArrayList<AstArgument>();
                     Type ret = Type.UNKNOWN;
                     // обработка аргументов
-                    this.next(Token.Type.OPEN_BRACKET);
-                    token = this.next(Token.Type.NAMING, Token.Type.CLOSE_BRACKET);
-                    cycle:
-                    while (true) {
-                        switch (token.type) {
-                            case COMMA -> {}
-                            case NAMING -> {
-                                var argument = new AstArgument(token.str);
-                                arguments.add(argument);
-                                token = next(Token.Type.COLON, Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
-                                switch (token.type) {
-                                    case COLON -> argument.type = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
-                                    default -> {
-                                        continue;
+                    token = this.next(Token.Type.OPEN_BRACKET, Token.Type.COLON);
+                    if (token.type == Token.Type.COLON) {
+                        var type = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
+                        boolean external = false;
+                        token = this.next();
+                        if (token.type == Token.Type.ASSIGN) {
+                            if (this.next(Token.Type.NAMING).str.equals("ext")) {
+                                external = true;
+                            } else {
+                                throw new RuntimeException("TODO:"); // todo: парсинг значений
+                            }
+                        } else this.lexer.ptr--;
+                        this.context.variables.add(new AstVariable(name, type, external));
+                    } else {
+                        token = this.next(Token.Type.NAMING, Token.Type.CLOSE_BRACKET);
+                        cycle:
+                        while (true) {
+                            switch (token.type) {
+                                case COMMA -> {
+                                }
+                                case NAMING -> {
+                                    var argument = new AstArgument(token.str);
+                                    arguments.add(argument);
+                                    token = next(Token.Type.COLON, Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
+                                    switch (token.type) {
+                                        case COLON -> argument.type = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
+                                        default -> {
+                                            continue;
+                                        }
                                     }
                                 }
+                                case CLOSE_BRACKET -> {
+                                    break cycle;
+                                }
+                                default -> throw InvalidTokenException.create(this.lexer.src, token);
                             }
-                            case CLOSE_BRACKET -> {
-                                break cycle;
+                            token = this.next(Token.Type.NAMING, Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
+                        }
+                        // обработка возвращаемого значения
+                        do {
+                            token = this.next(Token.Type.COLON, Token.Type.ASSIGN, Token.Type.NL);
+                            if (token.type == Token.Type.COLON) {
+                                ret = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
                             }
-                            default -> throw InvalidTokenException.create(this.lexer.src, token);
+                        } while (token.type == Token.Type.COLON);
+                        // добавляем функцию в список функций
+                        var ret$ = ret;
+                        var function = this.context.functions.stream().filter(it -> it.name.equals(name)).findFirst().orElseGet(() -> {
+                            var fun = new AstFunction(name, arguments, ret$);
+                            this.context.functions.add(fun);
+                            return fun;
+                        });
+                        // парсим тело функции
+                        if (token.type == Token.Type.ASSIGN) {
+                            token = this.next(Token.Type.OPEN_FBRACKET, Token.Type.NAMING);
+                            if (token.type == Token.Type.NAMING) {
+                                if (token.str.equals("ext")) {
+                                    function.expressions = null;
+                                } else {
+                                    throw new RuntimeException("Дичь"); // todo: допиши описание
+                                }
+                            } else {
+                                this.lexer.ptr--;
+                                function.expressions = new ArrayList<>();
+                                function.expressions.addAll(this.parseBody(function).actions);
+                            }
                         }
-                        token = this.next(Token.Type.NAMING, Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
-                    }
-                    // обработка возвращаемого значения
-                    do {
-                        token = this.next(Token.Type.COLON, Token.Type.PTR, Token.Type.NL);
-                        if (token.type == Token.Type.COLON) {
-                            ret = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
-                        }
-                    } while (token.type == Token.Type.COLON);
-                    // добавляем функцию в список функций
-                    var ret$ = ret;
-                    var function = this.context.functions.stream().filter(it -> it.name.equals(name)).findFirst().orElseGet(() -> {
-                        var fun = new AstFunction(name, arguments, ret$);
-                        this.context.functions.add(fun);
-                        return fun;
-                    });
-                    // парсим тело функции
-                    if (token.type== Token.Type.PTR) {
-                        function.expressions = new ArrayList<>();
-                        function.expressions.addAll(this.parseBody(function).actions);
                     }
                 }
                 default -> throw InvalidTokenException.create(this.lexer.src, token);
@@ -131,9 +156,10 @@ public class Parser {
                                 if (token.type == Token.Type.CLOSE_CBRACKET)
                                     break;
                                 var vname = token.str;
-                                function.variables.add(new AstVariable(vname));
+                                if (context.variable(function, vname) == null)
+                                    function.variables.add(new AstVariable(vname));
                                 expressions.add(new AstVariableSet(vname, actions.actions.get(i++)));
-                            } while (token.type != Token.Type.CLOSE_CBRACKET);
+                            } while (true);
                         } else {
                             expressions.add(actions);
                             this.lexer.ptr--;
@@ -203,7 +229,7 @@ public class Parser {
             case "label" -> {
                 var name = this.next(Token.Type.NAMING).str;
                 this.next(Token.Type.CLOSE_BRACKET);
-                this.next(Token.Type.PTR);
+                this.next(Token.Type.ASSIGN);
                 return new AstNamedActions(name, this.parseBody(function));
             }
             default -> throw InvalidTokenException.create(lexer.src, token);
