@@ -21,8 +21,9 @@ public class Compiler {
             if (variable.external)
                 out.append("external ");
             out.append("global ").append(variable.type.name);
-            if (!variable.external)
-                out.append(" 0");
+            if (!variable.external) {
+                out.append(' ').append(variable.value.value);
+            }
             out.append('\n');
         }
 

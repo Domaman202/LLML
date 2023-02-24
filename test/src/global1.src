@@ -1,0 +1,9 @@
+value: i32 = 33
+
+set(i) = {
+    [i) -> (value]
+}
+
+get() = {
+    [value]
+}

@@ -32,16 +32,17 @@ public class Parser {
                     token = this.next(Token.Type.OPEN_BRACKET, Token.Type.COLON);
                     if (token.type == Token.Type.COLON) {
                         var type = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
-                        boolean external = false;
+                        AstConstant value = new AstConstant(0);
                         token = this.next();
                         if (token.type == Token.Type.ASSIGN) {
-                            if (this.next(Token.Type.NAMING).str.equals("ext")) {
-                                external = true;
-                            } else {
-                                throw new RuntimeException("TODO:"); // todo: парсинг значений
-                            }
+                            token = this.next(Token.Type.NAMING, Token.Type.NUMBER);
+                            if (token.type == Token.Type.NAMING) {
+                                if (token.str.equals("ext")) {
+                                    value = null;
+                                } else throw InvalidTokenException.create(this.lexer.src, token);
+                            } else value = new AstConstant(token.str);
                         } else this.lexer.ptr--;
-                        this.context.variables.add(new AstVariable(name, type, external));
+                        this.context.variables.add(new AstVariable(name, type, value == null, value));
                     } else {
                         token = this.next(Token.Type.NAMING, Token.Type.CLOSE_BRACKET);
                         cycle:

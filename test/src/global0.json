@@ -1,0 +1,9 @@
+{
+  "name": "global #0",
+  "src": "global0",
+  "out": "global0",
+  "test": ["global0"],
+  "optimization": {
+    "ano": false
+  }
+}
