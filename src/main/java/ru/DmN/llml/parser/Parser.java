@@ -88,9 +88,7 @@ public class Parser {
                             if (token.type == Token.Type.NAMING) {
                                 if (token.str.equals("ext")) {
                                     function.expressions = null;
-                                } else {
-                                    throw new RuntimeException("Дичь"); // todo: допиши описание
-                                }
+                                } else throw InvalidTokenException.create(this.lexer.src, token);
                             } else {
                                 this.lexer.ptr--;
                                 function.expressions = new ArrayList<>();
@@ -277,7 +275,7 @@ public class Parser {
                 case ANNOTATION -> {
                     return this.parseAnnotation(function);
                 }
-                default -> throw InvalidTokenException.create(this.lexer.src, token); // todo:
+                default -> throw InvalidTokenException.create(this.lexer.src, token);
             }
         }
         throw new RuntimeException("Jepa");
