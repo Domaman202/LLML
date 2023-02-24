@@ -1,9 +1,19 @@
 package ru.DmN.llml.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
 import ru.DmN.llml.utils.Type;
 
+/**
+ * Значение (константа/переменная)
+ */
 public class AstValue extends AstExpression {
+    /**
+     * Константа
+     */
     public AstConstant constant;
+    /**
+     * Переменная
+     */
     public AstAbstractVariable variable;
 
     public AstValue(AstConstant constant) {
@@ -32,7 +42,12 @@ public class AstValue extends AstExpression {
         return this.constant == null;
     }
 
-    public Type type() {
+    public @NotNull Type type() {
         return this.isConst() ? this.constant.type() : this.variable.type;
+    }
+
+    @Override
+    public String print(int offset) {
+        return this.isConst() ? this.constant.print(offset) : this.variable.print(offset);
     }
 }

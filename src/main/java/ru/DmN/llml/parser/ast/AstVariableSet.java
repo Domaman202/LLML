@@ -1,12 +1,34 @@
 package ru.DmN.llml.parser.ast;
 
-public class AstVariableSet extends AstExpression {
-    public final String name;
-    public AstAbstractVariable variable;
-    public AstExpression value;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-    public AstVariableSet(String name, AstExpression value) {
+import static ru.DmN.llml.utils.PrintUtils.offset;
+
+/**
+ * Установка значения переменной
+ */
+public class AstVariableSet extends AstExpression {
+    /**
+     * Название
+     */
+    public final @NotNull String name;
+    /**
+     * Переменная
+     */
+    public @Nullable AstAbstractVariable variable;
+    /**
+     * Значение
+     */
+    public @NotNull AstExpression value;
+
+    public AstVariableSet(@NotNull String name, @NotNull AstExpression value) {
         this.name = name;
         this.value = value;
+    }
+
+    @Override
+    public String print(int offset) {
+        return offset(offset(offset).append("[Set Variable [").append(this.name).append("][").append(this.variable == null ? "null" : "X").append("]\n").append(this.value.print(offset + 1)).append('\n'), offset).append(']').toString();
     }
 }

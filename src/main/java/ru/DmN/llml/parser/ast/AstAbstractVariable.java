@@ -1,17 +1,36 @@
 package ru.DmN.llml.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
 import ru.DmN.llml.utils.Type;
 
+import static ru.DmN.llml.utils.PrintUtils.offset;
+
+/**
+ * Абстрактное представление переменной
+ */
 public abstract class AstAbstractVariable extends AstExpression {
-    public Type type;
+    /**
+     * Тип переменной
+     */
+    public @NotNull Type type;
 
     public AstAbstractVariable() {
         this.type = Type.UNKNOWN;
     }
 
-    public AstAbstractVariable(Type type) {
+    public AstAbstractVariable(@NotNull Type type) {
         this.type = type;
     }
 
-    public abstract String getName();
+    /**
+     * Возвращает имя переменной
+     *
+     * @return Имя переменной
+     */
+    public abstract @NotNull String getName();
+
+    @Override
+    public String print(int offset) {
+        return offset(offset).append("[Variable [").append(this.getName()).append(']').toString();
+    }
 }

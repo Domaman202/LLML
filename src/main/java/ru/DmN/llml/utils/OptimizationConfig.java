@@ -1,9 +1,16 @@
 package ru.DmN.llml.utils;
 
 public class OptimizationConfig {
-        public final boolean ano;
+    /**
+     * Argument Name Optimization
+     */
+    public final boolean ano;
 
-        public OptimizationConfig(boolean ano) {
-            this.ano = ano;
-        }
+    /**
+     *
+     * @param ano Argument Name Optimization
+     */
+    public OptimizationConfig(boolean ano) {
+        this.ano = ano;
     }
+}

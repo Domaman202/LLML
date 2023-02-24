@@ -1,13 +1,33 @@
 package ru.DmN.llml.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.DmN.llml.utils.Type;
 
-public class AstVariable extends AstAbstractVariable {
-    public final String name;
-    public final boolean global, external;
-    public final AstConstant value;
+import static ru.DmN.llml.utils.PrintUtils.offset;
 
-    public AstVariable(String name, Type type, boolean global, boolean external, AstConstant value) {
+/**
+ * Переменная
+ */
+public class AstVariable extends AstAbstractVariable {
+    /**
+     * Название
+     */
+    public final @NotNull String name;
+    /**
+     * Глобальная
+     */
+    public final boolean global;
+    /**
+     * Внешняя
+     */
+    public final boolean external;
+    /**
+     * Значение инициализации
+     */
+    public final @Nullable AstConstant value;
+
+    public AstVariable(@NotNull String name, Type type, boolean global, boolean external, @Nullable AstConstant value) {
         super(type);
         this.name = name;
         this.global = global;
@@ -15,16 +35,21 @@ public class AstVariable extends AstAbstractVariable {
         this.value = value;
     }
 
-    public AstVariable(String name, Type type, boolean external, AstConstant value) {
+    public AstVariable(@NotNull String name, Type type, boolean external, @NotNull AstConstant value) {
         this(name, type, true, external, value);
     }
 
-    public AstVariable(String name) {
+    public AstVariable(@NotNull String name) {
         this(name, Type.UNKNOWN, false, false, null);
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return this.name;
+    }
+
+    @Override
+    public String print(int offset) {
+        return offset(offset).append("[").append(this.global ? "Global " : "").append("Variable [").append(this.name).append(']').toString();
     }
 }

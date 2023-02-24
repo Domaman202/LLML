@@ -1,6 +1,14 @@
 package ru.DmN.llml.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Локальная tmp переменная
+ */
 public class AstTmpVariable extends AstAbstractVariable {
+    /**
+     * Номер переменной
+     */
     public int i;
 
     public AstTmpVariable(int i) {
@@ -8,7 +16,7 @@ public class AstTmpVariable extends AstAbstractVariable {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return String.valueOf(this.i);
     }
 }

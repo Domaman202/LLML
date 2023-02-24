@@ -1,9 +1,28 @@
 package ru.DmN.llml.parser.ast;
 
-public class AstNamedActionsReference extends AstExpression {
-    public final String name;
+import org.jetbrains.annotations.NotNull;
 
-    public AstNamedActionsReference(String name) {
+import static ru.DmN.llml.utils.PrintUtils.offset;
+
+/**
+ * Ссылка на блок наименованых действий
+ */
+public class AstNamedActionsReference extends AstExpression {
+    /**
+     * Название
+     */
+    public final @NotNull String name;
+
+    /**
+     *
+     * @param name Название
+     */
+    public AstNamedActionsReference(@NotNull String name) {
         this.name = name;
+    }
+
+    @Override
+    public String print(int offset) {
+        return offset(offset).append("[Named Actions Ref [").append(this.name).append(']').toString();
     }
 }

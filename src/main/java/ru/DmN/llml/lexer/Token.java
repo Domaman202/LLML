@@ -1,9 +1,24 @@
 package ru.DmN.llml.lexer;
 
+/**
+ * Токен
+ */
 public class Token {
+    /**
+     * Строка токена
+     */
     public final String str;
+    /**
+     * Тип токена
+     */
     public final Type type;
+    /**
+     * Линия токена
+     */
     public final int line;
+    /**
+     * Символ начала токена
+     */
     public final int symbol;
 
     public Token(String str, Type type, int line, int symbol) {

@@ -5,22 +5,47 @@ import ru.DmN.llml.parser.InvalidTokenException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Лексер
+ */
 public class Lexer {
+    /**
+     * Исходный код
+     */
     public final String src;
+    /**
+     * Токены
+     */
     public final List<Token> tokens;
+    /**
+     * Указатель на токен
+     */
     public int ptr;
 
+    /**
+     * @param str Код для обработки
+     */
     public Lexer(String str) {
         this.src = str;
         this.tokens = this.parseTokens();
     }
 
+    /**
+     * Сдвигает "ptr" и возвращает текущий токен
+     *
+     * @return Токен
+     */
     public Token next() {
         var token = this.tokens.get(this.ptr);
         this.ptr++;
         return token;
     }
 
+    /**
+     * Парсит все токены (вызывается в конструкторе)
+     *
+     * @return Список токенов
+     */
     protected List<Token> parseTokens() {
         var tokens = new ArrayList<Token>();
         var parser = new TokenParser(src);
@@ -34,14 +59,31 @@ public class Lexer {
     }
 
     public class TokenParser {
+        /**
+         * Обрабатываемая строка
+         */
         public String str;
+        /**
+         * Текущая линия
+         */
         public int line;
+        /**
+         * Текущий символ
+         */
         public int symbol;
 
+        /**
+         *
+         * @param str Строка для обработки
+         */
         public TokenParser(String str) {
             this.str = str;
         }
 
+        /**
+         * Обрабатывает токен
+         * @return Токен
+         */
         protected Token parseToken() {
             skipSpaces();
             if (str.length() > 0) {
@@ -125,6 +167,10 @@ public class Lexer {
             } else return new Token("", Token.Type.EOF, line, symbol);
         }
 
+        /**
+         * Парсинг токена названия
+         * @return Токен
+         */
         protected Token parseNaming() {
             var naming = new StringBuilder();
             var c = str.charAt(0);
@@ -145,6 +191,10 @@ public class Lexer {
             return new Token(name, name.equals("void") ? Token.Type.TYPE : Token.Type.NAMING, line, symbol);
         }
 
+        /**
+         * Парсит токен числа
+         * @return Токен
+         */
         protected Token parseNumber() {
             var num = new StringBuilder();
             cycle:
@@ -163,6 +213,9 @@ public class Lexer {
             return new Token(num.toString(), Token.Type.NUMBER, line, symbol);
         }
 
+        /**
+         * Пропуск пробелов и переносов строки
+         */
         public void skipNLSpaces() {
             while (true) {
                 skipSpaces();
@@ -174,6 +227,9 @@ public class Lexer {
             }
         }
 
+        /**
+         * Пропуск пробелов
+         */
         protected void skipSpaces() {
             cycle:
             while (!str.isEmpty()) {
@@ -186,6 +242,11 @@ public class Lexer {
             }
         }
 
+        /**
+         * Удаляет один символ из "str"
+         * @param count Кол-во символов
+         * @return Номер символа
+         */
         protected int delete(int count) {
             str = str.substring(count);
             symbol += count;

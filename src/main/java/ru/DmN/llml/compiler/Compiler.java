@@ -5,14 +5,29 @@ import ru.DmN.llml.utils.OptimizationConfig;
 import ru.DmN.llml.utils.Type;
 
 public class Compiler {
+    /**
+     * Контекст
+     */
     public final AstContext context;
+    /**
+     * Скомпилированный код
+     */
     public StringBuilder out;
 
+    /**
+     *
+     * @param context Контекст
+     */
     public Compiler(AstContext context) {
         this.context = context;
         this.out = new StringBuilder();
     }
 
+    /**
+     * Компилирует контекст
+     * @param config Конфиг
+     * @return Скомпилированный код
+     */
     public String compile(OptimizationConfig config) {
         out.append("target triple = \"x86_64-pc-linux-gnu\"\n");
 
@@ -56,6 +71,10 @@ public class Compiler {
         return this.out.append("\nattributes #0 = { nounwind }").toString();
     }
 
+    /**
+     * Заменяет названия аргументов на цифровой вариант
+     * @param function Функция
+     */
     protected void compileArgsNames(AstFunction function) {
         var ac = function.arguments.size();
 
@@ -72,6 +91,12 @@ public class Compiler {
         function.tmpVarCount += ac;
     }
 
+    /**
+     * Записывает выражение
+     * @param function Функция
+     * @param expression Выражение
+     * @return Значение выражения
+     */
     protected AstValue write(AstFunction function, AstExpression expression) {
         if (expression instanceof AstActions actions) {
             actions.actions.forEach(it -> this.write(function, it));
@@ -165,6 +190,13 @@ public class Compiler {
         return null;
     }
 
+    /**
+     * Если "значение" глобальная переменная - возвращает её значение.<br>
+     * Если "значение" константа/локальная переменная - возвращает её.
+     * @param function Функция
+     * @param value "Значение"
+     * @return Значение
+     */
     protected AstValue get(AstFunction function, AstValue value) {
         if (value.isConst())
             return value;
@@ -176,6 +208,12 @@ public class Compiler {
         } else return value;
     }
 
+    /**
+     * Устанавливает значение переменной
+     * @param function Функция
+     * @param of Значение
+     * @param to Переменная
+     */
     protected void set(AstFunction function, AstValue of, AstAbstractVariable to) {
         var tname = to.type.name;
         out.append("\n\t");
@@ -189,10 +227,20 @@ public class Compiler {
         }
     }
 
+    /**
+     * Записывает значение (константу/переменную)
+     * @param value Значение
+     * @return out
+     */
     protected StringBuilder write(AstValue value) {
         return value.isConst() ? out.append(value.constant.value) : this.write(value.variable);
     }
 
+    /**
+     * Записывает переменную (локальную/глобальную)
+     * @param avar Переменная
+     * @return out
+     */
     protected StringBuilder write(AstAbstractVariable avar) {
         return out.append(avar instanceof AstVariable var ? var.global ? '@' : '%' : '%').append(avar.getName());
     }

@@ -9,7 +9,6 @@ import ru.DmN.llml.parser.InvalidTokenException;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.Precompiler;
 import ru.DmN.llml.utils.OptimizationConfig;
-import ru.DmN.llml.utils.PrintUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -57,14 +56,14 @@ public class Main {
             var ctx = parser.parse();
 
             if (ast) {
-                System.out.println("Parsed:\n" + PrintUtils.print(ctx, 0));
+                System.out.println("Parsed:\n" + ctx.print(0));
             }
 
             var precompiler = new Precompiler(ctx);
             precompiler.precompile();
 
             if (ast) {
-                System.out.println("\nPrecompiled:\n" + PrintUtils.print(ctx, 0));
+                System.out.println("\nPrecompiled:\n" + ctx.print(0));
             }
 
             var compiler = new Compiler(ctx);

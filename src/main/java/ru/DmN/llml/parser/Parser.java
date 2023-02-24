@@ -1,5 +1,6 @@
 package ru.DmN.llml.parser;
 
+import org.jetbrains.annotations.NotNull;
 import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.lexer.Token;
 import ru.DmN.llml.parser.ast.*;
@@ -11,100 +12,117 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Парсер
+ */
 public class Parser {
-    public final Lexer lexer;
-    public final AstContext context;
+    /**
+     * Лексер
+     */
+    public final @NotNull Lexer lexer;
+    /**
+     * Контекст
+     */
+    public final @NotNull AstContext context;
 
-    public Parser(Lexer lexer) {
+    /**
+     * @param lexer Лексер
+     */
+    public Parser(@NotNull Lexer lexer) {
         this.lexer = lexer;
         this.context = new AstContext();
     }
 
-    public AstContext parse() {
+    /**
+     * Парсинг контекста
+     * @return Контекст
+     */
+    public @NotNull AstContext parse() {
         var token = this.next();
         while (token.type != Token.Type.EOF) {
-            switch (token.type) {
-                case NAMING -> {
-                    var name = token.str;
-                    var arguments = new ArrayList<AstArgument>();
-                    Type ret = Type.UNKNOWN;
-                    // обработка аргументов
-                    token = this.next(Token.Type.OPEN_BRACKET, Token.Type.COLON);
-                    if (token.type == Token.Type.COLON) {
-                        var type = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
-                        AstConstant value = new AstConstant(0);
-                        token = this.next();
-                        if (token.type == Token.Type.ASSIGN) {
-                            token = this.next(Token.Type.NAMING, Token.Type.NUMBER);
-                            if (token.type == Token.Type.NAMING) {
-                                if (token.str.equals("ext")) {
-                                    value = null;
-                                } else throw InvalidTokenException.create(this.lexer.src, token);
-                            } else value = new AstConstant(token.str);
-                        } else this.lexer.ptr--;
-                        this.context.variables.add(new AstVariable(name, type, value == null, value));
-                    } else {
-                        token = this.next(Token.Type.NAMING, Token.Type.CLOSE_BRACKET);
-                        cycle:
-                        while (true) {
-                            switch (token.type) {
-                                case COMMA -> {
-                                }
-                                case NAMING -> {
-                                    var argument = new AstArgument(token.str);
-                                    arguments.add(argument);
-                                    token = next(Token.Type.COLON, Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
-                                    switch (token.type) {
-                                        case COLON -> argument.type = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
-                                        default -> {
-                                            continue;
-                                        }
-                                    }
-                                }
-                                case CLOSE_BRACKET -> {
-                                    break cycle;
-                                }
-                                default -> throw InvalidTokenException.create(this.lexer.src, token);
+            if (Objects.requireNonNull(token.type) == Token.Type.NAMING) {
+                var name = token.str;
+                var arguments = new ArrayList<AstArgument>();
+                Type ret = Type.UNKNOWN;
+                // обработка аргументов
+                token = this.next(Token.Type.OPEN_BRACKET, Token.Type.COLON);
+                if (token.type == Token.Type.COLON) {
+                    var type = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
+                    AstConstant value = new AstConstant(0);
+                    token = this.next();
+                    if (token.type == Token.Type.ASSIGN) {
+                        token = this.next(Token.Type.NAMING, Token.Type.NUMBER);
+                        if (token.type == Token.Type.NAMING) {
+                            if (token.str.equals("ext")) {
+                                value = null;
+                            } else throw InvalidTokenException.create(this.lexer.src, token);
+                        } else value = new AstConstant(token.str);
+                    } else this.lexer.ptr--;
+                    this.context.variables.add(new AstVariable(name, type, value == null, value));
+                } else {
+                    token = this.next(Token.Type.NAMING, Token.Type.CLOSE_BRACKET);
+                    cycle:
+                    while (true) {
+                        switch (token.type) {
+                            case COMMA -> {
                             }
-                            token = this.next(Token.Type.NAMING, Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
+                            case NAMING -> {
+                                var argument = new AstArgument(token.str);
+                                arguments.add(argument);
+                                token = next(Token.Type.COLON, Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
+                                if (Objects.requireNonNull(token.type) == Token.Type.COLON) {
+                                    argument.type = Type.valueOf(next(Token.Type.TYPE).str.toUpperCase());
+                                } else continue;
+                            }
+                            case CLOSE_BRACKET -> {
+                                break cycle;
+                            }
+                            default -> throw InvalidTokenException.create(this.lexer.src, token);
                         }
-                        // обработка возвращаемого значения
-                        do {
-                            token = this.next(Token.Type.COLON, Token.Type.ASSIGN, Token.Type.NL);
-                            if (token.type == Token.Type.COLON) {
-                                ret = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
-                            }
-                        } while (token.type == Token.Type.COLON);
-                        // добавляем функцию в список функций
-                        var ret$ = ret;
-                        var function = this.context.functions.stream().filter(it -> it.name.equals(name)).findFirst().orElseGet(() -> {
-                            var fun = new AstFunction(name, arguments, ret$);
-                            this.context.functions.add(fun);
-                            return fun;
-                        });
-                        // парсим тело функции
-                        if (token.type == Token.Type.ASSIGN) {
-                            token = this.next(Token.Type.OPEN_FBRACKET, Token.Type.NAMING);
-                            if (token.type == Token.Type.NAMING) {
-                                if (token.str.equals("ext")) {
-                                    function.expressions = null;
-                                } else throw InvalidTokenException.create(this.lexer.src, token);
-                            } else {
-                                this.lexer.ptr--;
-                                function.expressions = new ArrayList<>();
-                                function.expressions.addAll(this.parseBody(function).actions);
-                            }
+                        token = this.next(Token.Type.NAMING, Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
+                    }
+                    // обработка возвращаемого значения
+                    do {
+                        token = this.next(Token.Type.COLON, Token.Type.ASSIGN, Token.Type.NL);
+                        if (token.type == Token.Type.COLON) {
+                            ret = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
+                        }
+                    } while (token.type == Token.Type.COLON);
+                    // добавляем функцию в список функций
+                    var ret$ = ret;
+                    var function = this.context.functions.stream().filter(it -> it.name.equals(name)).findFirst().orElseGet(() -> {
+                        var fun = new AstFunction(name, arguments, ret$);
+                        this.context.functions.add(fun);
+                        return fun;
+                    });
+                    // парсим тело функции
+                    if (token.type == Token.Type.ASSIGN) {
+                        token = this.next(Token.Type.OPEN_FBRACKET, Token.Type.NAMING);
+                        if (token.type == Token.Type.NAMING) {
+                            if (token.str.equals("ext")) {
+                                function.expressions = null;
+                            } else throw InvalidTokenException.create(this.lexer.src, token);
+                        } else {
+                            this.lexer.ptr--;
+                            function.expressions = new ArrayList<>();
+                            function.expressions.addAll(this.parseBody(function).actions);
                         }
                     }
                 }
-                default -> throw InvalidTokenException.create(this.lexer.src, token);
+            } else {
+                throw InvalidTokenException.create(this.lexer.src, token);
             }
             token = this.next();
         }
         return this.context;
     }
 
-    protected AstActions parseBody(AstFunction function) {
+    /**
+     * Парсинг тела функции
+     * @param function Функция
+     * @return Тело функции
+     */
+    protected @NotNull AstActions parseBody(@NotNull AstFunction function) {
         var expressions = new ArrayList<AstExpression>();
         Token token;
         //
@@ -169,14 +187,20 @@ public class Parser {
                 case CLOSE_FBRACKET -> {
                     break cycle$bodyparse;
                 }
-                default -> {}
+                default -> {
+                }
             }
             token = this.lexer.next();
         }
         return new AstActions(expressions);
     }
 
-    protected AstExpression parseAnnotation(AstFunction function) {
+    /**
+     * Парсинг аннотации
+     * @param function Функция
+     * @return Аннотация
+     */
+    protected @NotNull AstExpression parseAnnotation(@NotNull AstFunction function) {
         AstExpression result;
         var token = this.next(Token.Type.NAMING);
         this.next(Token.Type.OPEN_BRACKET);
@@ -213,7 +237,8 @@ public class Parser {
                                 break cycle;
                             } else tmp--;
                         }
-                        default -> {}
+                        default -> {
+                        }
                     }
                 }
                 //
@@ -237,7 +262,13 @@ public class Parser {
         return result;
     }
 
-    protected AstActions parseActions(AstFunction function, int endptr) {
+    /**
+     * Парсинг действий
+     * @param function Фукнция
+     * @param endptr Указатель конца действий
+     * @return Действия
+     */
+    protected @NotNull AstActions parseActions(@NotNull AstFunction function, int endptr) {
         var actions = new ArrayList<AstExpression>();
         while (true) {
             this.next();
@@ -251,9 +282,15 @@ public class Parser {
         return new AstActions(actions);
     }
 
-    protected AstExpression parseExpression(AstFunction function, int endptr) {
+    /**
+     * Парсинг выражения
+     * @param function Функция
+     * @param endptr Указатель конца выражения
+     * @return Выражение
+     */
+    protected @NotNull AstExpression parseExpression(@NotNull AstFunction function, int endptr) {
         var token = this.next();
-        while (this.lexer.ptr <= endptr) {
+        if (this.lexer.ptr <= endptr) {
             switch (token.type) {
                 case NUMBER -> {
                     return new AstConstant(token.str.contains(".") ? (Object) Double.parseDouble(token.str) : (Object) Integer.parseInt(token.str));
@@ -281,6 +318,10 @@ public class Parser {
         throw new RuntimeException("Jepa");
     }
 
+    /**
+     * Возвращает токен, сдвигает указатель
+     * @return Токен
+     */
     protected Token next() {
         var token = this.lexer.next();
         while (token.type == Token.Type.NL)
@@ -288,7 +329,13 @@ public class Parser {
         return token;
     }
 
-    protected Token next(Token.Type...type) {
+    /**
+     * Возвращает токен, сдвигает указатель
+     * @param type Требуемые типы для токена
+     * @return Токен
+     * @throws InvalidTokenException Токен не соотвествует возможному типу
+     */
+    protected Token next(@NotNull Token.Type... type) {
         var types = Arrays.stream(type).collect(Collectors.toList());
         if (types.contains(Token.Type.NAMING))
             types.add(Token.Type.TYPE);
@@ -303,7 +350,14 @@ public class Parser {
         return this.check(token, types);
     }
 
-    protected Token check(Token token, List<Token.Type> types) {
+    /**
+     * Проверяет токен на соотвествие типу
+     * @param token Токен
+     * @param types Возможные типы
+     * @return Токен
+     * @throws InvalidTokenException Токен не соотвествует возможному типу
+     */
+    protected Token check(@NotNull Token token, @NotNull List<Token.Type> types) {
         if (types.stream().anyMatch(t -> t == token.type)) {
             return token;
         } else {

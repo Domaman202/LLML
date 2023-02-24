@@ -1,4 +1,6 @@
 package ru.DmN.llml.parser.ast;
 
-public class AstExpression {
+import ru.DmN.llml.utils.IAstPrintable;
+
+public abstract class AstExpression implements IAstPrintable {
 }

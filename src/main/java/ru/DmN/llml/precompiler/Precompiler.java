@@ -1,16 +1,31 @@
 package ru.DmN.llml.precompiler;
 
+import org.jetbrains.annotations.NotNull;
 import ru.DmN.llml.parser.ast.*;
 import ru.DmN.llml.utils.Type;
 
+/**
+ * Прекомпилятор
+ */
 public class Precompiler {
-    public final AstContext context;
+    /**
+     * Контекст
+     */
+    public final @NotNull AstContext context;
 
-    public Precompiler(AstContext context) {
+    /**
+     *
+     * @param context Контескт
+     */
+    public Precompiler(@NotNull AstContext context) {
         this.context = context;
     }
 
-    public AstContext precompile() {
+    /**
+     * Прекомпилирует контекст
+     * @return Контекст
+     */
+    public @NotNull AstContext precompile() {
         for (var function : context.functions) {
             if (function.expressions != null && !function.expressions.isEmpty()) {
                 this.precompileTypes(function);
@@ -25,12 +40,18 @@ public class Precompiler {
         return this.context;
     }
 
-    protected void precompileCasts(AstFunction function) {
-        var cycle = true;
-        while (cycle) {
-            cycle = false;
-            for (int i = 0; i < function.expressions.size(); i++) {
-                while (cc(function, function.expressions.get(i))) cycle = true;
+    /**
+     * Прекомпиляция преобразований типов
+     * @param function Функуция
+     */
+    protected void precompileCasts(@NotNull AstFunction function) {
+        if (function.expressions != null) {
+            var cycle = true;
+            while (cycle) {
+                cycle = false;
+                for (int i = 0; i < function.expressions.size(); i++) {
+                    while (cc(function, function.expressions.get(i))) cycle = true;
+                }
             }
         }
     }
@@ -38,7 +59,7 @@ public class Precompiler {
     /**
      * Cast Calculation
      */
-    protected boolean cc(AstFunction function, AstExpression expression) {
+    protected boolean cc(@NotNull AstFunction function, @NotNull AstExpression expression) {
         if (expression instanceof AstReturn ret) {
             var type = dsgt(function, ret.value);
             if (type == function.ret) {
@@ -51,7 +72,11 @@ public class Precompiler {
         return false;
     }
 
-    protected void precompileTypes(AstFunction function) {
+    /**
+     * Прекомпиляция типов
+     * @param function Функция
+     */
+    protected void precompileTypes(@NotNull AstFunction function) {
         var cycle = true;
         while (cycle) {
             cycle = false;

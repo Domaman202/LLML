@@ -1,11 +1,24 @@
 package ru.DmN.llml.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.DmN.llml.utils.Type;
 
-public class AstConstant extends AstExpression {
-    public final Object value;
+import static ru.DmN.llml.utils.PrintUtils.offset;
 
-    public AstConstant(Object value) {
+/**
+ * Константа
+ */
+public class AstConstant extends AstExpression {
+    /**
+     * Значение
+     */
+    public final @Nullable Object value;
+
+    /**
+     * @param value Значение
+     */
+    public AstConstant(@Nullable Object value) {
         if (value instanceof String str) {
             var tmp = str.toUpperCase();
             if (tmp.equals("TRUE")) {
@@ -19,7 +32,12 @@ public class AstConstant extends AstExpression {
         } else this.value = value;
     }
 
-    public Type type() {
+    /**
+     * Возвращает тип значения константы
+     *
+     * @return Тип значения константы
+     */
+    public @NotNull Type type() {
         if (this.value == null)
             return Type.VOID;
         if (this.value instanceof Boolean)
@@ -29,5 +47,10 @@ public class AstConstant extends AstExpression {
         if (this.value instanceof Double)
             return Type.F32;
         return Type.UNKNOWN;
+    }
+
+    @Override
+    public String print(int offset) {
+        return offset(offset).append("[Constant [").append(this.value).append("]]").toString();
     }
 }
