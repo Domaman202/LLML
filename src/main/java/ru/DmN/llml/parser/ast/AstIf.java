@@ -9,7 +9,7 @@ public class AstIf extends AstExpression {
     /**
      * Условие
      */
-    public final @NotNull AstExpression value;
+    public @NotNull AstExpression value;
     /**
      * Ссылка на блок (if)
      */

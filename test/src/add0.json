@@ -3,7 +3,5 @@
   "src": "add0",
   "out": "add0",
   "test": ["add0"],
-  "optimization": {
-    "ano": false
-  }
+  "optimization": {}
 }

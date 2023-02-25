@@ -24,6 +24,9 @@ public class Main {
         parser.addArgument("-ast")
                 .nargs("*").type(Boolean.class)
                 .help("вывод ast в консоль");
+        parser.addArgument("-opt")
+                .nargs("*").type(String.class).metavar("<optimization>")
+                .help("включает оптимизацию <optimization>");
         parser.addArgument("src")
                 .nargs(1).type(String.class)
                 .help("файл с исходным кодом");
@@ -42,6 +45,7 @@ public class Main {
             boolean ast = args.get("ast") != null;
             String out = args.getString("o");
             out = out == null ? src.substring(Math.max(-1, src.lastIndexOf('/') + 1)) + ".ll" : out.substring(1, out.length() - 1);
+            var optCfg = OptimizationConfig.of(args);
 
             String code = null;
             try (var file = new FileInputStream(src)) {
@@ -60,14 +64,14 @@ public class Main {
             }
 
             var precompiler = new Precompiler(ctx);
-            precompiler.precompile();
+            precompiler.precompile(optCfg);
 
             if (ast) {
                 System.out.println("\nPrecompiled:\n" + ctx.print(0));
             }
 
             var compiler = new Compiler(ctx);
-            compiler.compile(new OptimizationConfig(true));
+            compiler.compile(optCfg);
 
             if (ast) {
                 System.out.println("\nCompiled:");

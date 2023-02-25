@@ -56,7 +56,7 @@ public class Tests {
         var lexer = new Lexer(src);
         var parser = new Parser(lexer);
         var precompiler = new Precompiler(parser.parse());
-        var compiler = new Compiler(precompiler.precompile());
+        var compiler = new Compiler(precompiler.precompile(config.optimization));
         var out = compiler.compile(config.optimization);
 
         var out$ll = "test/tmp/" + config.out + ".ll";

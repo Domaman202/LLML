@@ -12,7 +12,7 @@ public class AstCast extends AstExpression {
     /**
      * Значение
      */
-    public final @NotNull AstExpression value;
+    public @NotNull AstExpression value;
     /**
      * Тип
      */
