@@ -21,12 +21,10 @@ public class Tests {
         }
         file.mkdir();
         //
-        Arrays.stream(new File("test/src").listFiles()).forEach(it -> {
-            var name = it.getName();
-            if (name.endsWith(".json")) {
-                name = name.substring(0, name.length() - 5);
+        Arrays.stream(new File("test/config").listFiles()).forEach(it -> {
+            if (it.getName().endsWith(".json")) {
                 TestConfig config;
-                try (var stream = new FileInputStream("test/src/" + name + ".json")) {
+                try (var stream = new FileInputStream(it)) {
                     var gson = new Gson();
                     config = gson.fromJson(new String(stream.readAllBytes()), TestConfig.class);
                 } catch (IOException e) {
@@ -47,7 +45,7 @@ public class Tests {
 
     private static void test(TestConfig config) throws IOException, TestException {
         String src;
-        try (var stream = new FileInputStream("test/src/src." + config.src + ".llml")) {
+        try (var stream = new FileInputStream("test/src/" + config.src + ".llml")) {
             src = new String(stream.readAllBytes());
         } catch (IOException e) {
             throw new TestException("Ошибка при выполнении теста \"" + config.name + "\"! (Исходники не найдены)");
@@ -74,7 +72,7 @@ public class Tests {
         // тестирование
         if (config.test != null) {
             for (var test : config.test) {
-                exec("clang -o test/tmp/" + config.out + ' ' + out$opt + " test/src/test." + test + ".c");
+                exec("clang -o test/tmp/" + config.out + ' ' + out$opt + " test/tsrc/" + test + ".c");
                 exec("./test/tmp/" + test + " > test/tmp/" + test + ".log");
             }
         }
