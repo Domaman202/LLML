@@ -1,0 +1,6 @@
+{
+  "name": "math",
+  "src": "math",
+  "out": "math",
+  "test": ["math"]
+}

@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.DmN.llml.utils.Type;
 
+import java.util.Objects;
+
 import static ru.DmN.llml.utils.PrintUtils.offset;
 
 /**
@@ -13,7 +15,7 @@ public class AstConstant extends AstExpression {
     /**
      * Значение
      */
-    public final @Nullable Object value;
+    public @Nullable Object value;
 
     /**
      * @param value Значение
@@ -49,8 +51,26 @@ public class AstConstant extends AstExpression {
         return Type.UNKNOWN;
     }
 
+    public Type cast(Type type) {
+        if (type.fieldName().startsWith("I")) {
+            if (value instanceof Double d) {
+                value = (int) (double) d;
+            }
+        } else {
+            if (value instanceof Integer i) {
+                value = (double) (int) i;
+            }
+        }
+        return type;
+    }
+
     @Override
     public String print(int offset) {
         return offset(offset).append("[Constant [").append(this.value).append("]]").toString();
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toString(this.value);
     }
 }

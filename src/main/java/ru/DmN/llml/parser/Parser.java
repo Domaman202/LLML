@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.lexer.Token;
 import ru.DmN.llml.parser.ast.*;
+import ru.DmN.llml.utils.InvalidTokenException;
 import ru.DmN.llml.utils.Type;
 
 import java.util.ArrayList;
@@ -43,12 +44,12 @@ public class Parser {
             if (Objects.requireNonNull(token.type) == Token.Type.NAMING) {
                 var name = token.str;
                 var arguments = new ArrayList<AstArgument>();
-                Type ret = Type.UNKNOWN;
+                var ret = Type.UNKNOWN;
                 // обработка аргументов
                 token = this.next(Token.Type.OPEN_BRACKET, Token.Type.COLON);
                 if (token.type == Token.Type.COLON) {
                     var type = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
-                    AstConstant value = new AstConstant(0);
+                    var value = new AstConstant(0);
                     token = this.next();
                     if (token.type == Token.Type.ASSIGN) {
                         token = this.next(Token.Type.NAMING, Token.Type.NUMBER);
@@ -56,7 +57,7 @@ public class Parser {
                             if (token.str.equals("ext")) {
                                 value = null;
                             } else throw InvalidTokenException.create(this.lexer.src, token);
-                        } else value = new AstConstant(token.str);
+                        } else value = new AstConstant((Object) token.str);
                     } else this.lexer.ptr--;
                     this.context.variables.add(new AstVariable(name, type, value == null, value));
                 } else {
@@ -153,7 +154,7 @@ public class Parser {
                 case CLOSE_CBRACKET -> {
                     end = this.lexer.ptr - 1;
                     this.lexer.ptr = start;
-                    expressions.add(new AstReturn(this.parseExpression(function, end)));
+                    expressions.add(new AstReturn(this.parseExpression(function, end, true)));
                     this.lexer.ptr = end + 1;
                 }
                 case OPEN_BRACKET -> tmp++;
@@ -187,8 +188,6 @@ public class Parser {
                 // конец тела функции
                 case CLOSE_FBRACKET -> {
                     break cycle$bodyparse;
-                }
-                default -> {
                 }
             }
             token = this.lexer.next();
@@ -238,15 +237,13 @@ public class Parser {
                                 break cycle;
                             } else tmp--;
                         }
-                        default -> {
-                        }
                     }
                 }
                 //
                 return new AstCall(fun, arguments);
             }
             case "if" -> {
-                var value = this.parseExpression(function, Integer.MAX_VALUE);
+                var value = this.parseExpression(function, Integer.MAX_VALUE, true);
                 var a = new AstNamedActionsReference(this.next(Token.Type.NAMING).str);
                 var b = new AstNamedActionsReference(this.next(Token.Type.NAMING).str);
                 result = new AstIf(value, a, b);
@@ -275,7 +272,7 @@ public class Parser {
             this.next();
             if (this.lexer.ptr <= endptr) {
                 this.lexer.ptr--;
-                actions.add(this.parseExpression(function, endptr));
+                actions.add(this.parseExpression(function, endptr, false));
             } else {
                 break;
             }
@@ -289,9 +286,9 @@ public class Parser {
      * @param endptr Указатель конца выражения
      * @return Выражение
      */
-    protected @NotNull AstExpression parseExpression(@NotNull AstFunction function, int endptr) {
-        var token = this.next();
+    protected @NotNull AstExpression parseExpression(@NotNull AstFunction function, int endptr, boolean single) {
         if (this.lexer.ptr <= endptr) {
+            var token = this.next();
             switch (token.type) {
                 case NUMBER -> {
                     return new AstConstant(token.str.contains(".") ? (Object) Double.parseDouble(token.str) : (Object) Integer.parseInt(token.str));
@@ -302,16 +299,39 @@ public class Parser {
                 case OPERATION -> {
                     switch (token.str) {
                         case "!" -> {
-                            return new AstMath1Arg(AstMath1Arg.Operation.of(token.str), this.parseExpression(function, endptr));
+                            return new AstMath1Arg(AstMath1Arg.Operation.of(token.str), this.parseExpression(function, endptr, single));
                         }
                         case "+", "-", "*", "/", "&", "|", "=", "!=", ">", ">=", "<", "<=" -> {
-                            return new AstMath2Arg(AstMath2Arg.Operation.of(token.str), this.parseExpression(function, endptr), this.parseExpression(function, endptr));
+                            return new AstMath2Arg(AstMath2Arg.Operation.of(token.str), this.parseExpression(function, endptr, single), this.parseExpression(function, endptr, single));
                         }
                         default -> throw InvalidTokenException.create(this.lexer.src, token);
                     }
                 }
                 case ANNOTATION -> {
                     return this.parseAnnotation(function);
+                }
+                case OPEN_BRACKET -> {
+                    // начало выражения
+                    var start = this.lexer.ptr;
+                    // конец выражения
+                    var end = -1;
+                    //
+                    var tmp = 0;
+                    while (true) {
+                        token = this.lexer.next();
+                        switch (token.type) {
+                            case OPEN_BRACKET -> tmp++;
+                            case CLOSE_BRACKET -> {
+                                if (tmp == 0) {
+                                    end = this.lexer.ptr - 1;
+                                    this.lexer.ptr = start;
+                                    var expression = single ? this.parseExpression(function, end, true) : this.parseActions(function, end);
+                                    this.lexer.ptr = end + 1;
+                                    return expression;
+                                } else tmp--;
+                            }
+                        }
+                    }
                 }
                 default -> throw InvalidTokenException.create(this.lexer.src, token);
             }

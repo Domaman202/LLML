@@ -209,7 +209,7 @@ public class Compiler {
      * @return out
      */
     protected StringBuilder write(AstValue value) {
-        return value.isConst() ? out.append(value.constant.value) : this.write(value.variable);
+        return value.isConst() ? out.append(value.constant) : this.write(value.variable);
     }
 
     /**

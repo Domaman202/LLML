@@ -1,4 +1,4 @@
-package ru.DmN.llml.parser;
+package ru.DmN.llml.utils;
 
 import ru.DmN.llml.lexer.Token;
 
@@ -8,7 +8,7 @@ public class InvalidTokenException extends RuntimeException {
     }
 
     public static InvalidTokenException create(String src, Token token) {
-        for (int i = 0; i < token.line; i++)
+        for (int i = 1; i < token.line; i++)
             src = src.substring(src.indexOf('\n') + 1);
         var lei = src.indexOf('\n');
         if (lei > -1)

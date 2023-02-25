@@ -1,6 +1,6 @@
 package ru.DmN.llml.lexer;
 
-import ru.DmN.llml.parser.InvalidTokenException;
+import ru.DmN.llml.utils.InvalidTokenException;
 
 import java.util.ArrayList;
 import java.util.List;

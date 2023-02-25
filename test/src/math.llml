@@ -1,0 +1,17 @@
+abs(i): i32 = {
+    @if((>= i 0) a b)
+    @label(a) = {[i]}
+    @label(b) = {[- 0 i]}
+}
+
+labs(i): i64 = {
+    @if((>= i 0) a b)
+    @label(a) = {[i]}
+    @label(b) = {[- 0 i]}
+}
+
+fabs(f): f64 = {
+    @if((>= f 0) a b)
+    @label(a) = {[f]}
+    @label(b) = {[- 0 f]}
+}

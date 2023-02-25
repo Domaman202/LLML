@@ -5,7 +5,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import ru.DmN.llml.compiler.Compiler;
 import ru.DmN.llml.lexer.Lexer;
-import ru.DmN.llml.parser.InvalidTokenException;
+import ru.DmN.llml.utils.InvalidTokenException;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.Precompiler;
 
@@ -18,13 +18,13 @@ public class Main {
         var parser = ArgumentParsers.newFor("llml").build().defaultHelp(true).description("[Low Level Math Language]");
         parser.usage("llml [options] src");
         parser.addArgument("-o")
-                .nargs("?").type(String.class).metavar("<file>")
+                .nargs(1).type(String.class).metavar("<file>")
                 .help("записывает результат в <file>");
         parser.addArgument("-ast")
-                .nargs("?").type(Boolean.class)
+                .nargs("*").type(Boolean.class)
                 .help("вывод ast в консоль");
         parser.addArgument("-opt")
-                .nargs("?").type(Integer.class).metavar("<level>")
+                .nargs(1).type(Integer.class).metavar("<level>")
                 .help("выставляет уровень оптимизации в <level>");
         parser.addArgument("src")
                 .nargs(1).type(String.class)
@@ -43,7 +43,9 @@ public class Main {
             src = src.substring(1, src.length() - 1);
             boolean ast = args.get("ast") != null;
             String out = args.getString("o");
-            out = out == null ? src.substring(Math.max(-1, src.lastIndexOf('/') + 1)) + ".ll" : out;
+            if (out == null)
+                out = src.substring(Math.max(-1, src.lastIndexOf('/') + 1)) + ".ll";
+            else out = out.substring(1, out.length() - 1);
             var opt = args.getInt("opt");
 
             String code = null;

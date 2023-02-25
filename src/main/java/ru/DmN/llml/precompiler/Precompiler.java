@@ -217,11 +217,15 @@ public class Precompiler {
         if (expression instanceof AstMath1Arg math && math.rettype == Type.UNKNOWN)
             return math.rettype = type;
 
-        if (expression instanceof AstMath2Arg math && math.rettype == Type.UNKNOWN) {
+        if (expression instanceof AstMath2Arg math && math.rettype != grmt(math.rettype, type)) {
             math.rettype = type;
+            this.ts(function, math.a, type);
+            this.ts(function, math.b, type);
             return math.operation.logicOutput ? Type.I1 : math.rettype;
         }
 
+        if (expression instanceof AstConstant constant && constant.type().fieldName().startsWith("I") != type.fieldName().startsWith("I"))
+            return constant.cast(type);
         if (expression instanceof AstVariableGet get)
             return vts(function, get.name, type);
         if (expression instanceof AstVariableSet set)
@@ -234,7 +238,7 @@ public class Precompiler {
      */
     protected Type vts(AstFunction function, String name, Type type) {
         var var = context.variable(function, name);
-        if (var.type == Type.UNKNOWN)
+        if (var.type != grmt(var.type, type))
             return var.type = type;
         return Type.UNKNOWN;
     }

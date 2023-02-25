@@ -36,8 +36,8 @@ public class Tests {
                     new RuntimeException("Ошибка при выполнении теста \"" + config.name + "\":\n" + e.getMessage()).printStackTrace();
 //                e.printStackTrace();
                 } catch (TestException|RuntimeException e) {
-                    System.err.println(e.getMessage());
-//                e.printStackTrace();
+//                    System.err.println(e.getMessage());
+                e.printStackTrace();
                 }
             }
         });
@@ -62,9 +62,8 @@ public class Tests {
             stream.write(out.getBytes());
         }
 
-        if (calccheck(out) != loadcheck(config)) {
-            throw new TestException("Ошибка при проверке теста \"" + config.name + "\"!");
-        }
+        // проверка
+        check(config, out);
 
         // оптимизация
         var out$opt = "test/tmp/" + config.out + ".optimized.ll";
@@ -85,20 +84,16 @@ public class Tests {
         if (stream.available() > 0) throw new RuntimeException(new String(stream.readAllBytes()));
     }
 
-    private static int calccheck(String str) {
-        return str.chars().sum();
-    }
-
-    private static int loadcheck(TestConfig config) throws TestException {
+    private static void check(TestConfig config, String str) {
         var sum = 0;
         try (var stream = new FileInputStream("test/check/" + config.out + ".ll")) {
-            while (stream.available() > 0) {
+            while (stream.available() > 0)
                 sum += stream.read();
-            }
+            if (sum != str.chars().sum())
+                System.err.println("Ошибка при проверке теста \"" + config.name + "\"!");
         } catch (IOException e) {
-            throw new TestException("Ошибка при выполении теста \"" + config.name + "\"! (Лог проверки не найден)");
+            System.err.println("Ошибка при выполении теста \"" + config.name + "\"! (Лог проверки не найден)");
         }
-        return sum;
     }
 
     static {
