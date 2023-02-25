@@ -47,7 +47,7 @@ public class Tests {
 
     private static void test(TestConfig config) throws IOException, TestException {
         String src;
-        try (var stream = new FileInputStream("test/src/" + config.src + ".src")) {
+        try (var stream = new FileInputStream("test/src/src." + config.src + ".llml")) {
             src = new String(stream.readAllBytes());
         } catch (IOException e) {
             throw new TestException("Ошибка при выполнении теста \"" + config.name + "\"! (Исходники не найдены)");
@@ -56,8 +56,8 @@ public class Tests {
         var lexer = new Lexer(src);
         var parser = new Parser(lexer);
         var precompiler = new Precompiler(parser.parse());
-        var compiler = new Compiler(precompiler.precompile(config.optimization));
-        var out = compiler.compile(config.optimization);
+        var compiler = new Compiler(precompiler.precompile());
+        var out = compiler.compile();
 
         var out$ll = "test/tmp/" + config.out + ".ll";
         try (var stream = new FileOutputStream(out$ll)) {

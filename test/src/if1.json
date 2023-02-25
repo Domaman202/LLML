@@ -2,8 +2,5 @@
   "name": "if #1",
   "src": "if1",
   "out": "if1",
-  "test": ["if1"],
-  "optimization": {
-    "ano": true
-  }
+  "test": ["if1"]
 }

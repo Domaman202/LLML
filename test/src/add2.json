@@ -1,9 +1,0 @@
-{
-  "name": "add #2",
-  "src": "add2",
-  "out": "add2",
-  "test": ["add2"],
-  "optimization": {
-    "ano": true
-  }
-}

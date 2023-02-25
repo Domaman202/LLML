@@ -1,15 +1,15 @@
 target triple = "x86_64-pc-linux-gnu"
 
-define noundef i32 @add(i32 noundef %0, i32 noundef %1) #0 {
-	%3 = add i32 %0, %1
-	ret i32 %3
+define noundef i32 @add(i32 noundef %i, i32 noundef %j) #0 {
+	%1 = add i32 %i, %j
+	ret i32 %1
 }
 
-define noundef i32 @f(i32 noundef %0, i32 noundef %1, i32 noundef %2, i32 noundef %3) #0 {
-	%5 = tail call noundef i32 @add(i32 noundef %0, i32 noundef %1)
-	%6 = tail call noundef i32 @add(i32 noundef %2, i32 noundef %3)
-	%7 = tail call noundef i32 @add(i32 noundef %5, i32 noundef %6)
-	ret i32 %7
+define noundef i32 @f(i32 noundef %a, i32 noundef %b, i32 noundef %c, i32 noundef %d) #0 {
+	%1 = tail call noundef i32 @add(i32 noundef %a, i32 noundef %b)
+	%2 = tail call noundef i32 @add(i32 noundef %c, i32 noundef %d)
+	%3 = tail call noundef i32 @add(i32 noundef %1, i32 noundef %2)
+	ret i32 %3
 }
 
 attributes #0 = { nounwind }

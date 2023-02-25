@@ -2,8 +2,5 @@
   "name": "global external",
   "src": "global_ext",
   "out": "global_ext",
-  "test": ["global_ext"],
-  "optimization": {
-    "ano": false
-  }
+  "test": ["global_ext"]
 }

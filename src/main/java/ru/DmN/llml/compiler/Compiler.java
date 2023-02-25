@@ -1,7 +1,6 @@
 package ru.DmN.llml.compiler;
 
 import ru.DmN.llml.parser.ast.*;
-import ru.DmN.llml.utils.OptimizationConfig;
 import ru.DmN.llml.utils.Type;
 
 public class Compiler {
@@ -25,10 +24,9 @@ public class Compiler {
 
     /**
      * Компилирует контекст
-     * @param config Конфиг
      * @return Скомпилированный код
      */
-    public String compile(OptimizationConfig config) {
+    public String compile() {
         out.append("target triple = \"x86_64-pc-linux-gnu\"\n");
 
         for (var variable : this.context.variables) {
@@ -47,8 +45,6 @@ public class Compiler {
             if (function.ret != Type.VOID)
                 out.append("noundef ");
             out.append(function.ret.name).append(" @").append(function.name).append('(');
-            // (опция "ano") вычисляем новые имена аргументам
-            if (config.ano) this.compileArgsNames(function);
             //
             for (int i = 0; i < function.arguments.size();) {
                 var argument = function.arguments.get(i);
@@ -69,26 +65,6 @@ public class Compiler {
         }
 
         return this.out.append("\nattributes #0 = { nounwind }").toString();
-    }
-
-    /**
-     * Заменяет названия аргументов на цифровой вариант
-     * @param function Функция
-     */
-    protected void compileArgsNames(AstFunction function) {
-        var ac = function.arguments.size();
-
-        for (int i = 0; i < ac; i++) {
-            var argument = function.arguments.get(i);
-            argument.name = null;
-            argument.i = i;
-        }
-
-        for (int i = function.tmpVarCount; i > 0; i--) {
-            ((AstTmpVariable) function.variable(String.valueOf(i))).i += ac;
-        }
-
-        function.tmpVarCount += ac;
     }
 
     /**

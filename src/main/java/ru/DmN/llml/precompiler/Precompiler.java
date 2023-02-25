@@ -1,16 +1,8 @@
 package ru.DmN.llml.precompiler;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ru.DmN.llml.parser.ast.*;
-import ru.DmN.llml.precompiler.opt.VariableData;
-import ru.DmN.llml.utils.OptimizationConfig;
 import ru.DmN.llml.utils.Type;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Прекомпилятор
@@ -20,7 +12,6 @@ public class Precompiler {
      * Контекст
      */
     public final @NotNull AstContext context;
-    public final Map<AstAbstractVariable, VariableData> variablesData = new HashMap<>();
 
     /**
      * @param context Контескт
@@ -34,7 +25,7 @@ public class Precompiler {
      *
      * @return Контекст
      */
-    public @NotNull AstContext precompile(OptimizationConfig config) {
+    public @NotNull AstContext precompile() {
         for (var function : context.functions) {
             if (function.expressions != null && !function.expressions.isEmpty()) {
                 this.precompileTypes(function);
@@ -44,84 +35,10 @@ public class Precompiler {
                     function.ret = Type.VOID;
                     function.expressions.add(new AstReturn(null));
                 }
-
-                if (config.vao) {
-                    this.optimize(function);
-                }
             }
         }
         return this.context;
     }
-
-    protected void optimize(@NotNull AstFunction function) {
-        var cycle = new AtomicBoolean(true);
-        while (cycle.getAndSet(false)) {
-            for (int i = 0; i < function.expressions.size(); i++) {
-                var expression = this.optimize(function, function.expressions.get(i), cycle);
-                if (expression == null)
-                    function.expressions.remove(i--);
-                else function.expressions.set(i, expression);
-            }
-        }
-    }
-
-    @Contract("_, null, _ -> null")
-    protected AstExpression optimize(@NotNull AstFunction function, AstExpression expression, @NotNull AtomicBoolean changes) {
-        if (expression == null)
-            return null;
-        if (expression instanceof AstVariableGet get) {
-            var data = this.variablesData.get(get.variable);
-            if (data.gets.size() == 1) {
-                if (data.sets.isEmpty()) {
-                    if (get.variable instanceof AstVariable var) {
-                        if (var.external) {
-                            return get;
-                        } else {
-                            changes.set(true);
-                            data.gets.remove(get);
-                            return var.value;
-                        }
-                    }
-                } else if (data.sets.size() == 1) {
-                    changes.set(true);
-                    data.gets.remove(get);
-                    return data.sets.stream().findFirst().orElseThrow().value;
-                } else {
-                    return get;
-                }
-            }
-        } else if (expression instanceof AstVariableSet set) {
-            var data = this.variablesData.get(set.variable);
-            if (data.gets.isEmpty()) {
-                changes.set(true);
-                data.sets.remove(set);
-                return null;
-            }
-        } else if (expression instanceof AstActions actions) {
-            for (var action : actions.actions) {
-                this.optimize(function, action, changes);
-            }
-        } else if (expression instanceof AstCall call) {
-            for (var argument : call.arguments) {
-                this.optimize(function, argument, changes);
-            }
-        } else if (expression instanceof AstCast cast) {
-            cast.value = this.optimize(function, cast.value, changes);
-        } else if (expression instanceof AstIf if_) {
-            if_.value = this.optimize(function, if_.value, changes);
-        } else if (expression instanceof AstMath1Arg math) {
-            math.a = this.optimize(function, math.a, changes);
-        } else if (expression instanceof AstMath2Arg math) {
-            math.a = this.optimize(function, math.a, changes);
-            math.b = this.optimize(function, math.b, changes);
-        } else if (expression instanceof AstReturn ret) {
-            ret.value = this.optimize(function, ret.value, changes);
-        } else {
-            throw new RuntimeException("TODO:");
-        }
-        return expression;
-    }
-
 
     /**
      * Прекомпиляция преобразований типов
@@ -174,19 +91,10 @@ public class Precompiler {
      * Universal Calculation
      */
     protected void uc(AstFunction function, AstExpression expression) {
-        if (expression instanceof AstVariableGet get && get.variable == null) {
-            var var = get.variable = this.context.variable(function, get.name);
-            var data = this.variablesData.get(var);
-            if (data == null)
-                this.variablesData.put(var, data = new VariableData());
-            data.gets.add(get);
-        } else if (expression instanceof AstVariableSet set && set.variable == null) {
-            var var = set.variable = context.variable(function, set.name);
-            var data = this.variablesData.get(var);
-            if (data == null)
-                this.variablesData.put(var, data = new VariableData());
-            data.sets.add(set);
-        }
+        if (expression instanceof AstVariableGet get && get.variable == null)
+            get.variable = this.context.variable(function, get.name);
+        else if (expression instanceof AstVariableSet set && set.variable == null)
+            set.variable = context.variable(function, set.name);
     }
 
     /**

@@ -8,7 +8,6 @@ import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.parser.InvalidTokenException;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.Precompiler;
-import ru.DmN.llml.utils.OptimizationConfig;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,7 +44,6 @@ public class Main {
             boolean ast = args.get("ast") != null;
             String out = args.getString("o");
             out = out == null ? src.substring(Math.max(-1, src.lastIndexOf('/') + 1)) + ".ll" : out.substring(1, out.length() - 1);
-            var optCfg = OptimizationConfig.of(args);
 
             String code = null;
             try (var file = new FileInputStream(src)) {
@@ -64,14 +62,14 @@ public class Main {
             }
 
             var precompiler = new Precompiler(ctx);
-            precompiler.precompile(optCfg);
+            precompiler.precompile();
 
             if (ast) {
                 System.out.println("\nPrecompiled:\n" + ctx.print(0));
             }
 
             var compiler = new Compiler(ctx);
-            compiler.compile(optCfg);
+            compiler.compile();
 
             if (ast) {
                 System.out.println("\nCompiled:");
