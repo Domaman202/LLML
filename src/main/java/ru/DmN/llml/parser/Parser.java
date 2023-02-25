@@ -181,6 +181,7 @@ public class Parser {
                             expressions.add(actions);
                             this.lexer.ptr--;
                         }
+                        tmp = 0;
                     } else tmp--;
                 }
                 // конец тела функции
