@@ -18,14 +18,14 @@ public class Main {
         var parser = ArgumentParsers.newFor("llml").build().defaultHelp(true).description("[Low Level Math Language]");
         parser.usage("llml [options] src");
         parser.addArgument("-o")
-                .nargs(1).type(String.class).metavar("<file>")
+                .nargs("?").type(String.class).metavar("<file>")
                 .help("записывает результат в <file>");
         parser.addArgument("-ast")
-                .nargs("*").type(Boolean.class)
+                .nargs("?").type(Boolean.class)
                 .help("вывод ast в консоль");
         parser.addArgument("-opt")
-                .nargs("*").type(String.class).metavar("<optimization>")
-                .help("включает оптимизацию <optimization>");
+                .nargs("?").type(Integer.class).metavar("<level>")
+                .help("выставляет уровень оптимизации в <level>");
         parser.addArgument("src")
                 .nargs(1).type(String.class)
                 .help("файл с исходным кодом");
@@ -43,7 +43,8 @@ public class Main {
             src = src.substring(1, src.length() - 1);
             boolean ast = args.get("ast") != null;
             String out = args.getString("o");
-            out = out == null ? src.substring(Math.max(-1, src.lastIndexOf('/') + 1)) + ".ll" : out.substring(1, out.length() - 1);
+            out = out == null ? src.substring(Math.max(-1, src.lastIndexOf('/') + 1)) + ".ll" : out;
+            var opt = args.getInt("opt");
 
             String code = null;
             try (var file = new FileInputStream(src)) {
@@ -76,16 +77,32 @@ public class Main {
                 System.out.println(compiler.out);
             }
 
+            if (opt != null) {
+                out = out + ".tmp";
+            }
+
             try (var stream = new FileOutputStream(out)) {
                 stream.write(compiler.out.toString().getBytes());
             } catch (IOException e) {
                 System.err.println("Произошла ошибка при записи результата!\n" + e.getMessage());
                 System.exit(1);
             }
-        } catch (InvalidTokenException exception) {
+
+            if (opt != null) {
+                exec("opt -o " + out.substring(0, out.length() - 4) + ' ' + out + " -S -O" + opt);
+                exec("rm " + out);
+            }
+        } catch (InvalidTokenException | IOException exception) {
 //            System.err.println(exception.getMessage());
             exception.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private static void exec(String cmd) throws IOException {
+        var process = Runtime.getRuntime().exec(cmd);
+        while (process.isAlive()) Thread.onSpinWait();
+        var stream = process.getErrorStream();
+        if (stream.available() > 0) throw new RuntimeException(new String(stream.readAllBytes()));
     }
 }
