@@ -1,10 +1,10 @@
 package ru.DmN.llml.parser;
 
 import org.jetbrains.annotations.NotNull;
+import ru.DmN.llml.lexer.InvalidTokenException;
 import ru.DmN.llml.lexer.Lexer;
 import ru.DmN.llml.lexer.Token;
 import ru.DmN.llml.parser.ast.*;
-import ru.DmN.llml.utils.InvalidTokenException;
 import ru.DmN.llml.utils.Type;
 
 import java.util.ArrayList;
@@ -142,7 +142,7 @@ public class Parser {
                 // аннотация
                 case ANNOTATION -> {
                     if (tmp == 0) {
-                        function.expressions.add(this.parseAnnotation(function));
+                        expressions.add(this.parseAnnotation(function));
                     }
                 }
                 // начало выражения
@@ -152,10 +152,16 @@ public class Parser {
                 }
                 // выход из функции
                 case CLOSE_CBRACKET -> {
-                    end = this.lexer.ptr - 1;
-                    this.lexer.ptr = start;
-                    expressions.add(new AstReturn(this.parseExpression(function, end, true)));
-                    this.lexer.ptr = end + 1;
+                    if (tmp == 1) {
+                        end = this.lexer.ptr - 1;
+                        this.lexer.ptr = start;
+                        expressions.add(new AstReturn(this.parseExpression(function, end, true)));
+                        this.lexer.ptr = end + 1;
+                        //
+                        start = -1;
+                        end = -1;
+                        tmp = 0;
+                    } else tmp--;
                 }
                 case OPEN_BRACKET -> tmp++;
                 // конец выражения/присваивание
@@ -182,7 +188,10 @@ public class Parser {
                             expressions.add(actions);
                             this.lexer.ptr--;
                         }
+                        //
                         tmp = 0;
+                        start = -1;
+                        end = -1;
                     } else tmp--;
                 }
                 // конец тела функции
@@ -242,6 +251,7 @@ public class Parser {
                 //
                 return new AstCall(fun, arguments);
             }
+            case "jmp" -> result = new AstJump(new AstNamedActionsReference(this.next(Token.Type.NAMING).str));
             case "if" -> {
                 var value = this.parseExpression(function, Integer.MAX_VALUE, true);
                 var a = new AstNamedActionsReference(this.next(Token.Type.NAMING).str);

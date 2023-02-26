@@ -2,8 +2,8 @@ package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.DmN.llml.utils.IAstPrintable;
-import ru.DmN.llml.utils.Utils;
+import ru.DmN.llml.parser.utils.IAstPrintable;
+import ru.DmN.llml.parser.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;

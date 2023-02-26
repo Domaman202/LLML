@@ -1,0 +1,6 @@
+{
+  "name": "float point",
+  "src": "fp",
+  "out": "fp",
+  "test": ["fp"]
+}

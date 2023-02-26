@@ -10,8 +10,18 @@ labs(i): i64 = {
     @label(b) = {[- 0 i]}
 }
 
-fabs(f): f64 = {
-    @if((>= f 0) a b)
+fabs(f): f32 = {
+    @if((>= f 0.) a b)
     @label(a) = {[f]}
-    @label(b) = {[- 0 f]}
+    @label(b) = {[- 0. f]}
+}
+
+fabsl(f): f64 = {
+    @if((>= f 0.) a b)
+    @label(a) = {[f]}
+    @label(b) = {[- 0. f]}
+}
+
+acos(x: f64): f64 = {
+    [(+ (* (- (* (* -0.69813170079 x) x) 0.87266462599) x) 1.5707963267)]
 }

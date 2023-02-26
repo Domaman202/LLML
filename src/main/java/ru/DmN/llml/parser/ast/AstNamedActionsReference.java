@@ -2,7 +2,7 @@ package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 
-import static ru.DmN.llml.utils.PrintUtils.offset;
+import static ru.DmN.llml.parser.utils.Utils.offset;
 
 /**
  * Ссылка на блок наименованых действий

@@ -2,14 +2,14 @@ package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.DmN.llml.utils.IAstPrintable;
+import ru.DmN.llml.parser.utils.IAstPrintable;
+import ru.DmN.llml.parser.utils.Utils;
 import ru.DmN.llml.utils.Type;
-import ru.DmN.llml.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.DmN.llml.utils.PrintUtils.offset;
+import static ru.DmN.llml.parser.utils.Utils.offset;
 
 /**
  * Функция

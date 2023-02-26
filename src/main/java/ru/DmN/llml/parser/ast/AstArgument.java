@@ -3,7 +3,7 @@ package ru.DmN.llml.parser.ast;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static ru.DmN.llml.utils.PrintUtils.offset;
+import static ru.DmN.llml.parser.utils.Utils.offset;
 
 /**
  * Аргумент

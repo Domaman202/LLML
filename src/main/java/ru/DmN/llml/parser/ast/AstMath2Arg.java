@@ -1,11 +1,14 @@
 package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
+import ru.DmN.llml.parser.utils.CalculationOptions;
 import ru.DmN.llml.utils.Type;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
-import static ru.DmN.llml.utils.PrintUtils.offset;
+import static ru.DmN.llml.parser.utils.Utils.offset;
+import static ru.DmN.llml.precompiler.Precompiler.grmt;
 
 public class AstMath2Arg extends AstExpression {
     /**
@@ -40,6 +43,39 @@ public class AstMath2Arg extends AstExpression {
     @Override
     public String print(int offset) {
         return offset(offset(offset).append("[Math [").append(this.operation).append("][").append(this.rettype.name).append("]\n").append(this.a.print(offset + 1)).append('\n').append(this.b.print(offset + 1)).append('\n'), offset).append(']').toString();
+    }
+
+    @Override
+    public void iterate(@NotNull Consumer<AstExpression> consumer, @NotNull AstExpression parent) {
+        super.iterate(consumer, parent);
+        this.a.iterate(consumer, this);
+        this.b.iterate(consumer, this);
+    }
+
+    @Override
+    public boolean calcType(AstContext context, AstFunction function, CalculationOptions options) {
+        var ta = this.a.getType(context, function);
+        var tb = this.b.getType(context, function);
+        var tr = this.parent.getType(context, function);
+        if (options.tamtc) {
+            var i = 0;
+            if (ta != Type.UNKNOWN)
+                i++;
+            if (tb != Type.UNKNOWN)
+                i++;
+            if (tr != Type.UNKNOWN)
+                i++;
+            if (i <= 1) {
+                return false;
+            }
+        }
+        this.rettype = grmt(tr, grmt(ta, tb));
+        return this.rettype != Type.UNKNOWN;
+    }
+
+    @Override
+    public @NotNull Type getType(AstContext context, AstFunction function) {
+        return this.rettype;
     }
 
     public enum Operation {

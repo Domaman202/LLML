@@ -1,10 +1,12 @@
 package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
+import ru.DmN.llml.utils.Type;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import static ru.DmN.llml.utils.PrintUtils.offset;
+import static ru.DmN.llml.parser.utils.Utils.offset;
 
 /**
  * Вызов функции
@@ -34,5 +36,21 @@ public class AstCall extends AstExpression {
         for (var argument : this.arguments)
             out.append('\n').append(argument.print(offset + 1));
         return offset(out.append('\n'), offset).append(']').toString();
+    }
+
+    @Override
+    public void iterate(@NotNull Consumer<AstExpression> consumer, @NotNull AstExpression parent) {
+        super.iterate(consumer, parent);
+        this.arguments.forEach(it -> it.iterate(consumer, this));
+    }
+
+    @Override
+    public @NotNull Type getType(AstContext context, AstFunction function) {
+        return this.function.ret;
+    }
+
+    @Override
+    public boolean needTypeCalc(AstContext context, AstFunction function) {
+        return false;
     }
 }

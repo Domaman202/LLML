@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.DmN.llml.utils.Type;
 
-import static ru.DmN.llml.utils.PrintUtils.offset;
+import static ru.DmN.llml.parser.utils.Utils.offset;
 
 /**
  * Переменная
@@ -51,5 +51,15 @@ public class AstVariable extends AstAbstractVariable {
     @Override
     public String print(int offset) {
         return offset(offset).append("[").append(this.global ? "Global " : "").append("Variable [").append(this.name).append(']').toString();
+    }
+
+    @Override
+    public @NotNull Type getType(AstContext context, AstFunction function) {
+        return this.type;
+    }
+
+    @Override
+    public boolean needTypeCalc(AstContext context, AstFunction function) {
+        return false;
     }
 }

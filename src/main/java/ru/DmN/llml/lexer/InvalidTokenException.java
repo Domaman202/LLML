@@ -1,6 +1,4 @@
-package ru.DmN.llml.utils;
-
-import ru.DmN.llml.lexer.Token;
+package ru.DmN.llml.lexer;
 
 public class InvalidTokenException extends RuntimeException {
     protected InvalidTokenException(String msg) {

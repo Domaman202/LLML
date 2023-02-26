@@ -1,7 +1,5 @@
 package ru.DmN.llml.lexer;
 
-import ru.DmN.llml.utils.InvalidTokenException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -201,7 +199,7 @@ public class Lexer {
             while (true) {
                 var c = str.charAt(0);
                 switch (c) {
-                    case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+                    case '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
                         num.append(c);
                         delete(1);
                     }

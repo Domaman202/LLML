@@ -1,11 +1,13 @@
 package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
+import ru.DmN.llml.parser.utils.CalculationOptions;
 import ru.DmN.llml.utils.Type;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
-import static ru.DmN.llml.utils.PrintUtils.offset;
+import static ru.DmN.llml.parser.utils.Utils.offset;
 
 public class AstMath1Arg extends AstExpression {
     /**
@@ -33,7 +35,24 @@ public class AstMath1Arg extends AstExpression {
 
     @Override
     public String print(int offset) {
-        return offset(offset(offset).append("[Math [").append(this.operation).append("][").append(this.rettype.name).append("]\n").append(this.a.print(offset + 1)).append('\n').append('\n'), offset).append(']').toString();
+        return offset(offset(offset).append("[Math [").append(this.operation).append("][").append(this.rettype.name).append("]\n").append(this.a.print(offset + 1)).append('\n'), offset).append(']').toString();
+    }
+
+    @Override
+    public void iterate(@NotNull Consumer<AstExpression> consumer, @NotNull AstExpression parent) {
+        super.iterate(consumer, parent);
+        this.a.iterate(consumer, this);
+    }
+
+    @Override
+    public boolean calcType(AstContext context, AstFunction function, CalculationOptions options) {
+        this.rettype = this.operation.logicOutput ? Type.I1 : this.a.getType(context, function);
+        return this.rettype != Type.UNKNOWN;
+    }
+
+    @Override
+    public @NotNull Type getType(AstContext context, AstFunction function) {
+        return this.rettype;
     }
 
     public enum Operation {

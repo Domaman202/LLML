@@ -5,7 +5,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import ru.DmN.llml.compiler.Compiler;
 import ru.DmN.llml.lexer.Lexer;
-import ru.DmN.llml.utils.InvalidTokenException;
+import ru.DmN.llml.lexer.InvalidTokenException;
 import ru.DmN.llml.parser.Parser;
 import ru.DmN.llml.precompiler.Precompiler;
 
@@ -24,7 +24,7 @@ public class Main {
                 .nargs("*").type(Boolean.class)
                 .help("вывод ast в консоль");
         parser.addArgument("-opt")
-                .nargs(1).type(Integer.class).metavar("<level>")
+                .nargs("?").type(Integer.class).metavar("<level>")
                 .help("выставляет уровень оптимизации в <level>");
         parser.addArgument("src")
                 .nargs(1).type(String.class)
@@ -33,6 +33,10 @@ public class Main {
             compile(parser.parseArgs(args));
         } catch (ArgumentParserException e) {
             parser.handleError(e);
+            System.exit(1);
+        } catch (RuntimeException exception) {
+            exception.printStackTrace();
+//            System.err.println(exception.getMessage());
             System.exit(1);
         }
     }
@@ -95,8 +99,8 @@ public class Main {
                 exec("rm " + out);
             }
         } catch (InvalidTokenException | IOException exception) {
-//            System.err.println(exception.getMessage());
-            exception.printStackTrace();
+//            exception.printStackTrace();
+            System.err.println(exception.getMessage());
             System.exit(1);
         }
     }

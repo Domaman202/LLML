@@ -29,7 +29,7 @@ public class Compiler {
     public String compile() {
         out.append("target triple = \"x86_64-pc-linux-gnu\"\n");
 
-        for (var variable : this.context.variables) {
+        for (var variable : context.variables) {
             out.append('\n').append('@').append(variable.name).append(" = ");
             if (variable.external)
                 out.append("external ");
@@ -40,7 +40,7 @@ public class Compiler {
             out.append('\n');
         }
 
-        for (var function : this.context.functions) {
+        for (var function : context.functions) {
             out.append(function.expressions == null ? "\ndeclare " : "\ndefine ");
             if (function.ret != Type.VOID)
                 out.append("noundef ");
@@ -87,7 +87,7 @@ public class Compiler {
             this.write(tmp).append(" = tail call noundef ").append(tmp.type).append(" @").append(call.function.name).append('(');
             for (int i = 0; i < arguments.size();) {
                 var argument = arguments.get(i);
-                out.append(argument.type()).append(" noundef ");
+                out.append(argument.getType(context, function)).append(" noundef ");
                 this.write(argument);
                 if (++i < arguments.size())
                     out.append(", ");
@@ -97,44 +97,61 @@ public class Compiler {
         } else if (expression instanceof AstCast cast) {
             var val = this.write(function, cast.value);
             //
-            var of = val.type();
+            var of = val.getType(context, function);
             var of$int = of.fieldName().startsWith("I");
             var to = cast.type;
             var to$int = of.fieldName().startsWith("I");
             //
             var tmp = function.createTmpVariable(to);
             out.append("\n\t");
-            this.write(tmp).append(" = ").append(of$int ? (to$int ? (of.bits > to.bits ? "trunc" : "sext") : "sitofp") : (to$int ? "fptosi" : (of.bits > to.bits ? "fptrunc" : "fpext"))).append(' ').append(val.type().name).append(' ');
+            this.write(tmp).append(" = ").append(of$int ? (to$int ? (of.bits > to.bits ? "trunc" : "sext") : "sitofp") : (to$int ? "fptosi" : (of.bits > to.bits ? "fptrunc" : "fpext"))).append(' ').append(val.getType(this.context, function).name).append(' ');
             this.write(val).append(" to ").append(to);
             return new AstValue(tmp);
-        } else if (expression instanceof AstConstant constant) {
-            return new AstValue(constant);
+        } else if (expression instanceof AstConstant constant) { // todo:
+            var type = constant.getType(context, function);
+            if (type.fieldName().startsWith("I")) {
+                return new AstValue(constant);
+            } else {
+                assert constant.value != null;
+                var value = String.valueOf(constant.value).split("\\.");
+                if (value.length == 1) {
+                    constant.value = (double) (int) constant.value;
+                    return new AstValue(constant);
+                } else {
+                    var tmp$a = function.createTmpVariable(type);
+                    out.append("\n\t%").append(tmp$a.i).append(" = fdiv ").append(type.name).append(' ').append(value[1]).append(".0, ").append(Math.pow(10, value[1].length()));
+                    var tmp$b = function.createTmpVariable(type);
+                    out.append("\n\t%").append(tmp$b.i).append(" = fadd ").append(type.name).append(' ').append(value[0]).append(".0, %").append(tmp$a.i);
+                    return new AstValue(tmp$b);
+                }
+            }
         } else if (expression instanceof AstIf if_) {
             var var$a = this.write(function, if_.value);
             out.append("\n\tbr i1 ");
-            this.write(var$a).append(", label %").append(if_.a.name).append(", label %").append(if_.b.name);
-
+            this.write(var$a).append(", label %").append(if_.a.name);
+            if (if_.b != null) {
+                out.append(", label %").append(if_.b.name);
+            }
+        } else if (expression instanceof AstJump jump) {
+            out.append("\n\tbr label %").append(jump.block.name);
         } else if (expression instanceof AstMath1Arg math) {
             out.append("\n\t");
             var val$a = this.write(function, math.a);
             switch (math.operation) {
                 case NOT -> {
                     var tmp$0 = function.createTmpVariable();
-                    write(tmp$0).append(" = icmp eq ").append(val$a.type().name).append(' ');
-                    write(val$a);
-                    var tmp$1 = function.createTmpVariable();
-                    write(tmp$1).append(" = zext i1 ");
-                    write(tmp$0).append(" to ").append(math.rettype.name);
+                    this.write(tmp$0).append(" = xor ").append(val$a.getType(context, function).name).append(' ');
+                    this.write(val$a).append(", true");
+                    return new AstValue(tmp$0);
                 }
             }
         } else if (expression instanceof AstMath2Arg math) {
-            out.append("\n\t");
-            //
             var var$a = this.write(function, math.a);
             var var$b = this.write(function, math.b);
             var tmp = function.createTmpVariable(math.operation.logicOutput ? Type.I1 : math.rettype);
             var result$int = math.rettype.fieldName().startsWith("I");
             //
+            this.out.append("\n\t");
             this.write(tmp).append(" = ");
             switch (math.operation) {
                 case EQ, NOT_EQ, GREAT, GREAT_EQ, LESS, LESS_EQ  -> out.append(result$int ? 'i' : 'f').append("cmp ");
@@ -209,7 +226,7 @@ public class Compiler {
      * @return out
      */
     protected StringBuilder write(AstValue value) {
-        return value.isConst() ? out.append(value.constant) : this.write(value.variable);
+        return value.isConst() ? out.append(value.constant.value) : this.write(value.variable);
     }
 
     /**

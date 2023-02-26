@@ -2,6 +2,6 @@ add(a, b): i32 = {
     [+ a b]
 }
 
-f(a: i32, b: i32): i32 = {
+f(a, b): i32 = {
     [@call(add a b)]
 }

@@ -1,8 +1,13 @@
 package ru.DmN.llml.parser.ast;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.DmN.llml.parser.utils.CalculationOptions;
+import ru.DmN.llml.utils.Type;
 
-import static ru.DmN.llml.utils.PrintUtils.offset;
+import java.util.function.Consumer;
+
+import static ru.DmN.llml.parser.utils.Utils.offset;
 
 /**
  * Возврат из функции
@@ -27,5 +32,25 @@ public class AstReturn extends AstExpression {
         if (this.value != null)
             offset(out.append('\n').append(this.value.print(offset + 1)).append('\n'), offset);
         return out.append(']').toString();
+    }
+
+    @Override
+    public void iterate(@NotNull Consumer<AstExpression> consumer, @NotNull AstExpression parent) {
+        super.iterate(consumer, parent);
+        if (this.value != null) {
+            this.value.iterate(consumer, this);
+        }
+    }
+
+    @Override
+    public boolean calcType(AstContext context, AstFunction function, CalculationOptions options) {
+        assert this.value != null;
+        function.ret = this.value.getType(context, function);
+        return function.ret != Type.UNKNOWN;
+    }
+
+    @Override
+    public @NotNull Type getType(AstContext context, AstFunction function) {
+        return function.ret;
     }
 }
