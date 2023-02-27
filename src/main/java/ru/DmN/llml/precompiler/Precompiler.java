@@ -56,9 +56,12 @@ public class Precompiler {
         //
         for (int i = 0; i < function.arguments.size(); i++) {
             var argument = function.arguments.get(i);
-            if (function.variableSetMap.getOrDefault(argument.name, 0) > 0) {
-                function.variables.add(new AstVariable(argument.name, argument.type, false, false, null));
-                function.expressions.add(new AstVariableSet(argument.name, new AstVariableGet(String.valueOf(i))));
+            var name = argument.name;
+            var sc = function.variableSetMap.getOrDefault(name, 0);
+            if (sc > 0) {
+                function.variables.add(new AstVariable(name, argument.type, false, false, null));
+                function.expressions.add(new AstVariableSet(name, new AstVariableGet(String.valueOf(i))));
+                function.variableSetMap.put(name, sc + 1);
                 //
                 argument.i = i;
                 argument.name = null;

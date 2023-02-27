@@ -135,6 +135,11 @@ public class Compiler {
             }
         } else if (expression instanceof AstJump jump) {
             out.append("\n\tbr label %").append(jump.block.name);
+        } else if (expression instanceof AstLabel label) {
+            out.append("\n\tbr label %").append(label.name).append('\n').append(label.name).append(':');
+            if (label.itc) {
+                function.tmpVarCount++;
+            }
         } else if (expression instanceof AstMath1Arg math) {
             out.append("\n\t");
             var val$a = this.write(function, math.a);
@@ -183,6 +188,17 @@ public class Compiler {
             }
             this.set(function, this.write(function, set.value), var);
             return new AstValue(var);
+        } else if (expression instanceof AstWhile while_) {
+            var i = while_.id;
+            var name$check = ".w" + i + ".c";
+            var name$loop = ".w" + i + ".l";
+            var name$exit = ".w" + i + ".e";
+            this.write(function, new AstLabel(name$check, false));
+            this.write(function, new AstIf(while_.value, new AstNamedActionsReference(name$loop), new AstNamedActionsReference(name$exit)));
+            this.write(function, new AstLabel(name$loop, true));
+            this.write(function, while_.actions);
+            this.write(function, new AstJump(new AstNamedActionsReference(name$check)));
+            this.write(function, new AstLabel(name$exit, true));
         }
 
         return null;

@@ -1,0 +1,6 @@
+{
+  "name": "Cycle #1",
+  "src": "cycle1",
+  "out": "cycle1",
+  "test": ["cycle1"]
+}

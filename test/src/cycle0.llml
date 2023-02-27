@@ -1,0 +1,14 @@
+f(i: i32): i32 = {
+    [0) -> (sum]
+
+    @jmp(check)
+    @label(check) = {@if((> i 0) loop exit)}
+    @label(loop) = {
+        [+ sum i) -> (sum]
+        [- i 1) -> (i]
+        @jmp(check)
+    }
+    @label(exit)
+
+    [sum]
+}

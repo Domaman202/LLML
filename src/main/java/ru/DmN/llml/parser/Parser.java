@@ -255,7 +255,7 @@ public class Parser {
             }
             case "jmp" -> result = new AstJump(new AstNamedActionsReference(this.next(Token.Type.NAMING).str));
             case "if" -> {
-                var value = this.parseExpression(function, Integer.MAX_VALUE, true);
+                var value = this.parseExpression(function, Integer.MAX_VALUE, true); // todo: end of expression
                 var a = new AstNamedActionsReference(this.next(Token.Type.NAMING).str);
                 var b = new AstNamedActionsReference(this.next(Token.Type.NAMING).str);
                 result = new AstIf(value, a, b);
@@ -263,8 +263,20 @@ public class Parser {
             case "label" -> {
                 var name = this.next(Token.Type.NAMING).str;
                 this.next(Token.Type.CLOSE_BRACKET);
+                token = this.next();
+                if (token.type == Token.Type.ASSIGN) {
+                    return new AstNamedActions(name, this.parseBody(function));
+                } else {
+                    this.lexer.ptr--;
+                    return new AstLabel(name, true);
+                }
+            }
+            case "while" -> {
+                var value = this.parseExpression(function, Integer.MAX_VALUE, true); // todo: end of expression
+                this.next(Token.Type.CLOSE_BRACKET);
                 this.next(Token.Type.ASSIGN);
-                return new AstNamedActions(name, this.parseBody(function));
+                var actions = this.parseBody(function);
+                return new AstWhile(value, actions, function.whilesCount++);
             }
             default -> throw InvalidTokenException.create(lexer.src, token);
         }

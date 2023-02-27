@@ -39,6 +39,7 @@ public class AstFunction implements IAstPrintable {
     public final @NotNull List<AstAbstractVariable> variables;
     public final Map<String, Integer> variableSetMap = new HashMap<>();
     public int tmpVarCount = 0;
+    public int whilesCount = 0;
 
     public AstFunction(@NotNull String name, @NotNull List<AstArgument> arguments, @NotNull Type ret) {
         this.name = name;
