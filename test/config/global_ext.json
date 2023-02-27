@@ -1,5 +1,5 @@
 {
-  "name": "global external",
+  "name": "Global-External",
   "src": "global_ext",
   "out": "global_ext",
   "test": ["global_ext"]

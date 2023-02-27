@@ -1,5 +1,6 @@
 package ru.DmN.llml.compiler;
 
+import org.jetbrains.annotations.NotNull;
 import ru.DmN.llml.parser.ast.*;
 import ru.DmN.llml.utils.Type;
 
@@ -176,6 +177,10 @@ public class Compiler {
             return this.get(function, new AstValue(get.variable));
         } else if (expression instanceof AstVariableSet set) {
             var var = set.variable;
+            if (var instanceof AstVariable v && !v.allocated && function.variableSetMap.getOrDefault(var.getName(), 0) > 1) {
+                out.append("\n\t%").append(v.getName()).append(" = alloca ").append(var.type.name); // todo: align
+                v.allocated = true;
+            }
             this.set(function, this.write(function, set.value), var);
             return new AstValue(var);
         }
@@ -190,13 +195,13 @@ public class Compiler {
      * @param value "Значение"
      * @return Значение
      */
-    protected AstValue get(AstFunction function, AstValue value) {
+    protected AstValue get(@NotNull AstFunction function, @NotNull AstValue value) {
         if (value.isConst())
             return value;
-        if (value.variable instanceof AstVariable var && var.global) {
+        if (value.variable instanceof AstVariable var && var.allocated) {
             var tmp = function.createTmpVariable(var.type);
             out.append("\n\t");
-            this.write(tmp).append(" = load ").append(var.type.name).append(", ptr @").append(var.name);
+            this.write(tmp).append(" = load ").append(var.type.name).append(", ptr ").append(var.global ? '@' : '%').append(var.name);
             return new AstValue(tmp);
         } else return value;
     }
@@ -207,13 +212,13 @@ public class Compiler {
      * @param of Значение
      * @param to Переменная
      */
-    protected void set(AstFunction function, AstValue of, AstAbstractVariable to) {
+    protected void set(@NotNull AstFunction function, @NotNull AstValue of, @NotNull AstAbstractVariable to) {
         var tname = to.type.name;
         out.append("\n\t");
         of = this.get(function, of);
-        if (to instanceof AstVariable var && var.global) {
+        if (to instanceof AstVariable var && var.allocated) {
             out.append("store ").append(tname).append(' ');
-            this.write(of).append(", ptr @").append(var.name);
+            this.write(of).append(", ptr ").append(var.global ? '@' : '%').append(var.name);
         } else {
             this.write(to).append(" = bitcast ").append(tname).append(' ');
             this.write(of).append(" to ").append(tname);
@@ -225,7 +230,7 @@ public class Compiler {
      * @param value Значение
      * @return out
      */
-    protected StringBuilder write(AstValue value) {
+    protected StringBuilder write(@NotNull AstValue value) {
         return value.isConst() ? out.append(value.constant.value) : this.write(value.variable);
     }
 
@@ -234,7 +239,7 @@ public class Compiler {
      * @param avar Переменная
      * @return out
      */
-    protected StringBuilder write(AstAbstractVariable avar) {
-        return out.append(avar instanceof AstVariable var ? var.global ? '@' : '%' : '%').append(avar.getName());
+    protected StringBuilder write(@NotNull AstAbstractVariable avar) {
+        return out.append(avar instanceof AstVariable var && var.global ? '@' : '%').append(avar.getName());
     }
 }

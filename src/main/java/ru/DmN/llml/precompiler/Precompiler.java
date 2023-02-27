@@ -32,12 +32,13 @@ public class Precompiler {
     public @NotNull AstContext precompile() {
         for (var function : context.functions) {
             if (function.expressions != null && !function.expressions.isEmpty()) {
+                this.buildArguments(function);
+                //
                 var expressions = getAllExpressions(function);
-
                 this.calc(function, expressions);
                 this.calcType(function, expressions, new CalculationOptions(true));
                 this.calcType(function, expressions, new CalculationOptions(false));
-
+                //
                 if (function.ret == Type.UNKNOWN) {
                     function.ret = Type.VOID;
                     function.expressions.add(new AstReturn(null));
@@ -47,13 +48,29 @@ public class Precompiler {
         return this.context;
     }
 
-//    protected void calcDoubleConstants(AstFunction function, List<AstExpression> expressions) { // todo:
-//        for (var constant : expressions.stream().filter(it -> it instanceof AstConstant).map(it -> (AstConstant) it).toList()) {
-//            var type = constant.getType(context, function);
-//            if (type.fieldName().startsWith("I")) {
-//            }
-//        }
-//    }
+    protected void buildArguments(AstFunction function) {
+        var j = 0;
+        //
+        var body = function.expressions;
+        function.expressions = new ArrayList<>();
+        //
+        for (int i = 0; i < function.arguments.size(); i++) {
+            var argument = function.arguments.get(i);
+            if (function.variableSetMap.getOrDefault(argument.name, 0) > 0) {
+                function.variables.add(new AstVariable(argument.name, argument.type, false, false, null));
+                function.expressions.add(new AstVariableSet(argument.name, new AstVariableGet(String.valueOf(i))));
+                //
+                argument.i = i;
+                argument.name = null;
+                //
+                j++;
+            }
+        }
+        //
+        function.expressions.addAll(body);
+        //
+        function.tmpVarCount = j;
+    }
 
     protected void calc(AstFunction function, List<AstExpression> expressions) {
         expressions.forEach(it -> it.calc(context, function));
@@ -66,7 +83,6 @@ public class Precompiler {
             expressions = expressions.stream().filter(it -> it.needTypeCalc(context, function)).toList();
             for (AstExpression it : expressions) {
                 if (it.calcType(context, function, options)) {
-                    System.out.println("Step:" + context.print(0) + "\n\n");
                     cycle = true;
                     break;
                 }

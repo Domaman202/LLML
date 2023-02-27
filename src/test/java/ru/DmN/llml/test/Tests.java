@@ -36,8 +36,8 @@ public class Tests {
                     new RuntimeException("Ошибка при выполнении теста \"" + config.name + "\":\n" + e.getMessage()).printStackTrace();
 //                e.printStackTrace();
                 } catch (TestException|RuntimeException e) {
-//                    System.err.println(e.getMessage());
-                e.printStackTrace();
+                    System.err.println(e.getMessage());
+//                e.printStackTrace();
                 }
             }
         });

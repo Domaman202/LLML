@@ -64,11 +64,11 @@ public class Lexer {
         /**
          * Текущая линия
          */
-        public int line;
+        public int line = 1;
         /**
          * Текущий символ
          */
-        public int symbol;
+        public int symbol = 0;
 
         /**
          *
@@ -209,20 +209,6 @@ public class Lexer {
                 }
             }
             return new Token(num.toString(), Token.Type.NUMBER, line, symbol);
-        }
-
-        /**
-         * Пропуск пробелов и переносов строки
-         */
-        public void skipNLSpaces() {
-            while (true) {
-                skipSpaces();
-                if (!str.isEmpty() && str.charAt(0) == '\n') {
-                    delete(1);
-                    line++;
-                    symbol = 0;
-                } else break;
-            }
         }
 
         /**

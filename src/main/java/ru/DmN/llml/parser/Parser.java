@@ -183,6 +183,8 @@ public class Parser {
                                 if (context.variable(function, vname) == null)
                                     function.variables.add(new AstVariable(vname));
                                 expressions.add(new AstVariableSet(vname, actions.actions.get(i++)));
+                                var uc = function.variableSetMap.get(vname);
+                                function.variableSetMap.put(vname, uc == null ? 1 : uc + 1);
                             } while (true);
                         } else {
                             expressions.add(actions);

@@ -1,5 +1,5 @@
 {
-  "name": "float point",
+  "name": "Float-Point",
   "src": "fp",
   "out": "fp",
   "test": ["fp"]

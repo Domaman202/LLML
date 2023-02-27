@@ -1,0 +1,6 @@
+{
+  "name": "Assign",
+  "src": "assign",
+  "out": "assign",
+  "test": ["assign"]
+}

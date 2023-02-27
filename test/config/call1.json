@@ -1,5 +1,5 @@
 {
-  "name": "call #1",
+  "name": "Call #1",
   "src": "call1",
   "out": "call1",
   "test": ["call1"]

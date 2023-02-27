@@ -1,5 +1,5 @@
 {
-  "name": "global #1",
+  "name": "Global #1",
   "src": "global1",
   "out": "global1",
   "test": ["global1"]

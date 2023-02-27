@@ -29,6 +29,6 @@ public class AstArgument extends AstAbstractVariable {
 
     @Override
     public String print(int offset) {
-        return offset(offset).append("[Argument ([").append(this.name).append("][").append(this.type.name).append("])").toString();
+        return offset(offset).append("[Argument ([").append(this.getName()).append("][").append(this.type.name).append("])").toString();
     }
 }

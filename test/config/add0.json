@@ -1,5 +1,5 @@
 {
-  "name": "add #0",
+  "name": "Add #0",
   "src": "add0",
   "out": "add0",
   "test": ["add0"]

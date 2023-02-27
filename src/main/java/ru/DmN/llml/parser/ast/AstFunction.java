@@ -7,7 +7,9 @@ import ru.DmN.llml.parser.utils.Utils;
 import ru.DmN.llml.utils.Type;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ru.DmN.llml.parser.utils.Utils.offset;
 
@@ -35,6 +37,7 @@ public class AstFunction implements IAstPrintable {
      * Локальные переменные
      */
     public final @NotNull List<AstAbstractVariable> variables;
+    public final Map<String, Integer> variableSetMap = new HashMap<>();
     public int tmpVarCount = 0;
 
     public AstFunction(@NotNull String name, @NotNull List<AstArgument> arguments, @NotNull Type ret) {
@@ -71,25 +74,25 @@ public class AstFunction implements IAstPrintable {
      * @return Переменная
      */
     public @NotNull AstTmpVariable createTmpVariable(Type type) {
-        var var = new AstTmpVariable(++this.tmpVarCount);
+        var var = new AstTmpVariable(++tmpVarCount);
         var.type = type;
-        this.variables.add(var);
+        variables.add(var);
         return var;
     }
 
     @Override
     public String print(int offset) {
-        var out = offset(offset).append('[').append(this.expressions == null ? "External " : "").append("Function (");
-        for (int i = 0; i < this.arguments.size(); i++) {
-            var argument = this.arguments.get(i);
-            out.append('[').append(argument.name).append("][").append(argument.type).append(']');
-            if (i + 1 < this.arguments.size()) {
+        var out = offset(offset).append('[').append(expressions == null ? "External " : "").append("Function (");
+        for (int i = 0; i < arguments.size(); i++) {
+            var argument = arguments.get(i);
+            out.append('[').append(argument.getName()).append("][").append(argument.type).append(']');
+            if (i + 1 < arguments.size()) {
                 out.append(", ");
             }
         }
         out.append(") [").append(this.ret).append(']');
-        if (this.expressions != null)
-            for (var expression : this.expressions)
+        if (expressions != null)
+            for (var expression : expressions)
                 out.append('\n').append(expression.print(offset + 1));
         return offset(out.append('\n'), offset).append(']').toString();
     }

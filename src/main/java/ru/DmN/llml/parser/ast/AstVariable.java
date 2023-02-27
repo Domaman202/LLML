@@ -26,6 +26,7 @@ public class AstVariable extends AstAbstractVariable {
      * Значение инициализации
      */
     public final @Nullable AstConstant value;
+    public boolean allocated;
 
     public AstVariable(@NotNull String name, Type type, boolean global, boolean external, @Nullable AstConstant value) {
         super(type);
@@ -33,9 +34,10 @@ public class AstVariable extends AstAbstractVariable {
         this.global = global;
         this.external = external;
         this.value = value;
+        this.allocated = global;
     }
 
-    public AstVariable(@NotNull String name, Type type, boolean external, @NotNull AstConstant value) {
+    public AstVariable(@NotNull String name, Type type, boolean external, @Nullable AstConstant value) {
         this(name, type, true, external, value);
     }
 
