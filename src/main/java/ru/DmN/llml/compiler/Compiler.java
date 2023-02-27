@@ -128,15 +128,16 @@ public class Compiler {
             }
         } else if (expression instanceof AstIf if_) {
             var var$a = this.write(function, if_.value);
-            out.append("\n\tbr i1 ");
+            out$nl("br i1 ");
             this.write(var$a).append(", label %").append(if_.a.name);
             if (if_.b != null) {
                 out.append(", label %").append(if_.b.name);
             }
         } else if (expression instanceof AstJump jump) {
-            out.append("\n\tbr label %").append(jump.block.name);
+            out$nl("br label %").append(jump.block.name);
         } else if (expression instanceof AstLabel label) {
-            out.append("\n\tbr label %").append(label.name).append('\n').append(label.name).append(':');
+            this.write(function, new AstJump(new AstNamedActionsReference(label.name)));
+            out.append('\n').append(label.name).append(':');
             if (label.itc) {
                 function.tmpVarCount++;
             }
@@ -173,17 +174,17 @@ public class Compiler {
         } else if (expression instanceof AstReturn ret) {
             if (function.ret != Type.VOID) {
                 var val = this.write(function, ret.value);
-                out.append("\n\t").append("ret ").append(function.ret.name).append(' ');
+                out$nl("ret ").append(function.ret.name).append(' ');
                 this.write(val);
             } else {
-                out.append("\n\t").append("ret void");
+                out$nl("ret void");
             }
         } else if (expression instanceof AstVariableGet get) {
             return this.get(function, new AstValue(get.variable));
         } else if (expression instanceof AstVariableSet set) {
             var var = set.variable;
             if (var instanceof AstVariable v && !v.allocated && function.variableSetMap.getOrDefault(var.getName(), 0) > 1) {
-                out.append("\n\t%").append(v.getName()).append(" = alloca ").append(var.type.name); // todo: align
+                out$nl("%").append(v.getName()).append(" = alloca ").append(var.type.name); // todo: align
                 v.allocated = true;
             }
             this.set(function, this.write(function, set.value), var);
@@ -239,6 +240,10 @@ public class Compiler {
             this.write(to).append(" = bitcast ").append(tname).append(' ');
             this.write(of).append(" to ").append(tname);
         }
+    }
+
+    protected StringBuilder out$nl(String str) {
+        return out.append("\n\t").append(str);
     }
 
     /**
