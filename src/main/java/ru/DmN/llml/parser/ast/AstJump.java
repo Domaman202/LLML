@@ -22,6 +22,6 @@ public class AstJump extends AstExpression {
 
     @Override
     public String print(int offset) {
-        return offset(offset(offset(offset(offset).append("[Jmp").append('\n').append(this.block.print(offset + 1)).append('\n'), offset + 1).append("\n"), offset + 1).append('\n'), offset).append(']').toString();
+        return offset(offset(offset(offset(offset).append("[Jmp").append('\n').append(this.label.print(offset + 1)).append('\n'), offset + 1).append("\n"), offset + 1).append('\n'), offset).append(']').toString();
     }
 }
