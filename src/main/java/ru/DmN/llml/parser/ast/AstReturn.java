@@ -2,12 +2,13 @@ package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.DmN.llml.parser.utils.CalculationOptions;
+import ru.DmN.llml.precompiler.CalculationOptions;
 import ru.DmN.llml.utils.Type;
 
 import java.util.function.Consumer;
 
 import static ru.DmN.llml.parser.utils.Utils.offset;
+import static ru.DmN.llml.precompiler.Precompiler.cast;
 
 /**
  * Возврат из функции
@@ -39,6 +40,13 @@ public class AstReturn extends AstExpression {
         super.iterate(consumer, parent);
         if (this.value != null) {
             this.value.iterate(consumer, this);
+        }
+    }
+
+    @Override
+    public void calc(AstContext context, AstFunction function, CalculationOptions options) {
+        if (options.tc && this.value != null) {
+            this.value = cast(context, function, this, this.value, function.ret);
         }
     }
 

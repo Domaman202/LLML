@@ -2,7 +2,7 @@ package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.DmN.llml.parser.utils.CalculationOptions;
+import ru.DmN.llml.precompiler.CalculationOptions;
 import ru.DmN.llml.utils.Type;
 
 import java.util.Objects;

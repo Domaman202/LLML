@@ -34,10 +34,10 @@ public class Tests {
                     test(config);
                 } catch (IOException e) {
                     new RuntimeException("Ошибка при выполнении теста \"" + config.name + "\":\n" + e.getMessage()).printStackTrace();
-//                e.printStackTrace();
+                e.printStackTrace();
                 } catch (TestException|RuntimeException e) {
                     System.err.println(e.getMessage());
-//                e.printStackTrace();
+                e.printStackTrace();
                 }
             }
         });

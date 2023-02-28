@@ -1,7 +1,7 @@
 package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
-import ru.DmN.llml.parser.utils.CalculationOptions;
+import ru.DmN.llml.precompiler.CalculationOptions;
 import ru.DmN.llml.parser.utils.IAstPrintable;
 import ru.DmN.llml.utils.Type;
 
@@ -30,7 +30,7 @@ public abstract class AstExpression implements IAstPrintable {
      * @param context  Контекст
      * @param function Функция
      */
-    public void calc(AstContext context, AstFunction function) {
+    public void calc(AstContext context, AstFunction function, CalculationOptions options) {
     }
 
     /**

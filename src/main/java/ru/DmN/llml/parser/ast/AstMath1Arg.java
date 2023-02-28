@@ -1,13 +1,14 @@
 package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
-import ru.DmN.llml.parser.utils.CalculationOptions;
+import ru.DmN.llml.precompiler.CalculationOptions;
 import ru.DmN.llml.utils.Type;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
 
 import static ru.DmN.llml.parser.utils.Utils.offset;
+import static ru.DmN.llml.precompiler.Precompiler.cast;
 
 public class AstMath1Arg extends AstExpression {
     /**
@@ -42,6 +43,13 @@ public class AstMath1Arg extends AstExpression {
     public void iterate(@NotNull Consumer<AstExpression> consumer, @NotNull AstExpression parent) {
         super.iterate(consumer, parent);
         this.a.iterate(consumer, this);
+    }
+
+    @Override
+    public void calc(AstContext context, AstFunction function, CalculationOptions options) {
+        if (options.tc) {
+            this.a = cast(context, function, this, this.a, this.rettype);
+        }
     }
 
     @Override

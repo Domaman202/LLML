@@ -2,7 +2,6 @@ package ru.DmN.llml.precompiler;
 
 import org.jetbrains.annotations.NotNull;
 import ru.DmN.llml.parser.ast.*;
-import ru.DmN.llml.parser.utils.CalculationOptions;
 import ru.DmN.llml.utils.Type;
 
 import java.util.ArrayList;
@@ -35,9 +34,10 @@ public class Precompiler {
                 this.buildArguments(function);
                 //
                 var expressions = getAllExpressions(function);
-                this.calc(function, expressions);
-                this.calcType(function, expressions, new CalculationOptions(true));
-                this.calcType(function, expressions, new CalculationOptions(false));
+                this.calc(function, expressions, new CalculationOptions(false, false));
+                this.calcType(function, expressions, new CalculationOptions(true, false));
+                this.calcType(function, expressions, new CalculationOptions(false, false));
+                this.calc(function, expressions, new CalculationOptions(false, true));
                 //
                 if (function.ret == Type.UNKNOWN) {
                     function.ret = Type.VOID;
@@ -48,6 +48,10 @@ public class Precompiler {
         return this.context;
     }
 
+    /**
+     * Сборка аргументов в переменные
+     * @param function Функция
+     */
     protected void buildArguments(AstFunction function) {
         var j = 0;
         //
@@ -80,8 +84,8 @@ public class Precompiler {
      * @param function Функция
      * @param expressions Выражения
      */
-    protected void calc(AstFunction function, List<AstExpression> expressions) {
-        expressions.forEach(it -> it.calc(context, function));
+    protected void calc(AstFunction function, List<AstExpression> expressions, CalculationOptions options) {
+        expressions.forEach(it -> it.calc(context, function, options));
     }
 
     /**
@@ -114,6 +118,14 @@ public class Precompiler {
         assert function.expressions != null;
         function.expressions.forEach(it -> it.iterate(list::add, AstEmptyExpression.INSTANCE));
         return list;
+    }
+
+    public static AstExpression cast(AstContext context, AstFunction function, AstExpression parent, AstExpression expression, Type type) {
+        if(expression.getType(context, function) == type)
+            return expression;
+        var expr = new AstCast(expression, type);
+        expr.parent = parent;
+        return expr;
     }
 
     /**

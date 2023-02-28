@@ -2,7 +2,7 @@ package ru.DmN.llml.parser.ast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.DmN.llml.parser.utils.CalculationOptions;
+import ru.DmN.llml.precompiler.CalculationOptions;
 import ru.DmN.llml.utils.Type;
 
 import java.util.function.Consumer;
@@ -46,8 +46,10 @@ public class AstVariableSet extends AstExpression {
     }
 
     @Override
-    public void calc(AstContext context, AstFunction function) {
-        this.variable = context.variable(function, this.name);
+    public void calc(AstContext context, AstFunction function, CalculationOptions options) {
+        if (!options.tc) {
+            this.variable = context.variable(function, this.name);
+        }
     }
 
     @Override
