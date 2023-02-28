@@ -109,7 +109,7 @@ public class Compiler {
             this.write(tmp).append(" = ").append(of$int ? (to$int ? (of.bits > to.bits ? "trunc" : "sext") : "sitofp") : (to$int ? "fptosi" : (of.bits > to.bits ? "fptrunc" : "fpext"))).append(' ').append(val.getType(this.context, function).name).append(' ');
             this.write(val).append(" to ").append(to);
             return new AstValue(tmp);
-        } else if (expression instanceof AstConstant constant) { // todo:
+        } else if (expression instanceof AstConstant constant) { // todo: normal double
             var type = constant.getType(context, function);
             if (type.fieldName().startsWith("I")) {
                 return new AstValue(constant);
