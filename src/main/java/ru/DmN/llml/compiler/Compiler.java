@@ -2,6 +2,7 @@ package ru.DmN.llml.compiler;
 
 import org.jetbrains.annotations.NotNull;
 import ru.DmN.llml.parser.ast.*;
+import ru.DmN.llml.utils.NotRealizedException;
 import ru.DmN.llml.utils.Type;
 
 public class Compiler {
@@ -78,7 +79,7 @@ public class Compiler {
         if (expression instanceof AstActions actions) {
             actions.actions.forEach(it -> this.write(function, it));
         } else if (expression instanceof AstAnnotation annotation) {
-            throw new RuntimeException("TODO:");
+            throw new NotRealizedException();
         } else if (expression instanceof AstArgument argument) {
             return new AstValue(argument);
         } else if (expression instanceof AstCall call) {
@@ -151,6 +152,7 @@ public class Compiler {
                     this.write(val$a).append(", true");
                     return new AstValue(tmp$0);
                 }
+                default -> throw new NotRealizedException();
             }
         } else if (expression instanceof AstMath2Arg math) {
             var var$a = this.write(function, math.a);
@@ -162,6 +164,7 @@ public class Compiler {
             this.write(tmp).append(" = ");
             switch (math.operation) {
                 case EQ, NOT_EQ, GREAT, GREAT_EQ, LESS, LESS_EQ  -> out.append(result$int ? 'i' : 'f').append("cmp ");
+                default -> throw new NotRealizedException();
             }
             out.append(result$int ? math.operation.iir : math.operation.fir).append(' ').append(math.rettype.name).append(' ');
             this.write(var$a);
@@ -200,7 +203,7 @@ public class Compiler {
             this.write(function, while_.actions);
             this.write(function, new AstJump(new AstLabelReference(name$check)));
             this.write(function, new AstLabel(name$exit, true));
-        }
+        } else throw new NotRealizedException();
 
         return null;
     }
