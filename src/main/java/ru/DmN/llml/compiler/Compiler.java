@@ -134,7 +134,7 @@ public class Compiler {
                 out.append(", label %").append(if_.b.name);
             }
         } else if (expression instanceof AstJump jump) {
-            out$nl("br label %").append(jump.block.name);
+            out$nl("br label %").append(jump.label.name);
         } else if (expression instanceof AstLabel label) {
             this.write(function, new AstJump(new AstLabelReference(label.name)));
             out.append('\n').append(label.name).append(':');
