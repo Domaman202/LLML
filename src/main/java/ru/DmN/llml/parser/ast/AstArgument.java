@@ -18,6 +18,9 @@ public class AstArgument extends AstAbstractVariable {
      */
     public @Nullable String name;
 
+    /**
+     * @param name Название аргумента
+     */
     public AstArgument(@Nullable String name) {
         this.name = name;
     }

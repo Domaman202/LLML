@@ -4,11 +4,20 @@ import org.jetbrains.annotations.NotNull;
 
 import static ru.DmN.llml.parser.utils.Utils.offset;
 
+/**
+ * Безусловный переход
+ */
 public class AstJump extends AstExpression {
-    public final @NotNull AstNamedActionsReference block;
+    /**
+     * Ссылка на метку
+     */
+    public final @NotNull AstLabelReference label;
 
-    public AstJump(@NotNull AstNamedActionsReference block) {
-        this.block = block;
+    /**
+     * @param label Ссылка на метку
+     */
+    public AstJump(@NotNull AstLabelReference label) {
+        this.label = label;
     }
 
     @Override

@@ -136,7 +136,7 @@ public class Compiler {
         } else if (expression instanceof AstJump jump) {
             out$nl("br label %").append(jump.block.name);
         } else if (expression instanceof AstLabel label) {
-            this.write(function, new AstJump(new AstNamedActionsReference(label.name)));
+            this.write(function, new AstJump(new AstLabelReference(label.name)));
             out.append('\n').append(label.name).append(':');
             if (label.itc) {
                 function.tmpVarCount++;
@@ -195,10 +195,10 @@ public class Compiler {
             var name$loop = ".w" + i + ".l";
             var name$exit = ".w" + i + ".e";
             this.write(function, new AstLabel(name$check, false));
-            this.write(function, new AstIf(while_.value, new AstNamedActionsReference(name$loop), new AstNamedActionsReference(name$exit)));
+            this.write(function, new AstIf(while_.value, new AstLabelReference(name$loop), new AstLabelReference(name$exit)));
             this.write(function, new AstLabel(name$loop, true));
             this.write(function, while_.actions);
-            this.write(function, new AstJump(new AstNamedActionsReference(name$check)));
+            this.write(function, new AstJump(new AstLabelReference(name$check)));
             this.write(function, new AstLabel(name$exit, true));
         }
 

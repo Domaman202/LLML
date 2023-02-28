@@ -6,11 +6,28 @@ import java.util.function.Consumer;
 
 import static ru.DmN.llml.parser.utils.Utils.offset;
 
+/**
+ * Цикл
+ */
 public class AstWhile extends AstExpression {
+    /**
+     * Условие
+     */
     public final AstExpression value;
+    /**
+     * Действия
+     */
     public final AstActions actions;
+    /**
+     * Id
+     */
     public final int id;
 
+    /**
+     * @param value Условие
+     * @param actions Дейвствия
+     * @param id Id
+     */
     public AstWhile(AstExpression value, AstActions actions, int id) {
         this.value = value;
         this.actions = actions;

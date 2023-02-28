@@ -75,10 +75,21 @@ public class Precompiler {
         function.tmpVarCount = j;
     }
 
+    /**
+     * Вычисление выражений
+     * @param function Функция
+     * @param expressions Выражения
+     */
     protected void calc(AstFunction function, List<AstExpression> expressions) {
         expressions.forEach(it -> it.calc(context, function));
     }
 
+    /**
+     * Вычисление типов выражений
+     * @param function Функция
+     * @param expressions Выражения
+     * @param options Опции
+     */
     protected void calcType(AstFunction function, List<AstExpression> expressions, CalculationOptions options) {
         var cycle = true;
         while (cycle) {
@@ -93,6 +104,11 @@ public class Precompiler {
         }
     }
 
+    /**
+     * Получение всех выражений функции
+     * @param function Функция
+     * @return Все выражения функции
+     */
     protected static List<AstExpression> getAllExpressions(AstFunction function) {
         var list = new ArrayList<AstExpression>();
         assert function.expressions != null;

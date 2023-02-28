@@ -14,10 +14,17 @@ public abstract class AstAbstractVariable extends AstExpression {
      */
     public @NotNull Type type;
 
+    /**
+     * Констуктор переменной с неизвестным типом
+     */
     public AstAbstractVariable() {
         this.type = Type.UNKNOWN;
     }
 
+    /**
+     * Конструктор переменной с известным типом
+     * @param type Тип
+     */
     public AstAbstractVariable(@NotNull Type type) {
         this.type = type;
     }

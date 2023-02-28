@@ -17,6 +17,9 @@ public class AstConstant extends AstExpression {
      * Значение
      */
     public @Nullable Object value;
+    /**
+     * Тип константы
+     */
     public @NotNull Type type;
 
     /**
@@ -47,7 +50,12 @@ public class AstConstant extends AstExpression {
         }
     }
 
-    public Type cast(Type type) {
+    /**
+     * Меняет тип константы
+     *
+     * @param type Новый тип константы
+     */
+    public void cast(Type type) {
         if (type.fieldName().startsWith("I")) {
             if (value instanceof Double d) {
                 value = (int) (double) d;
@@ -57,7 +65,7 @@ public class AstConstant extends AstExpression {
                 value = (double) (int) i;
             }
         }
-        return this.type = type;
+        this.type = type;
     }
 
     @Override

@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import static ru.DmN.llml.parser.utils.Utils.offset;
 
 /**
- * Ссылка на блок наименованых действий
+ * Ссылка на метку
  */
-public class AstNamedActionsReference extends AstExpression {
+public class AstLabelReference extends AstExpression {
     /**
      * Название
      */
@@ -17,7 +17,7 @@ public class AstNamedActionsReference extends AstExpression {
      *
      * @param name Название
      */
-    public AstNamedActionsReference(@NotNull String name) {
+    public AstLabelReference(@NotNull String name) {
         this.name = name;
     }
 

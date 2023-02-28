@@ -7,26 +7,29 @@ import java.util.function.Consumer;
 
 import static ru.DmN.llml.parser.utils.Utils.offset;
 
+/**
+ * Условный переход
+ */
 public class AstIf extends AstExpression {
     /**
      * Условие
      */
     public @NotNull AstExpression value;
     /**
-     * Ссылка на блок (if)
+     * Ссылка на метку (if)
      */
-    public final @NotNull AstNamedActionsReference a;
+    public final @NotNull AstLabelReference a;
     /**
-     * Ссылка на блок (else)
+     * Ссылка на метку (else)
      */
-    public final @Nullable AstNamedActionsReference b;
+    public final @Nullable AstLabelReference b;
 
     /**
      * @param value Условие
      * @param a     if
      * @param b     else
      */
-    public AstIf(@NotNull AstExpression value, @NotNull AstNamedActionsReference a, @Nullable AstNamedActionsReference b) {
+    public AstIf(@NotNull AstExpression value, @NotNull AstLabelReference a, @Nullable AstLabelReference b) {
         this.value = value;
         this.a = a;
         this.b = b;

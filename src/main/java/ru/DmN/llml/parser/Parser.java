@@ -253,11 +253,11 @@ public class Parser {
                 //
                 return new AstCall(fun, arguments);
             }
-            case "jmp" -> result = new AstJump(new AstNamedActionsReference(this.next(Token.Type.NAMING).str));
+            case "jmp" -> result = new AstJump(new AstLabelReference(this.next(Token.Type.NAMING).str));
             case "if" -> {
                 var value = this.parseExpression(function, Integer.MAX_VALUE, true); // todo: end of expression
-                var a = new AstNamedActionsReference(this.next(Token.Type.NAMING).str);
-                var b = new AstNamedActionsReference(this.next(Token.Type.NAMING).str);
+                var a = new AstLabelReference(this.next(Token.Type.NAMING).str);
+                var b = new AstLabelReference(this.next(Token.Type.NAMING).str);
                 result = new AstIf(value, a, b);
             }
             case "label" -> {

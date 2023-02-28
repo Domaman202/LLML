@@ -5,6 +5,9 @@ import ru.DmN.llml.utils.Type;
 
 import static ru.DmN.llml.parser.utils.Utils.offset;
 
+/**
+ * Пустое выражение
+ */
 public final class AstEmptyExpression extends AstExpression {
     public static final AstEmptyExpression INSTANCE = new AstEmptyExpression();
 
