@@ -1,5 +1,12 @@
 target triple = "x86_64-pc-linux-gnu"
 
+define noundef float @f(i8 noundef %i0) #0 {
+	%1 = sext i8 %i0 to i64
+	%i1 = bitcast i64 %1 to i64
+	%2 = sitofp i64 %i1 to float
+	ret float %2
+}
+
 define noundef i64 @iu(i8 noundef %i) #0 {
 	%1 = sext i8 %i to i64
 	ret i64 %1

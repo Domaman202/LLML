@@ -253,6 +253,11 @@ public class Parser {
                 //
                 return new AstCall(fun, arguments);
             }
+            case "cast" -> {
+                var type = Type.valueOf(this.next(Token.Type.TYPE).str.toUpperCase());
+                var value = this.parseExpression(function, Integer.MAX_VALUE, true);
+                result = new AstCast(value, type); // todo: end of expression
+            }
             case "jmp" -> result = new AstJump(new AstLabelReference(this.next(Token.Type.NAMING).str));
             case "if" -> {
                 var value = this.parseExpression(function, Integer.MAX_VALUE, true); // todo: end of expression
@@ -312,7 +317,7 @@ public class Parser {
      */
     protected @NotNull AstExpression parseExpression(@NotNull AstFunction function, int endptr, boolean single) {
         if (this.lexer.ptr <= endptr) {
-            var token = this.next();
+            var token = this.next(Token.Type.NUMBER, Token.Type.NAMING, Token.Type.OPERATION, Token.Type.ANNOTATION, Token.Type.OPEN_BRACKET);
             switch (token.type) {
                 case NUMBER -> {
                     return new AstConstant(token.str.contains(".") ? (Object) Double.parseDouble(token.str) : (Object) Integer.parseInt(token.str));
@@ -357,7 +362,6 @@ public class Parser {
                         }
                     }
                 }
-                default -> throw InvalidTokenException.create(this.lexer.src, token);
             }
         }
         throw new RuntimeException("Jepa");
@@ -382,8 +386,6 @@ public class Parser {
      */
     protected Token next(@NotNull Token.Type... type) {
         var types = Arrays.stream(type).collect(Collectors.toList());
-        if (types.contains(Token.Type.NAMING))
-            types.add(Token.Type.TYPE);
         var token = this.lexer.next();
         if (token.type == Token.Type.NL) {
             if (types.contains(Token.Type.NL)) {
@@ -392,6 +394,8 @@ public class Parser {
                 token = this.next();
             }
         }
+        if (types.contains(Token.Type.NAMING) && token.type == Token.Type.TYPE)
+            token = new Token(token.str, Token.Type.NAMING, token.line, token.symbol);
         return this.check(token, types);
     }
 
