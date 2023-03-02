@@ -57,7 +57,7 @@ public class Parser {
                             if (token.str.equals("ext")) {
                                 value = null;
                             } else throw InvalidTokenException.create(this.lexer.src, token);
-                        } else value = new AstConstant((Object) token.str);
+                        } else value = new AstConstant(token.str);
                     } else this.lexer.ptr--;
                     this.context.variables.add(new AstVariable(name, type, value == null, value));
                 } else {
@@ -320,7 +320,7 @@ public class Parser {
             var token = this.next(Token.Type.NUMBER, Token.Type.NAMING, Token.Type.OPERATION, Token.Type.ANNOTATION, Token.Type.OPEN_BRACKET);
             switch (token.type) {
                 case NUMBER -> {
-                    return new AstConstant(token.str.contains(".") ? (Object) Double.parseDouble(token.str) : (Object) Integer.parseInt(token.str));
+                    return new AstConstant(token.str);
                 }
                 case NAMING -> {
                     return new AstVariableGet(token.str);

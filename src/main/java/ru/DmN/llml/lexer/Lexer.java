@@ -145,7 +145,7 @@ public class Lexer {
                             }
                         }
                     }
-                    case '+', '/', '*', '&', '!' -> {
+                    case '+', '*', '&', '!' -> {
                         delete(1);
                         return new Token(String.valueOf(c), Token.Type.OPERATION, line, symbol);
                     }
@@ -156,6 +156,17 @@ public class Lexer {
                             delete(1);
                         }
                         return new Token(token, Token.Type.OPERATION, line, delete(1));
+                    }
+                    case '/' -> {
+                        if (str.charAt(1) == '/') {
+                            while (str.charAt(0) != '\n')
+                                delete(1);
+                            delete(1);
+                            return parseToken();
+                        } else {
+                            delete(1);
+                            return new Token(String.valueOf(c), Token.Type.OPERATION, line, symbol);
+                        }
                     }
                     default -> {
                         delete(1);

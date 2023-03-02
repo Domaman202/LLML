@@ -1,27 +1,35 @@
-abs(i): i32 = {
-    @if((>= i 0) a b)
-    @label(a) = {[i]}
-    @label(b) = {[- 0 i]}
+// Functions "abs"
+
+abs(v): i32 = {
+    @if((>= v 0) a b)
+    @label(a) = {[v]}
+    @label(b) = {[- 0 v]}
 }
 
-labs(i): i64 = {
-    @if((>= i 0) a b)
-    @label(a) = {[i]}
-    @label(b) = {[- 0 i]}
+labs(v): i64 = {
+    @if((>= v 0) a b)
+    @label(a) = {[v]}
+    @label(b) = {[- 0 v]}
 }
 
-fabs(f): f32 = {
-    @if((>= f 0.) a b)
-    @label(a) = {[f]}
-    @label(b) = {[- 0. f]}
+fabs(v): f32 = {
+    @if((>= v 0.) a b)
+    @label(a) = {[v]}
+    @label(b) = {[- 0. v]}
 }
 
-fabsl(f): f64 = {
-    @if((>= f 0.) a b)
-    @label(a) = {[f]}
-    @label(b) = {[- 0. f]}
+fabsl(v): f64 = {
+    @if((>= v 0.) a b)
+    @label(a) = {[v]}
+    @label(b) = {[- 0. v]}
 }
 
-acos(x: f64): f64 = {
-    [(+ (* (- (* (* -0.69813170079 x) x) 0.87266462599) x) 1.5707963267)]
+// Functions "acos"
+
+acosf(v: f32): f32 = {
+    [+ (* (- (* (* -0.69813170079 v) v) 0.87266462599) v) 1.5707963267]
+}
+
+acos(v: f64): f64 = {
+    [+ (* (- (* (* -0.69813170079 v) v) 0.87266462599) v) 1.5707963267]
 }

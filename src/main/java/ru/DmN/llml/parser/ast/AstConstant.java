@@ -20,33 +20,55 @@ public class AstConstant extends AstExpression {
     /**
      * Тип константы
      */
-    public @NotNull Type type;
+    public @NotNull Type type = Type.UNKNOWN;
 
     /**
      * @param value Значение
      */
     public AstConstant(@Nullable Object value) {
         if (value instanceof String str) {
-            var tmp = str.toUpperCase();
-            if (tmp.equals("TRUE")) {
-                this.value = true;
-                this.type = Type.I1;
-            } else if (tmp.equals("FALSE")) {
-                this.value = false;
-                this.type = Type.I1;
-            } else {
-                // todo: regex num check
-                if (str.contains(".")) {
-                    this.value = Double.parseDouble(str);
+            this.parse(str);
+        } else this.value = value;
+    }
+
+    /**
+     * @param value Значение
+     */
+    public AstConstant(@NotNull String value) {
+        this.parse(value);
+    }
+
+    protected void parse(@NotNull String value) {
+        var tmp = value.toUpperCase();
+        if (tmp.equals("TRUE")) {
+            this.value = true;
+            this.type = Type.I1;
+        } else if (tmp.equals("FALSE")) {
+            this.value = false;
+            this.type = Type.I1;
+        } else {
+            // todo: regex num check
+            if (value.contains(".")) {
+                var d = Double.parseDouble(value);
+                var left = (long) d;
+                var right = Long.parseLong(value.substring(value.indexOf('.') + 1) + '0');
+                if (left >= Integer.MIN_VALUE && left <= Integer.MAX_VALUE && right >= Integer.MIN_VALUE && right <= Integer.MAX_VALUE) {
+                    this.value = (float) d;
                     this.type = Type.F32;
                 } else {
-                    this.value = Integer.parseInt(str);
+                    this.value = d;
+                    this.type = Type.F64;
+                }
+            } else {
+                var i = Long.parseLong(value);
+                if (i >= Integer.MIN_VALUE && i <= Integer.MAX_VALUE) {
+                    this.value = (int) i;
                     this.type = Type.I32;
+                } else {
+                    this.value = i;
+                    this.type = Type.I64;
                 }
             }
-        } else {
-            this.value = value;
-            this.type = Type.UNKNOWN;
         }
     }
 
