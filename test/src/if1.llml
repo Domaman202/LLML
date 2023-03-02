@@ -1,5 +1,5 @@
 f(i: i32): i32 = {
-    @if(< i 5 ret5 retI)
+    @if((< i 5) ret5 retI)
     @label(ret5) = { [5] }
     @label(retI) = { [i] }
 }

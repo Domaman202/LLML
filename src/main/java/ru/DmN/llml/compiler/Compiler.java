@@ -130,10 +130,7 @@ public class Compiler {
         } else if (expression instanceof AstIf if_) {
             var var$a = this.write(function, if_.value);
             out$nl("br i1 ");
-            this.write(var$a).append(", label %").append(if_.a.name);
-            if (if_.b != null) {
-                out.append(", label %").append(if_.b.name);
-            }
+            this.write(var$a).append(", label %").append(if_.a.name).append(", label %").append(if_.b.name);
         } else if (expression instanceof AstJump jump) {
             out$nl("br label %").append(jump.label.name);
         } else if (expression instanceof AstLabel label) {

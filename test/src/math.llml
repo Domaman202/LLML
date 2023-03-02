@@ -1,24 +1,24 @@
 // Functions "abs"
 
-abs(v): i32 = {
+abs(v: i32): i32 = {
     @if((>= v 0) a b)
     @label(a) = {[v]}
     @label(b) = {[- 0 v]}
 }
 
-labs(v): i64 = {
+labs(v: i64): i64 = {
     @if((>= v 0) a b)
     @label(a) = {[v]}
     @label(b) = {[- 0 v]}
 }
 
-fabs(v): f32 = {
+fabs(v: f32): f32 = {
     @if((>= v 0.) a b)
     @label(a) = {[v]}
     @label(b) = {[- 0. v]}
 }
 
-fabsl(v): f64 = {
+fabsl(v: f64): f64 = {
     @if((>= v 0.) a b)
     @label(a) = {[v]}
     @label(b) = {[- 0. v]}
@@ -32,4 +32,42 @@ acosf(v: f32): f32 = {
 
 acos(v: f64): f64 = {
     [+ (* (- (* (* -0.69813170079 v) v) 0.87266462599) v) 1.5707963267]
+}
+
+// Functions "pow"
+
+powi(v: i32, d: i32): i32 = {
+    @if((= d 0) a b)
+    @label(a) = {[1]}
+    @label(b) = {
+        [@call(powi v (/ d 2))) -> (tmp]
+        [* tmp tmp) -> (tmp]
+        @if((= (% d 2) 0) c e)
+        @label(c) = {[tmp]}
+        @label(e) = {[* v tmp]}
+    }
+}
+
+powf(v: f32, d: i32): f32 = {
+    @if((= d 0.) a b)
+    @label(a) = {[1]}
+    @label(b) = {
+        [@call(powf v (/ d 2))) -> (tmp]
+        [* tmp tmp) -> (tmp]
+        @if((= (% d 2.) 0.) c e)
+        @label(c) = {[tmp]}
+        @label(e) = {[* v tmp]}
+    }
+}
+
+pow(v: f64, d: i32): f64 = {
+    @if((= d 0.) a b)
+    @label(a) = {[1]}
+    @label(b) = {
+        [@call(pow v (/ d 2))) -> (tmp]
+        [* tmp tmp) -> (tmp]
+        @if((= (% d 2.) 0.) c e)
+        @label(c) = {[tmp]}
+        @label(e) = {[* v tmp]}
+    }
 }

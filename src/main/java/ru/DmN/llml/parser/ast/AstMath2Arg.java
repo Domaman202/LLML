@@ -92,6 +92,7 @@ public class AstMath2Arg extends AstExpression {
         SUB("-", "sub", "fsub", false),
         MUL("*", "mul", "fmul", false),
         DIV("/", "sdiv", "fdiv", false),
+        REM("%", "srem", "frem", false),
         AND("&", "and", "and", false),
         OR("|", "or", "or", false),
         EQ("=", "eq", "oeq", true),

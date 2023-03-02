@@ -22,14 +22,14 @@ public class AstIf extends AstExpression {
     /**
      * Ссылка на метку (else)
      */
-    public final @Nullable AstLabelReference b;
+    public final @NotNull AstLabelReference b;
 
     /**
      * @param value Условие
      * @param a     if
      * @param b     else
      */
-    public AstIf(@NotNull AstExpression value, @NotNull AstLabelReference a, @Nullable AstLabelReference b) {
+    public AstIf(@NotNull AstExpression value, @NotNull AstLabelReference a, @NotNull AstLabelReference b) {
         this.value = value;
         this.a = a;
         this.b = b;

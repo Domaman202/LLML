@@ -169,7 +169,7 @@ public class Parser {
                     if (tmp == 1) {
                         end = this.lexer.ptr - 1;
                         this.lexer.ptr = start;
-                        var actions = this.parseActions(function, end);
+                        var actions = this.parseActions(function, end, false);
                         this.lexer.ptr = end + 1;
                         token = this.lexer.next();
                         if (token.type == Token.Type.PTR) {
@@ -243,7 +243,7 @@ public class Parser {
                             if (tmp == 0) {
                                 end = this.lexer.ptr - 1;
                                 this.lexer.ptr = start;
-                                arguments = this.parseActions(function, end).actions;
+                                arguments = this.parseActions(function, end, true).actions;
                                 this.lexer.ptr = end + 1;
                                 break cycle;
                             } else tmp--;
@@ -283,7 +283,7 @@ public class Parser {
                 var actions = this.parseBody(function);
                 return new AstWhile(value, actions, function.whilesCount++);
             }
-            default -> throw InvalidTokenException.create(lexer.src, token);
+            default -> throw InvalidTokenException.create(this.lexer.src, token);
         }
         this.next(Token.Type.CLOSE_BRACKET);
         return result;
@@ -295,13 +295,13 @@ public class Parser {
      * @param endptr Указатель конца действий
      * @return Действия
      */
-    protected @NotNull AstActions parseActions(@NotNull AstFunction function, int endptr) {
+    protected @NotNull AstActions parseActions(@NotNull AstFunction function, int endptr, boolean single) {
         var actions = new ArrayList<AstExpression>();
         while (true) {
             this.next();
             if (this.lexer.ptr <= endptr) {
                 this.lexer.ptr--;
-                actions.add(this.parseExpression(function, endptr, false));
+                actions.add(this.parseExpression(function, endptr, single));
             } else {
                 break;
             }
@@ -317,7 +317,7 @@ public class Parser {
      */
     protected @NotNull AstExpression parseExpression(@NotNull AstFunction function, int endptr, boolean single) {
         if (this.lexer.ptr <= endptr) {
-            var token = this.next(Token.Type.NUMBER, Token.Type.NAMING, Token.Type.OPERATION, Token.Type.ANNOTATION, Token.Type.OPEN_BRACKET);
+            var token = this.next(Token.Type.NUMBER, Token.Type.NAMING, Token.Type.OPERATION, Token.Type.ASSIGN, Token.Type.ANNOTATION, Token.Type.OPEN_BRACKET);
             switch (token.type) {
                 case NUMBER -> {
                     return new AstConstant(token.str);
@@ -325,12 +325,12 @@ public class Parser {
                 case NAMING -> {
                     return new AstVariableGet(token.str);
                 }
-                case OPERATION -> {
+                case OPERATION, ASSIGN -> {
                     switch (token.str) {
                         case "!" -> {
                             return new AstMath1Arg(AstMath1Arg.Operation.of(token.str), this.parseExpression(function, endptr, single));
                         }
-                        case "+", "-", "*", "/", "&", "|", "=", "!=", ">", ">=", "<", "<=" -> {
+                        case "+", "-", "*", "/", "%", "&", "|", "=", "!=", ">", ">=", "<", "<=" -> {
                             return new AstMath2Arg(AstMath2Arg.Operation.of(token.str), this.parseExpression(function, endptr, single), this.parseExpression(function, endptr, single));
                         }
                         default -> throw InvalidTokenException.create(this.lexer.src, token);
@@ -354,7 +354,7 @@ public class Parser {
                                 if (tmp == 0) {
                                     end = this.lexer.ptr - 1;
                                     this.lexer.ptr = start;
-                                    var expression = single ? this.parseExpression(function, end, true) : this.parseActions(function, end);
+                                    var expression = single ? this.parseExpression(function, end, true) : this.parseActions(function, end, false);
                                     this.lexer.ptr = end + 1;
                                     return expression;
                                 } else tmp--;

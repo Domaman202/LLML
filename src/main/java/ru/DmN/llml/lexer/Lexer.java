@@ -145,7 +145,7 @@ public class Lexer {
                             }
                         }
                     }
-                    case '+', '*', '&', '!' -> {
+                    case '+', '*', '%', '&', '!' -> {
                         delete(1);
                         return new Token(String.valueOf(c), Token.Type.OPERATION, line, symbol);
                     }
